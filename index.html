@@ -1,0 +1,2471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="NRA 2026">
+<title>Harbor NRA 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #1B5EA6;
+    --blue-dark: #144780;
+    --blue-light: rgba(59,122,196,0.18);
+    --blue-mid: #3B7AC4;
+    --green: #4BAD4A;
+    --green-dark: #368035;
+    --green-deep: #0F1410;
+    --green-light: rgba(75,173,74,0.12);
+    --amber: #D4A017;
+    --amber-light: rgba(212,160,23,0.12);
+    --white: #FFFFFF;
+    --off-white: #111214;
+    --surface: #191C1F;
+    --surface-raised: #21252A;
+    --border: rgba(255,255,255,0.07);
+    --border-strong: rgba(255,255,255,0.14);
+    --text-primary: #F2F4F8;
+    --text-secondary: #B0BCC8;
+    --text-hint: #6E7F90;
+    --shadow-sm: 0 1px 4px rgba(0,0,0,0.4);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --font: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'DM Mono', monospace;
+    --tab-h: 60px;
+    --header-h: 130px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    font-family: var(--font);
+    background: var(--off-white);
+    color: var(--text-primary);
+    height: 100%;
+    overscroll-behavior: none;
+  }
+
+  .app {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: var(--off-white);
+  }
+
+  /* Dark mode scrollbar */
+  ::-webkit-scrollbar { width: 0; height: 0; }
+
+
+  /* HEADER - three layer stack */
+  .header-stack {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  /* Layer 1: Logo bar - matches background */
+  .header-logo-bar {
+    background: var(--off-white);
+    padding: 16px 24px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-logo {
+    height: 44px;
+    width: auto;
+    max-width: 80%;
+    object-fit: contain;
+  }
+
+  /* Layer 2: Identity bar - blue border */
+  .header-identity-bar {
+    background: transparent;
+    border: 1.5px solid var(--blue);
+    border-radius: var(--radius-md);
+    margin: 8px 16px;
+    padding: 0 16px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+  }
+  .header-identity-bar:active { background: var(--blue-light); }
+  .header-identity-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+  .header-identity-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+    flex: 1;
+  }
+  .header-identity-arrow {
+    font-size: 10px;
+    color: var(--text-secondary);
+    transition: transform 0.15s;
+    flex-shrink: 0;
+  }
+  .header-identity-bar.open .header-identity-arrow { transform: rotate(180deg); }
+
+  /* Identity dropdown panel */
+  .identity-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--surface-raised);
+    border: 1.5px solid var(--green);
+    border-top: none;
+    z-index: 500;
+    max-height: 320px;
+    overflow-y: auto;
+    box-shadow: var(--shadow-md);
+  }
+  .identity-dropdown.open { display: block; }
+  .identity-dropdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  .identity-dropdown-item:last-child { border-bottom: none; }
+  .identity-dropdown-item:active { background: var(--surface); }
+  .identity-dropdown-item.selected { background: rgba(75,173,74,0.08); }
+  .identity-dropdown-item-name { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+  .identity-dropdown-item-tags { font-size: 10px; color: var(--text-hint); }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.85); }
+  }
+
+  /* TAB BAR - Layer 3 */
+  .tab-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+  }
+  .tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 4px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.18s ease;
+  }
+  .tab.active { border-bottom-color: var(--blue); }
+  .tab-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-hint);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .tab.active .tab-label { color: var(--blue); }
+
+  /* SCREENS */
+  .screen { display: none; padding-bottom: 2rem; animation: fadeIn 0.2s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* SECTION HEADER */
+  .section-head {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-hint);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 16px 16px 6px;
+  }
+
+  /* AGENDA SCREEN */
+  .links-grid {
+    background: #0D0F11;
+    padding: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .link-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: calc(33.333% - 6px);
+    padding: 12px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 4px;
+    text-decoration: none;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    line-height: 1.3;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .link-chip:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.25); }
+
+  .trip-note {
+    background: var(--surface-raised);
+    border-left: 3px solid var(--green);
+    margin: 12px 16px;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .day-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    margin: 10px 16px 0;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  .day-header {
+    padding: 12px 14px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+  }
+  .day-header:active { background: var(--surface-raised); }
+  .day-title-block {}
+  .day-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+  .day-date { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+  .day-icon {
+    width: 32px; height: 32px;
+    border-radius: var(--radius-sm);
+    background: var(--green-light);
+    border: 1px solid rgba(75,173,74,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--green);
+    font-family: var(--font-mono);
+    flex-shrink: 0;
+  }
+  .day-body { display: none; border-top: 1px solid var(--border); }
+  .day-body.open { display: block; }
+  .event {
+    display: flex;
+    gap: 10px;
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .event:last-child { border-bottom: none; }
+  .event-time {
+    font-size: 11px;
+    color: var(--text-hint);
+    font-family: var(--font-mono);
+    min-width: 58px;
+    padding-top: 1px;
+  }
+  .event-desc { font-size: 13px; color: var(--text-primary); line-height: 1.45; }
+  .event-link { color: var(--blue-mid); text-decoration: none; border-bottom: 1px solid rgba(59,122,196,0.3); }
+  .event-link:hover { border-bottom-color: var(--blue-mid); }
+  .event-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .badge-show { background: var(--blue-light); color: var(--blue-mid); }
+  .badge-event { background: var(--green-light); color: var(--green); }
+
+  /* SCOUT LIST */
+  .person-select-wrap {
+    padding: 0 16px 8px;
+    position: relative;
+  }
+  .person-dropdown-trigger {
+    width: 100%;
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 36px 10px 12px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface-raised);
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+    transition: border-color 0.15s;
+    position: relative;
+  }
+  .person-dropdown-trigger.open { border-color: var(--green); border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+  .person-dropdown-trigger-text { flex: 1; }
+  .person-dropdown-arrow {
+    position: absolute;
+    right: 12px;
+    font-size: 10px;
+    color: var(--green);
+    transition: transform 0.15s;
+  }
+  .person-dropdown-trigger.open .person-dropdown-arrow { transform: rotate(180deg); }
+  .person-dropdown-list {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 16px;
+    right: 16px;
+    background: var(--surface-raised);
+    border: 1.5px solid var(--green);
+    border-top: none;
+    border-bottom-left-radius: var(--radius-sm);
+    border-bottom-right-radius: var(--radius-sm);
+    z-index: 200;
+    max-height: 260px;
+    overflow-y: auto;
+    box-shadow: var(--shadow-md);
+  }
+  .person-dropdown-list.open { display: block; }
+  .person-dropdown-item {
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--text-primary);
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .person-dropdown-item:last-child { border-bottom: none; }
+  .person-dropdown-item:active, .person-dropdown-item:hover { background: var(--surface); }
+  .person-dropdown-item.selected { color: var(--green); }
+  .person-dropdown-item-role { font-size: 11px; color: var(--text-hint); }
+
+  .hall-banner {
+    margin: 8px 16px;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-left: 3px solid var(--text-primary);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--text-primary);
+    font-weight: 500;
+    display: none;
+  }
+
+  .booth-item {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    background: var(--surface);
+    border: 1.5px solid var(--green);
+    border-radius: var(--radius-md);
+    margin: 0 16px 10px;
+    overflow: hidden;
+    box-shadow: 0 0 0 0 rgba(75,173,74,0);
+  }
+  .booth-item.reported { border-color: var(--amber); }
+
+  /* Scout discovery cards - blue border */
+  .scout-disc-card {
+    background: var(--surface);
+    border: 1.5px solid var(--blue-mid);
+    border-radius: var(--radius-md);
+    margin: 0 16px 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  .scout-disc-card.handled { border-color: var(--amber); }
+  .scout-disc-header {
+    padding: 10px 14px 8px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .scout-disc-who { display: flex; align-items: center; gap: 7px; }
+  .scout-disc-avatar {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .scout-disc-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .scout-disc-time { font-size: 11px; color: var(--text-hint); font-family: var(--font-mono); }
+  .scout-disc-body { padding: 10px 14px; }
+  .scout-disc-booth {
+    font-size: 13px; font-weight: 600;
+    color: var(--blue-mid);
+    margin-bottom: 5px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .scout-disc-note { font-size: 13px; color: var(--text-primary); line-height: 1.5; }
+
+  /* Attribution lines used on every exhibitor card */
+  .card-attrib {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    flex: 1;
+    min-width: 0;
+  }
+  .card-attrib-from {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3;
+  }
+  .card-attrib-for {
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.3;
+  }
+
+  /* Chevron toggle on expandable cards */
+  .card-chevron {
+    font-size: 10px;
+    color: var(--text-hint);
+    flex-shrink: 0;
+    margin-left: 8px;
+    transition: transform 0.15s;
+  }
+
+  /* Exhibitor detail block, shown on expand for any card with an exhibitor */
+  .exhibitor-details {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .exhibitor-details-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-hint);
+    margin-bottom: 4px;
+    margin-top: 10px;
+  }
+  .exhibitor-details-label:first-child { margin-top: 0; }
+  .exhibitor-details-text {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+  }
+  .exhibitor-chips { display: flex; gap: 4px; flex-wrap: wrap; }
+  .exhibitor-chip {
+    font-size: 10px;
+    padding: 3px 7px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.06);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+  .exhibitor-chip.featured {
+    background: var(--amber-light);
+    color: var(--amber);
+    border-color: rgba(212,160,23,0.35);
+  }
+  .exhibitor-chip.first-time {
+    background: var(--blue-light);
+    color: var(--blue-mid);
+    border-color: rgba(59,122,196,0.35);
+  }
+  .exhibitor-details-empty {
+    font-size: 11px;
+    color: var(--text-hint);
+    font-style: italic;
+  }
+
+  /* Body open state shared with discovery cards */
+  .scout-disc-body.collapsed { display: none; }
+  .disc-card-body.collapsed { display: none; }
+
+  .booth-item-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .booth-item-header:active { background: var(--surface-raised); }
+
+  .booth-item-body {
+    display: none;
+    padding: 0 16px 14px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .booth-item-body.open { display: block; }
+
+  .booth-item-body-note {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+  .booth-item-body-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-hint);
+    margin-bottom: 4px;
+    margin-top: 12px;
+  }
+  .booth-capture-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 12px 0 4px;
+  }
+  .booth-capture-input {
+    width: 100%;
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 8px 10px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface-raised);
+    color: var(--text-primary);
+    outline: none;
+    margin-bottom: 8px;
+    transition: border-color 0.15s;
+  }
+  .booth-capture-input:focus { border-color: var(--green); }
+  .booth-capture-textarea {
+    width: 100%;
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 8px 10px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface-raised);
+    color: var(--text-primary);
+    outline: none;
+    resize: none;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    transition: border-color 0.15s;
+  }
+  .booth-capture-textarea:focus { border-color: var(--green); }
+  .booth-submit-btn {
+    width: 100%;
+    padding: 9px;
+    background: var(--green);
+    color: var(--green-deep);
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: background 0.15s;
+  }
+  .booth-submit-btn:active { background: var(--green-dark); }
+  .booth-submitted-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--amber);
+    padding: 6px 0 2px;
+  }
+
+  .check-circle {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--border-strong);
+    flex-shrink: 0;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+    transition: all 0.15s;
+  }
+  .check-circle.done {
+    background: var(--green);
+    border-color: var(--green);
+  }
+  .check-circle.done::after {
+    content: '';
+    width: 9px; height: 9px;
+    background: var(--green-deep);
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+  }
+
+  .booth-info { flex: 1; min-width: 0; }
+  .booth-name { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+  .booth-meta { display: flex; align-items: center; gap: 6px; margin-top: 3px; flex-wrap: wrap; }
+  .booth-num { font-size: 11px; font-family: var(--font-mono); color: var(--text-hint); }
+  .hall-pill {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.03em;
+  }
+  .hall-S { background: var(--blue-light); color: var(--blue-mid); }
+  .hall-N { background: rgba(186,117,23,0.18); color: #D4941A; }
+  .hall-E { background: rgba(75,173,74,0.15); color: var(--green); }
+  .booth-reason { font-size: 12px; color: var(--text-secondary); margin-top: 3px; line-height: 1.4; }
+  .booth-assignees { display: flex; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
+  .assignee-tag {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: var(--surface-raised);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 24px;
+    color: var(--text-hint);
+  }
+  .empty-text { font-size: 13px; line-height: 1.5; }
+
+  /* ADD BOOTH FORM */
+  .add-form {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-top: 16px;
+    padding: 16px;
+  }
+  .form-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .form-input {
+    width: 100%;
+    font-family: var(--font);
+    font-size: 14px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface-raised);
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.15s;
+    margin-bottom: 10px;
+  }
+  .form-input:focus { border-color: var(--green); background: var(--surface); }
+  .lookup-result {
+    font-size: 12px;
+    color: var(--green);
+    background: var(--green-light);
+    border-radius: var(--radius-sm);
+    padding: 7px 10px;
+    margin-bottom: 10px;
+    display: none;
+    font-weight: 500;
+  }
+  .btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: var(--green);
+    color: var(--green-deep);
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    letter-spacing: 0.02em;
+  }
+  .btn-primary:active { background: var(--green-dark); transform: scale(0.98); }
+
+  /* DISCOVER SCREEN */
+  .discover-wrap {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 16px;
+  }
+  .who-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
+
+  .voice-btn {
+    width: 100%;
+    padding: 11px;
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--border-strong);
+    background: var(--surface-raised);
+    color: var(--text-secondary);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    transition: all 0.15s;
+  }
+  .voice-btn.recording {
+    background: rgba(226,75,74,0.12);
+    border-color: #E24B4A;
+    color: #E24B4A;
+    animation: recordPulse 1.2s infinite;
+  }
+  @keyframes recordPulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(226,75,74,0.2); }
+    50% { box-shadow: 0 0 0 6px rgba(226,75,74,0); }
+  }
+  .voice-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  .disc-textarea {
+    width: 100%;
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--off-white);
+    color: var(--text-primary);
+    outline: none;
+    resize: none;
+    margin-bottom: 10px;
+    line-height: 1.5;
+    transition: border-color 0.15s;
+  }
+  .disc-textarea:focus { border-color: var(--green); background: var(--surface); }
+  .disc-textarea { background: var(--surface-raised); }
+
+  .tag-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 6px; }
+
+  /* FEED SCREEN */
+  .disc-card {
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    margin: 10px 16px 0;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    animation: slideIn 0.2s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .disc-card-header {
+    padding: 10px 14px 8px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .disc-who { display: flex; align-items: center; gap: 7px; }
+  .disc-avatar {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 600;
+  }
+  .disc-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .disc-time { font-size: 11px; color: var(--text-hint); font-family: var(--font-mono); }
+  .disc-card-body { padding: 10px 14px; }
+  .disc-booth-line {
+    font-size: 13px; font-weight: 600;
+    color: var(--green);
+    margin-bottom: 5px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .disc-tagged { display: flex; gap: 4px; flex-wrap: wrap; }
+  .tagged-for {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--blue-light);
+    color: var(--blue-mid);
+    border: 1px solid rgba(59,122,196,0.25);
+  }
+  .tagged-for::before { content: '→ '; }
+
+  /* IDENTITY DROPDOWN */
+  .voice-field-wrap {
+    position: relative;
+    margin-bottom: 10px;
+  }
+  .voice-field-wrap input,
+  .voice-field-wrap textarea {
+    padding-right: 38px !important;
+    margin-bottom: 0 !important;
+  }
+  .voice-field-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-hint);
+    transition: color 0.15s;
+    user-select: none;
+    flex-shrink: 0;
+  }
+  .voice-field-wrap.is-textarea .voice-field-icon {
+    top: 10px;
+    transform: none;
+  }
+  .voice-field-icon:hover { color: var(--green); }
+  .voice-field-icon.recording { color: #E24B4A; animation: recordPulse 1.2s infinite; }
+  .voice-field-icon svg { width: 16px; height: 16px; fill: currentColor; }
+
+  /* Exhibitor search results */
+  .search-result {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    gap: 10px;
+  }
+  .search-result:last-child { border-bottom: none; }
+  .search-result:active { opacity: 0.7; }
+  .search-result-name { font-size: 13px; color: var(--text-primary); flex: 1; min-width: 0; }
+  .search-result-meta { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .search-result-booth { font-size: 11px; font-family: var(--font-mono); color: var(--text-hint); }
+  .search-hint { font-size: 12px; color: var(--text-hint); padding: 8px 0; text-align: center; }
+
+  /* Multi-photo capture and feed display */
+  .photos-thumbs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .photos-thumbs-grid:empty { margin-bottom: 0; }
+  .photo-thumb-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--surface-raised);
+  }
+  .photo-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    cursor: pointer;
+  }
+  .photo-thumb-x {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    border: none;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .photo-thumb-x:active { background: rgba(0,0,0,0.9); }
+  .photo-thumb-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--text-hint);
+  }
+  .feed-photo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    margin-top: 6px;
+    margin-bottom: 4px;
+  }
+  .feed-photo-thumb {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+    display: block;
+  }
+  /* Lightbox */
+  .photo-lightbox {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .photo-lightbox img {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 8px;
+  }
+  .photo-lightbox-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header-stack">
+    <div class="header-logo-bar">
+      <img src="assets/harbor-solutions-logo.png" alt="Harbor Solutions" class="header-logo" onerror="this.style.display='none';document.getElementById('header-fallback').style.display='block'">
+      <div id="header-fallback" style="display:none;color:white;font-size:18px;font-weight:700;letter-spacing:0.06em;">HARBOR SOLUTIONS</div>
+    </div>
+
+    <div class="header-identity-bar" id="header-identity" onclick="toggleIdentityDropdown()">
+      <span class="header-identity-label">Viewing as</span>
+      <span class="header-identity-name" id="header-identity-name">Select your name</span>
+      <span class="header-identity-arrow">&#9660;</span>
+      <div class="identity-dropdown" id="identity-dropdown"></div>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab active" onclick="showScreen('hunt')">
+        <div class="tab-label">Scout</div>
+      </div>
+      <div class="tab" onclick="showScreen('discover')">
+        <div class="tab-label">Discovery</div>
+      </div>
+      <div class="tab" onclick="showScreen('feed')">
+        <div class="tab-label">Feed</div>
+      </div>
+      <div class="tab" onclick="showScreen('agenda')">
+        <div class="tab-label">Agenda</div>
+      </div>
+      <div class="tab" id="admin-tab" onclick="showScreen('admin')" style="display:none;">
+        <div class="tab-label">Manage</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AGENDA -->
+  <div id="screen-agenda" class="screen">
+    <div class="section-head" style="background:#0D0F11;margin:0;padding:14px 12px 6px;">Useful Links</div>
+    <div class="links-grid">
+      <a class="link-chip" href="https://www.hilton.com/en/hotels/chiphhh-palmer-house/" target="_blank">Palmer House</a>
+      <a class="link-chip" href="https://www.nationalrestaurantshow.com/home/" target="_blank">NRA Show</a>
+      <a class="link-chip" href="https://www.transitchicago.com/" target="_blank">CTA Transit</a>
+      <a class="link-chip" href="https://www.mlb.com/cubs/ballpark" target="_blank">Wrigley Field</a>
+      <a class="link-chip" href="https://wendellaboats.com/" target="_blank">Arch. Tour</a>
+      <a class="link-chip" href="https://maps.apple.com/?address=3702+N+Broadway,+Chicago,+IL+60613" target="_blank">Panino's</a>
+    </div>
+    <div class="trip-note">Casual attire throughout. Show execution details on prep call.</div>
+
+    <div class="day-card">
+      <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-title-block">
+          <div class="day-title">Travel + Arrival</div>
+          <div class="day-date">Friday, May 15</div>
+        </div>
+        <div class="day-icon">15</div>
+      </div>
+      <div class="day-body">
+        <div class="event"><div class="event-time">8:10a</div><div class="event-desc">Depart <a class="event-link" href="https://www.portseattle.org/sea-tac" target="_blank">SeaTac</a></div></div>
+        <div class="event"><div class="event-time">2:32p</div><div class="event-desc">Arrive <a class="event-link" href="https://www.flychicago.com/ohare/home/pages/default.aspx" target="_blank">O'Hare</a> — <a class="event-link" href="https://www.transitchicago.com/" target="_blank">CTA Blue Line</a> to Monroe/Dearborn</div></div>
+        <div class="event"><div class="event-time">Hotel</div><div class="event-desc"><a class="event-link" href="https://www.hilton.com/en/hotels/chiphhh-palmer-house/" target="_blank">Palmer House Hilton</a> — use mobile key to skip check-in line</div></div>
+        <div class="event"><div class="event-time">5–6p</div><div class="event-desc">Downtime</div></div>
+        <div class="event"><div class="event-time">6:00p</div><div class="event-desc">Meet in lobby → casual team dinner</div></div>
+        <div class="event"><div class="event-time">Eve</div><div class="event-desc">Optional live music or free time</div></div>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-title-block">
+          <div class="day-title">NRA Show + Smithfield Dinner</div>
+          <div class="day-date">Saturday, May 16</div>
+        </div>
+        <div class="day-icon">16</div>
+      </div>
+      <div class="day-body">
+        <div class="event"><div class="event-time">9:30a</div><div class="event-desc">Meet in lobby → shuttle to <a class="event-link" href="https://www.mccormickplace.com/" target="_blank">McCormick Place</a></div></div>
+        <div class="event"><div class="event-time">10a–2:30p</div><div class="event-desc"><a class="event-link" href="https://www.nationalrestaurantshow.com/home/" target="_blank">NRA Show</a> floor <span class="event-badge badge-show">Day 1</span></div></div>
+        <div class="event"><div class="event-time">Afternoon</div><div class="event-desc">Return to <a class="event-link" href="https://www.hilton.com/en/hotels/chiphhh-palmer-house/" target="_blank">Palmer House</a> + downtime</div></div>
+        <div class="event"><div class="event-time">Evening</div><div class="event-desc">Smithfield dinner — <a class="event-link" href="https://paninospizzeria.com/" target="_blank">Panino's</a> (full buyout) <span class="event-badge badge-event">Vendor</span></div></div>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-title-block">
+          <div class="day-title">Show + Vendor Events</div>
+          <div class="day-date">Sunday, May 17</div>
+        </div>
+        <div class="day-icon">17</div>
+      </div>
+      <div class="day-body">
+        <div class="event"><div class="event-time">9:30a</div><div class="event-desc">Meet in lobby → shuttle to <a class="event-link" href="https://www.mccormickplace.com/" target="_blank">McCormick Place</a></div></div>
+        <div class="event"><div class="event-time">Morning</div><div class="event-desc"><a class="event-link" href="https://www.nationalrestaurantshow.com/home/" target="_blank">NRA Show</a> floor <span class="event-badge badge-show">Day 2</span></div></div>
+        <div class="event"><div class="event-time">Afternoon</div><div class="event-desc">Reset at <a class="event-link" href="https://www.hilton.com/en/hotels/chiphhh-palmer-house/" target="_blank">Palmer House</a></div></div>
+        <div class="event"><div class="event-time">Evening</div><div class="event-desc">Tillamook · Buyers Edge · Ajinomoto · Texas Pete <span class="event-badge badge-event">Vendors</span></div></div>
+        <div class="event"><div class="event-time">Transport</div><div class="event-desc"><a class="event-link" href="https://www.uber.com/" target="_blank">Grouped Ubers</a></div></div>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-title-block">
+          <div class="day-title">Chicago + Cubs Game</div>
+          <div class="day-date">Monday, May 18</div>
+        </div>
+        <div class="day-icon">18</div>
+      </div>
+      <div class="day-body">
+        <div class="event"><div class="event-time">9–9:30a</div><div class="event-desc">Optional <a class="event-link" href="https://www.nationalrestaurantshow.com/home/" target="_blank">show</a> visit</div></div>
+        <div class="event"><div class="event-time">12:30p</div><div class="event-desc"><a class="event-link" href="https://wendellaboats.com/" target="_blank">Architecture tour</a> — 400 N Michigan Ave (90 min)</div></div>
+        <div class="event"><div class="event-time">Afternoon</div><div class="event-desc">Free time — <a class="event-link" href="https://www.themagnificentmile.com/" target="_blank">Magnificent Mile</a></div></div>
+        <div class="event"><div class="event-time">6:30p</div><div class="event-desc">Cubs at <a class="event-link" href="https://www.mlb.com/cubs/ballpark" target="_blank">Wrigley Field</a> — <a class="event-link" href="https://www.transitchicago.com/" target="_blank">train</a> back after</div></div>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-title-block">
+          <div class="day-title">Travel Home</div>
+          <div class="day-date">Tuesday, May 19</div>
+        </div>
+        <div class="day-icon">19</div>
+      </div>
+      <div class="day-body">
+        <div class="event"><div class="event-time">7:00a</div><div class="event-desc">Depart <a class="event-link" href="https://www.hilton.com/en/hotels/chiphhh-palmer-house/" target="_blank">Palmer House</a> → <a class="event-link" href="https://www.transitchicago.com/" target="_blank">Blue Line</a> to O'Hare</div></div>
+        <div class="event"><div class="event-time">10:00a</div><div class="event-desc">Flight departure from <a class="event-link" href="https://www.flychicago.com/ohare/home/pages/default.aspx" target="_blank">O'Hare</a></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCOUT LIST -->
+  <div id="screen-hunt" class="screen active">
+    <div class="section-head" id="playbook-heading">Your Playbook</div>
+    <div class="hall-banner" id="hall-banner"></div>
+    <div id="booth-items"></div>
+
+    <div class="section-head" id="discoveries-for-you-heading" style="margin-top:8px;display:none;">Discoveries For You</div>
+    <div id="scout-discoveries"></div>
+  </div>
+
+  <!-- ADMIN / MANAGE -->
+  <div id="screen-admin" class="screen">
+    <div class="section-head">Add a booth</div>
+    <div class="add-form">
+      <label class="form-label">Search exhibitor</label>
+      <input class="form-input" id="manage-exhibitor-search" type="text" placeholder="Name or booth number..." oninput="searchManageExhibitors(this.value)" autocomplete="off">
+      <div id="manage-exhibitor-results"></div>
+      <div class="lookup-result" id="add-lookup" style="margin-top:4px;"></div>
+      <input type="hidden" id="add-booth-num">
+
+      <label class="form-label" style="margin-top:4px;">Reason to visit</label>
+      <input class="form-input" id="add-reason" type="text" placeholder="e.g. Category review, pricing update">
+
+      <label class="form-label">Assign to</label>
+      <div class="person-select-wrap" style="padding:0 0 12px;">
+        <div class="person-dropdown-trigger" id="assign-dropdown-trigger" onclick="toggleAssignDropdown()">
+          <span class="person-dropdown-trigger-text" id="assign-dropdown-label" style="color:var(--text-hint)">Select a person</span>
+          <span class="person-dropdown-arrow">&#9660;</span>
+        </div>
+        <div class="person-dropdown-list" id="assign-dropdown-list"></div>
+      </div>
+
+      <button class="btn-primary" onclick="addBooth()">Add to scout list</button>
+    </div>
+  </div>
+
+  <!-- DISCOVER / LOG -->
+  <div id="screen-discover" class="screen">
+    <div class="section-head">Exhibitor Lookup</div>
+    <div class="add-form" style="margin-top:0;border-top:none;">
+      <input class="form-input" id="exhibitor-search" type="text" placeholder="Search by name or booth number..." oninput="searchExhibitors(this.value)" autocomplete="off">
+      <div id="exhibitor-results"></div>
+      <div class="lookup-result" id="disc-lookup" style="display:none;margin-bottom:8px;"></div>
+    </div>
+
+    <div class="section-head">Log a floor discovery</div>
+    <div class="discover-wrap">
+
+      <div class="tag-label">Who did you talk to?</div>
+      <input class="form-input" id="disc-contact" type="text" placeholder="Contact name (optional)" autocomplete="off" style="margin-bottom:10px;">
+
+      <div class="tag-label">What stood out? Why does it matter for Harbor?</div>
+      <textarea class="disc-textarea" id="disc-note" placeholder="Impressions, products, follow-up needed..." rows="4"></textarea>
+
+      <div class="tag-label">Flag for a teammate or group</div>
+      <div style="font-size:10px;color:var(--text-hint);margin-bottom:5px;">Group</div>
+      <div class="person-select-wrap" style="padding:0 0 10px;">
+        <div class="person-dropdown-trigger" id="group-dropdown-trigger" onclick="toggleGroupDropdown()">
+          <span class="person-dropdown-trigger-text" id="group-dropdown-label" style="color:var(--text-hint)">Select a group</span>
+          <span class="person-dropdown-arrow">&#9660;</span>
+        </div>
+        <div class="person-dropdown-list" id="group-dropdown-list"></div>
+      </div>
+      <div style="font-size:10px;color:var(--text-hint);margin-bottom:5px;">Individual</div>
+      <div class="person-select-wrap" style="padding:0 0 12px;">
+        <div class="person-dropdown-trigger" id="indiv-dropdown-trigger" onclick="toggleIndivDropdown()">
+          <span class="person-dropdown-trigger-text" id="indiv-dropdown-label" style="color:var(--text-hint)">Select a person</span>
+          <span class="person-dropdown-arrow">&#9660;</span>
+        </div>
+        <div class="person-dropdown-list" id="indiv-dropdown-list"></div>
+      </div>
+
+      <button class="btn-primary" onclick="submitDisc()">Share with the team →</button>
+    </div>
+  </div>
+
+  <div id="screen-feed" class="screen">
+    <div class="section-head" id="feed-foryou-heading" style="display:none;">For You</div>
+    <div id="feed-foryou"></div>
+
+    <div class="section-head" style="margin-top:4px;">
+      Team Log
+      <div class="person-select-wrap" style="padding:0;margin-top:6px;">
+        <div class="person-dropdown-trigger" id="feed-filter-trigger" onclick="toggleFeedFilterDropdown()">
+          <span class="person-dropdown-trigger-text" id="feed-filter-label">All</span>
+          <span class="person-dropdown-arrow">&#9660;</span>
+        </div>
+        <div class="person-dropdown-list" id="feed-filter-list"></div>
+      </div>
+    </div>
+    <div id="feed-list" style="padding-bottom:1rem;"></div>
+  </div>
+
+</div>
+
+<!-- Photo lightbox -->
+<div id="photo-lightbox" class="photo-lightbox" onclick="closeLightbox()">
+  <button type="button" class="photo-lightbox-close" onclick="closeLightbox()" aria-label="Close">&times;</button>
+  <img id="photo-lightbox-img" src="" alt="">
+</div>
+
+<script>
+const ROLE_TAGS = ['Sales','Leadership','Cat Management','Solutions','Procurement'];
+const PEOPLE = [
+  {id:'dan',name:'Dan Seth',first:'Dan',role:'VP Sales',tags:['Sales','Leadership'],color:'#534AB7'},
+  {id:'christina',name:'Christina Kost',first:'Christina',role:'TSC',tags:['Sales'],color:'#1D9E75'},
+  {id:'brian_l',name:'Brian Lippert',first:'Brian',role:'TSC',tags:['Sales'],color:'#D85A30'},
+  {id:'tammy',name:'Tammy Pratt',first:'Tammy',role:'TSC',tags:['Sales'],color:'#D4537E'},
+  {id:'david',name:'David Radford',first:'David',role:'TSC',tags:['Sales'],color:'#BA7517'},
+  {id:'wade',name:'Wade Triplett',first:'Wade',role:'Cat Mgmt',tags:['Cat Management'],color:'#378ADD'},
+  {id:'andy',name:'Andy Cook',first:'Andy',role:'Solutions',tags:['Solutions'],color:'#4BAD4A'},
+  {id:'tony',name:'Tony Radelich',first:'Tony',role:'TSC',tags:['Sales'],color:'#E24B4A'},
+  {id:'brian_w',name:'Brian Wright',first:'Brian',role:'TSC',tags:['Sales'],color:'#7F77DD'},
+  {id:'jeff',name:'Jeff Paradise',first:'Jeff',role:'VP Street Sales',tags:['Sales','Leadership'],color:'#0F6E56'},
+  {id:'kawika',name:'Kawika McGrath',first:'Kawika',role:'DM',tags:['Sales','Leadership'],color:'#993C1D'},
+  {id:'michelle',name:'Michelle McClure',first:'Michelle',role:'Supply Chain',tags:['Procurement'],color:'#993556'},
+  {id:'kristie',name:'Kristie Love',first:'Kristie',role:'Casinos',tags:['Sales'],color:'#185FA5'},
+  {id:'dawn',name:'Dawn Schafer',first:'Dawn',role:'Cat Mgmt',tags:['Cat Management'],color:'#3B6D11'},
+  {id:'kevin',name:'Kevin Pribilsky',first:'Kevin',role:'President',tags:['Sales','Leadership','Cat Management','Procurement'],color:'#1B5EA6'},
+  {id:'darrin',name:'Darrin Soderberg',first:'Darrin',role:'VP Cat Mgmt',tags:['Sales','Leadership','Cat Management','Procurement'],color:'#854F0B'}
+];
+
+
+
+let BOOTHS = {};
+let SEARCH_DATA = [];
+
+let currentUser = null; // single identity for the whole session
+let boothList = [];
+let discoveries = [];
+let feedFilter = 'all';
+
+function searchExhibitors(val) {
+  const container = document.getElementById('exhibitor-results');
+  const q = val.trim().toLowerCase();
+  if (!q) { container.innerHTML = '<div class="search-hint">Type a name or booth number</div>'; return; }
+  const results = SEARCH_DATA.filter(e => {
+    return e[1].toLowerCase().includes(q) || e[0].includes(q);
+  }).slice(0, 12);
+  if (results.length === 0) { container.innerHTML = '<div class="search-hint">No results found</div>'; return; }
+  const hallFull = {'S':'South','N':'North','E':'East','?':'Unknown'};
+  container.innerHTML = '';
+  results.forEach(e => {
+    const div = document.createElement('div');
+    div.className = 'search-result';
+    div.onclick = () => {
+      selectedExhibitor = { booth: e[0], name: e[1], hall: hallFull[e[2]]||e[2], hallCode: e[2] };
+      const lookup = document.getElementById('disc-lookup');
+      lookup.style.display = 'block';
+      const headerHtml = `
+        <div style="font-weight:600;color:var(--text-primary);margin-bottom:4px;">${e[1]}</div>
+        <div style="font-size:12px;color:var(--text-hint);margin-bottom:6px;">
+          <span class="hall-pill hall-${e[2]}">${hallFull[e[2]]||e[2]}</span>
+          <span style="margin-left:6px;font-family:var(--font-mono);">Booth #${e[0]}</span>
+        </div>`;
+      lookup.innerHTML = headerHtml;
+      document.getElementById('exhibitor-search').value = '';
+      container.innerHTML = '';
+    };
+    div.innerHTML = `
+      <span class="search-result-name">${e[1]}</span>
+      <div class="search-result-meta">
+        <span class="hall-pill hall-${e[2]}">${hallFull[e[2]]||e[2]}</span>
+        <span class="search-result-booth">#${e[0]}</span>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+let selectedManageExhibitor = null; // {booth, name, hall, hallCode} captured from search tap
+
+function searchManageExhibitors(val) {
+  const container = document.getElementById('manage-exhibitor-results');
+  const q = val.trim().toLowerCase();
+  if (!q) { container.innerHTML = ''; return; }
+  const results = SEARCH_DATA.filter(e => {
+    return e[1].toLowerCase().includes(q) || e[0].includes(q);
+  }).slice(0, 12);
+  if (results.length === 0) { container.innerHTML = '<div class="search-hint">No results found</div>'; return; }
+  const hallFull = {'S':'South','N':'North','E':'East','?':'Unknown'};
+  container.innerHTML = '';
+  results.forEach(e => {
+    const div = document.createElement('div');
+    div.className = 'search-result';
+    div.onclick = () => {
+      selectedManageExhibitor = {
+        booth: e[0],
+        name: e[1],
+        hall: hallFull[e[2]] || e[2],
+        hallCode: e[2]
+      };
+      document.getElementById('add-booth-num').value = e[0];
+      const lookup = document.getElementById('add-lookup');
+      lookup.style.display = 'block';
+      lookup.textContent = `${e[1]} — ${hallFull[e[2]]||e[2]} Hall, Booth ${e[0]}`;
+      document.getElementById('manage-exhibitor-search').value = '';
+      container.innerHTML = '';
+    };
+    div.innerHTML = `
+      <span class="search-result-name">${e[1]}</span>
+      <div class="search-result-meta">
+        <span class="hall-pill hall-${e[2]}">${hallFull[e[2]]||e[2]}</span>
+        <span class="search-result-booth">#${e[0]}</span>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+
+function initials(name) {
+  return name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+}
+
+function timeAgo(d) {
+  const mins = Math.floor((Date.now() - d) / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return mins + 'm ago';
+  return Math.floor(mins/60) + 'h ago';
+}
+
+function buildIdentityOverlay() {
+  const list = document.getElementById('identity-dropdown');
+  const sorted = [...PEOPLE].sort((a,b) => a.first.localeCompare(b.first));
+  sorted.forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'identity-dropdown-item';
+    item.id = 'id-item-' + p.id;
+    item.innerHTML = `<span class="identity-dropdown-item-name">${p.first} ${p.name.split(' ')[1]||''}</span><span class="identity-dropdown-item-tags">${p.tags.join(', ')||''}</span>`;
+    item.onclick = (e) => { e.stopPropagation(); setIdentity(p.id); };
+    list.appendChild(item);
+  });
+}
+
+function toggleIdentityDropdown() {
+  const trigger = document.getElementById('header-identity');
+  const list = document.getElementById('identity-dropdown');
+  const isOpen = list.classList.toggle('open');
+  trigger.classList.toggle('open', isOpen);
+}
+
+function closeIdentityDropdown() {
+  document.getElementById('header-identity').classList.remove('open');
+  document.getElementById('identity-dropdown').classList.remove('open');
+}
+
+const ADMIN_USERS = ['andy', 'dawn', 'darrin'];
+
+function setIdentity(id) {
+  const p = PEOPLE.find(x=>x.id===id);
+  if (!p) return;
+  currentUser = id;
+  localStorage.setItem('harbor_nra_user', id);
+  document.getElementById('header-identity-name').textContent = p.name;
+  document.querySelectorAll('.identity-dropdown-item').forEach(el=>el.classList.remove('selected'));
+  const item = document.getElementById('id-item-'+id);
+  if (item) item.classList.add('selected');
+  closeIdentityDropdown();
+
+  // Show or hide admin tab
+  const adminTab = document.getElementById('admin-tab');
+  if (ADMIN_USERS.includes(id)) {
+    adminTab.style.display = 'flex';
+  } else {
+    adminTab.style.display = 'none';
+    // If currently on admin screen, redirect to Scout
+    if (document.getElementById('screen-admin').classList.contains('active')) {
+      showScreen('hunt');
+    }
+  }
+
+  document.getElementById('playbook-heading').textContent = p.first + "'s Playbook";
+  renderBoothItems();
+  renderScoutDiscoveries();
+  renderFeed();
+}
+
+function switchIdentity() {
+  toggleIdentityDropdown();
+}
+
+function initIdentity() {
+  const saved = localStorage.getItem('harbor_nra_user');
+  if (saved && PEOPLE.find(x=>x.id===saved)) {
+    setIdentity(saved);
+  }
+}
+
+// Close all dropdowns on outside tap
+document.addEventListener('click', e => {
+  const identityTrigger = document.getElementById('header-identity');
+  if (identityTrigger && !identityTrigger.contains(e.target)) closeIdentityDropdown();
+  const groupTrigger = document.getElementById('group-dropdown-trigger');
+  const groupList = document.getElementById('group-dropdown-list');
+  if (groupTrigger && !groupTrigger.contains(e.target) && groupList && !groupList.contains(e.target)) closeGroupDropdown();
+  const feedTrigger = document.getElementById('feed-filter-trigger');
+  const feedList = document.getElementById('feed-filter-list');
+  if (feedTrigger && !feedTrigger.contains(e.target) && feedList && !feedList.contains(e.target)) closeFeedFilterDropdown();
+  const assignTrigger = document.getElementById('assign-dropdown-trigger');
+  const assignList = document.getElementById('assign-dropdown-list');
+  if (assignTrigger && !assignTrigger.contains(e.target) && assignList && !assignList.contains(e.target)) closeAssignDropdown();
+  const indivTrigger = document.getElementById('indiv-dropdown-trigger');
+  const indivList = document.getElementById('indiv-dropdown-list');
+  if (indivTrigger && !indivTrigger.contains(e.target) && indivList && !indivList.contains(e.target)) closeIndivDropdown();
+});
+
+function renderAttribution(d, viewerId) {
+  // "From [LoggerName]" + "For [Person/Group]" when relevant.
+  // Tagged-to-self ("For Andy") is the explicit signal that distinguishes this from
+  // a generic discovery the viewer happens to see.
+  const logger = PEOPLE.find(p => p.id === d.logger);
+  const fromName = logger ? logger.first : 'Unknown';
+
+  const taggedIds = d.tagged || [];
+  const taggedGroups = d.taggedGroups || [];
+
+  // Build "For ..." line. Prefer naming the viewer specifically if they were tagged
+  // by id; otherwise list other tagged people; then groups. If neither, no second line.
+  const forParts = [];
+  if (taggedIds.includes(viewerId)) {
+    const me = PEOPLE.find(p => p.id === viewerId);
+    forParts.push(me ? me.first : 'You');
+  }
+  taggedIds.forEach(id => {
+    if (id === viewerId) return;
+    const p = PEOPLE.find(pp => pp.id === id);
+    if (p) forParts.push(p.first);
+  });
+  taggedGroups.forEach(g => forParts.push(g));
+
+  const forLine = forParts.length ? `For ${forParts.join(', ')}` : '';
+  return { fromLine: `From ${fromName}`, forLine };
+}
+
+function renderExhibitorDetails(boothNum) {
+  // Pull full exhibitor record from BOOTHS lookup and render categories,
+  // badges, featured flag, and description. Returns HTML string, never null;
+  // shows an "no additional details" message if the lookup is empty.
+  const f = BOOTHS && BOOTHS[boothNum];
+  if (!f) {
+    return `<div class="exhibitor-details"><div class="exhibitor-details-empty">No additional exhibitor details available.</div></div>`;
+  }
+  const cats = (f.cat && f.cat.length) ? f.cat : [];
+  const badges = (f.bg && f.bg.length) ? f.bg : [];
+  const featured = !!f.f;
+  const desc = f.d || '';
+
+  let chipsHtml = '';
+  const chipParts = [];
+  if (featured) chipParts.push(`<span class="exhibitor-chip featured">Featured</span>`);
+  badges.forEach(b => {
+    const cls = /first.?time/i.test(b) ? 'exhibitor-chip first-time' : 'exhibitor-chip';
+    chipParts.push(`<span class="${cls}">${b}</span>`);
+  });
+  if (chipParts.length) {
+    chipsHtml = `<div class="exhibitor-details-label">Highlights</div><div class="exhibitor-chips">${chipParts.join('')}</div>`;
+  }
+
+  let catsHtml = '';
+  if (cats.length) {
+    const catChips = cats.map(c => `<span class="exhibitor-chip">${c}</span>`).join('');
+    catsHtml = `<div class="exhibitor-details-label">Categories</div><div class="exhibitor-chips">${catChips}</div>`;
+  }
+
+  let descHtml = '';
+  if (desc) {
+    descHtml = `<div class="exhibitor-details-label">About</div><div class="exhibitor-details-text">${desc}</div>`;
+  }
+
+  if (!chipsHtml && !catsHtml && !descHtml) {
+    return `<div class="exhibitor-details"><div class="exhibitor-details-empty">No additional exhibitor details available.</div></div>`;
+  }
+  return `<div class="exhibitor-details">${chipsHtml}${catsHtml}${descHtml}</div>`;
+}
+
+function toggleCardExpand(headerEl) {
+  // Generic toggler for any card whose header has class "expand-trigger"
+  // and whose next sibling is the body (with class containing "card-body" or "disc-body").
+  const body = headerEl.nextElementSibling;
+  if (!body) return;
+  const isCollapsed = body.classList.toggle('collapsed');
+  const chev = headerEl.querySelector('.card-chevron');
+  if (chev) chev.innerHTML = isCollapsed ? '&#9660;' : '&#9650;';
+}
+
+function renderScoutDiscoveries() {
+  const container = document.getElementById('scout-discoveries');
+  const heading = document.getElementById('discoveries-for-you-heading');
+  if (!container || !currentUser) { if(container) container.innerHTML=''; return; }
+
+  const person = PEOPLE.find(p=>p.id===currentUser);
+  const myTags = person ? person.tags : [];
+
+  const mine = discoveries.filter(d => {
+    const taggedMe = d.tagged && d.tagged.includes(currentUser);
+    const taggedMyGroup = d.taggedGroups && d.taggedGroups.some(g => myTags.includes(g));
+    return taggedMe || taggedMyGroup;
+  });
+
+  if (mine.length === 0) {
+    heading.style.display = 'none';
+    container.innerHTML = '';
+    return;
+  }
+
+  heading.style.display = 'block';
+  container.innerHTML = '';
+
+  // Handled-by-current-user sorts to the bottom
+  const sortedMine = [...mine].sort((a, b) => {
+    const ah = (a.handledBy||[]).includes(currentUser) ? 1 : 0;
+    const bh = (b.handledBy||[]).includes(currentUser) ? 1 : 0;
+    return ah - bh;
+  });
+
+  sortedMine.forEach(d => {
+    const logger = PEOPLE.find(p=>p.id===d.logger);
+    const card = document.createElement('div');
+    const isHandled = (d.handledBy||[]).includes(currentUser);
+    card.className = 'scout-disc-card' + (isHandled ? ' handled' : '');
+    const mins = Math.floor((Date.now()-d.time)/60000);
+    const timeStr = mins < 1 ? 'just now' : mins < 60 ? mins+'m ago' : Math.floor(mins/60)+'h ago';
+    const attr = renderAttribution(d, currentUser);
+    const discKey = `${d.time}_${d.logger}`;
+    card.innerHTML = `
+      <div class="scout-disc-header expand-trigger" onclick="toggleCardExpand(this)" style="cursor:pointer;">
+        <div class="scout-disc-who" style="flex:1;min-width:0;">
+          <div class="scout-disc-avatar" style="background:${logger?.color||'#999'}22;color:${logger?.color||'#999'}">${initials(logger?.name||'??')}</div>
+          <div class="card-attrib">
+            <div class="card-attrib-from">${attr.fromLine}</div>
+            ${attr.forLine ? `<div class="card-attrib-for">${attr.forLine}</div>` : ''}
+          </div>
+        </div>
+        <div class="scout-disc-time">${timeStr}${isHandled ? ` <span style="color:var(--amber);font-weight:600;margin-left:4px;">Handled</span>` : ''}</div>
+        <div class="card-chevron">&#9660;</div>
+      </div>
+      <div class="scout-disc-body collapsed">
+        <div class="scout-disc-booth">
+          <span class="hall-pill hall-${d.hallCode||'?'}">${d.hall||'?'}</span>
+          ${d.name} <span style="font-size:11px;color:var(--text-hint);font-family:var(--font-mono)">#${d.booth}</span>
+        </div>
+        <div class="scout-disc-note">${d.note}</div>
+        ${renderExhibitorDetails(d.booth)}
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
+          <button onclick="event.stopPropagation();toggleHandled('${discKey}')" style="width:100%;padding:10px;font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;background:${isHandled?'var(--amber-light)':'rgba(255,255,255,0.06)'};color:${isHandled?'var(--amber)':'var(--text-primary)'};border:1px solid ${isHandled?'rgba(212,160,23,0.35)':'var(--border-strong)'};border-radius:var(--radius-sm);cursor:pointer;">${isHandled?'Mark as Not Handled':'Mark as Handled'}</button>
+        </div>
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+async function toggleHandled(discKey) {
+  const d = discoveries.find(x => `${x.time}_${x.logger}` === discKey);
+  if (!d || !currentUser) return;
+  if (!Array.isArray(d.handledBy)) d.handledBy = [];
+  const idx = d.handledBy.indexOf(currentUser);
+  if (idx >= 0) d.handledBy.splice(idx, 1);
+  else d.handledBy.push(currentUser);
+  await saveDiscoveries();
+  renderScoutDiscoveries();
+}
+window.toggleHandled = toggleHandled;
+
+function renderBoothItems() {
+  const c = document.getElementById('booth-items');
+  const banner = document.getElementById('hall-banner');
+  if (!currentUser) { c.innerHTML = ''; banner.style.display='none'; return; }
+  const mine = boothList.filter(b => b.assignees.includes(currentUser));
+  if (mine.length === 0) {
+    c.innerHTML = `<div class="empty-state"><div class="empty-text">No booths assigned yet.</div></div>`;
+    banner.style.display = 'none';
+    return;
+  }
+  const hc = {};
+  mine.forEach(b => { hc[b.hall] = (hc[b.hall]||0)+1; });
+  const top = Object.entries(hc).sort((a,b)=>b[1]-a[1])[0];
+  if (top && top[1] >= 2) {
+    banner.style.display = 'block';
+    banner.textContent = `${top[1]} of your ${mine.length} booths are in ${top[0]} Hall. Start there.`;
+  } else { banner.style.display='none'; }
+
+  c.innerHTML = '';
+  // Reported booths sort to the bottom, preserving original order within each group
+  const sortedMine = [...mine].sort((a, b) => (a.reported ? 1 : 0) - (b.reported ? 1 : 0));
+  sortedMine.forEach(b => {
+    const div = document.createElement('div');
+    div.className = 'booth-item' + (b.reported ? ' reported' : '');
+    const assigneeNames = b.assignees.map(id => PEOPLE.find(p=>p.id===id)?.first||'').filter(Boolean);
+    const submitted = b.reported;
+    div.innerHTML = `
+      <div class="booth-item-header" onclick="toggleBoothExpand(this)">
+        <div class="booth-info" style="flex:1;min-width:0;">
+          <div class="booth-name">${b.name}</div>
+          <div class="booth-meta">
+            <span class="hall-pill hall-${b.hallCode}">${b.hall} Hall</span>
+            <span class="booth-num">#${b.booth}</span>
+            ${submitted ? `<span style="font-size:10px;color:var(--amber);font-weight:600;">Reported</span>` : ''}
+          </div>
+        </div>
+        <div style="font-size:10px;color:var(--text-hint);flex-shrink:0;">&#9660;</div>
+      </div>
+      <div class="booth-item-body">
+        ${renderExhibitorDetails(b.booth)}
+        ${b.reason ? `<div class="booth-item-body-label">Why you're here</div><div class="booth-item-body-note">${b.reason}</div>` : ''}
+        <hr class="booth-capture-divider">
+        ${submitted ? `
+          <div class="booth-submitted-badge">&#10003; Reported to team feed</div>
+          <div class="booth-item-body-label" style="margin-top:14px;">Add a follow-up</div>
+          <input class="booth-capture-input" id="fcontact-${b.id}" type="text" placeholder="Who did you speak with? (optional)">
+          <textarea class="booth-capture-textarea" id="fnotes-${b.id}" rows="3" placeholder="New impressions, follow-up details..."></textarea>
+          <button class="booth-submit-btn" onclick="submitBoothFollowup('${b.id}')">Share follow-up with team →</button>
+        ` : `
+          <div class="booth-item-body-label">Contact name</div>
+          <input class="booth-capture-input" id="contact-${b.id}" type="text" placeholder="Who did you speak with?">
+          <div class="booth-item-body-label">Impressions</div>
+          <textarea class="booth-capture-textarea" id="notes-${b.id}" rows="3" placeholder="What stood out? Relevant products, pricing, follow-up needed?"></textarea>
+          <button class="booth-submit-btn" onclick="submitBoothReport('${b.id}')">Share discovery with team →</button>
+        `}
+      </div>`;
+    c.appendChild(div);
+  });
+}
+
+function toggleBoothExpand(header) {
+  const body = header.nextElementSibling;
+  const chevron = header.querySelector('div[style*="9660"]');
+  const isOpen = body.classList.toggle('open');
+  if (chevron) chevron.innerHTML = isOpen ? '&#9650;' : '&#9660;';
+}
+
+
+let assignSelected = null;
+
+function buildAssignScroll() {
+  const list = document.getElementById('assign-dropdown-list');
+  const none = document.createElement('div');
+  none.className = 'person-dropdown-item';
+  none.textContent = 'None';
+  none.onclick = () => {
+    assignSelected = null;
+    document.getElementById('assign-dropdown-label').textContent = 'Select a person';
+    document.getElementById('assign-dropdown-label').style.color = 'var(--text-hint)';
+    document.querySelectorAll('#assign-dropdown-list .person-dropdown-item').forEach(el=>el.classList.remove('selected'));
+    closeAssignDropdown();
+  };
+  list.appendChild(none);
+  const sorted = [...PEOPLE].sort((a,b)=>a.first.localeCompare(b.first));
+  sorted.forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'person-dropdown-item';
+    item.innerHTML = `<span>${p.first} ${p.name.split(' ')[1]||''}</span><span class="person-dropdown-item-role">${p.tags.join(', ')||''}</span>`;
+    item.onclick = () => {
+      assignSelected = p.id;
+      document.getElementById('assign-dropdown-label').textContent = `${p.first} ${p.name.split(' ')[1]||''}`;
+      document.getElementById('assign-dropdown-label').style.color = 'var(--text-primary)';
+      document.querySelectorAll('#assign-dropdown-list .person-dropdown-item').forEach(el=>el.classList.remove('selected'));
+      item.classList.add('selected');
+      closeAssignDropdown();
+    };
+    list.appendChild(item);
+  });
+}
+
+function toggleAssignDropdown() {
+  const trigger = document.getElementById('assign-dropdown-trigger');
+  const list = document.getElementById('assign-dropdown-list');
+  const isOpen = list.classList.toggle('open');
+  trigger.classList.toggle('open', isOpen);
+}
+function closeAssignDropdown() {
+  document.getElementById('assign-dropdown-trigger').classList.remove('open');
+  document.getElementById('assign-dropdown-list').classList.remove('open');
+}
+
+let selectedGroup = null;
+let selectedIndiv = null;
+let selectedExhibitor = null; // {booth, name, hall, hallCode}
+
+function buildTagGroupsScroll() {
+  const list = document.getElementById('group-dropdown-list');
+  // None option
+  const none = document.createElement('div');
+  none.className = 'person-dropdown-item';
+  none.textContent = 'None';
+  none.onclick = () => {
+    selectedGroup = null;
+    document.getElementById('group-dropdown-label').textContent = 'Select a group';
+    document.getElementById('group-dropdown-label').style.color = 'var(--text-hint)';
+    document.querySelectorAll('#group-dropdown-list .person-dropdown-item').forEach(el=>el.classList.remove('selected'));
+    closeGroupDropdown();
+  };
+  list.appendChild(none);
+  ROLE_TAGS.forEach(tag => {
+    const item = document.createElement('div');
+    item.className = 'person-dropdown-item';
+    item.textContent = tag;
+    item.onclick = () => {
+      selectedGroup = tag;
+      document.getElementById('group-dropdown-label').textContent = tag;
+      document.getElementById('group-dropdown-label').style.color = 'var(--text-primary)';
+      document.querySelectorAll('#group-dropdown-list .person-dropdown-item').forEach(el=>el.classList.remove('selected'));
+      item.classList.add('selected');
+      closeGroupDropdown();
+    };
+    list.appendChild(item);
+  });
+}
+
+function buildTagPeopleScroll() {
+  const list = document.getElementById('indiv-dropdown-list');
+  const none = document.createElement('div');
+  none.className = 'person-dropdown-item';
+  none.textContent = 'None';
+  none.onclick = () => {
+    selectedIndiv = null;
+    document.getElementById('indiv-dropdown-label').textContent = 'Select a person';
+    document.getElementById('indiv-dropdown-label').style.color = 'var(--text-hint)';
+    document.querySelectorAll('#indiv-dropdown-list .person-dropdown-item').forEach(el=>el.classList.remove('selected'));
+    closeIndivDropdown();
+  };
+  list.appendChild(none);
+  const sorted = [...PEOPLE].sort((a,b)=>a.first.localeCompare(b.first));
+  sorted.forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'person-dropdown-item';
+    item.innerHTML = `<span>${p.first} ${p.name.split(' ')[1]||''}</span><span class="person-dropdown-item-role">${p.tags.join(', ')||''}</span>`;
+    item.onclick = () => {
+      selectedIndiv = p.id;
+      document.getElementById('indiv-dropdown-label').textContent = `${p.first} ${p.name.split(' ')[1]||''}`;
+      document.getElementById('indiv-dropdown-label').style.color = 'var(--text-primary)';
+      document.querySelectorAll('#indiv-dropdown-list .person-dropdown-item').forEach(el=>el.classList.remove('selected'));
+      item.classList.add('selected');
+      closeIndivDropdown();
+    };
+    list.appendChild(item);
+  });
+}
+
+function toggleGroupDropdown() {
+  const trigger = document.getElementById('group-dropdown-trigger');
+  const list = document.getElementById('group-dropdown-list');
+  closeIndivDropdown();
+  const isOpen = list.classList.toggle('open');
+  trigger.classList.toggle('open', isOpen);
+}
+function closeGroupDropdown() {
+  document.getElementById('group-dropdown-trigger').classList.remove('open');
+  document.getElementById('group-dropdown-list').classList.remove('open');
+}
+function toggleIndivDropdown() {
+  const trigger = document.getElementById('indiv-dropdown-trigger');
+  const list = document.getElementById('indiv-dropdown-list');
+  closeGroupDropdown();
+  const isOpen = list.classList.toggle('open');
+  trigger.classList.toggle('open', isOpen);
+}
+function closeIndivDropdown() {
+  document.getElementById('indiv-dropdown-trigger').classList.remove('open');
+  document.getElementById('indiv-dropdown-list').classList.remove('open');
+}
+
+function buildFeedFilters() {
+  const list = document.getElementById('feed-filter-list');
+  const allItem = document.createElement('div');
+  allItem.className = 'person-dropdown-item selected';
+  allItem.textContent = 'All discoveries';
+  allItem.onclick = () => {
+    feedFilter = 'all';
+    document.getElementById('feed-filter-label').textContent = 'All discoveries';
+    document.querySelectorAll('#feed-filter-list .person-dropdown-item').forEach(el=>el.classList.remove('selected'));
+    allItem.classList.add('selected');
+    closeFeedFilterDropdown();
+    renderFeed();
+  };
+  list.appendChild(allItem);
+  const sorted = [...PEOPLE].sort((a,b)=>a.first.localeCompare(b.first));
+  sorted.forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'person-dropdown-item';
+    item.innerHTML = `<span>${p.first} ${p.name.split(' ')[1]||''}</span><span class="person-dropdown-item-role">${p.tags.join(', ')||''}</span>`;
+    item.onclick = () => {
+      feedFilter = p.id;
+      document.getElementById('feed-filter-label').textContent = `${p.first} ${p.name.split(' ')[1]||''}`;
+      document.querySelectorAll('#feed-filter-list .person-dropdown-item').forEach(el=>el.classList.remove('selected'));
+      item.classList.add('selected');
+      closeFeedFilterDropdown();
+      renderFeed();
+    };
+    list.appendChild(item);
+  });
+}
+
+function toggleFeedFilterDropdown() {
+  const trigger = document.getElementById('feed-filter-trigger');
+  const list = document.getElementById('feed-filter-list');
+  const isOpen = list.classList.toggle('open');
+  trigger.classList.toggle('open', isOpen);
+}
+function closeFeedFilterDropdown() {
+  document.getElementById('feed-filter-trigger').classList.remove('open');
+  document.getElementById('feed-filter-list').classList.remove('open');
+}
+
+function makeDiscCard(d) {
+  const logger = PEOPLE.find(p=>p.id===d.logger);
+  const taggedPeople = (d.tagged||[]).map(id=>PEOPLE.find(p=>p.id===id)?.first).filter(Boolean);
+  const attr = renderAttribution(d, currentUser);
+  const card = document.createElement('div');
+  card.className = 'disc-card';
+  card.innerHTML = `
+    <div class="disc-card-header expand-trigger" onclick="toggleCardExpand(this)" style="cursor:pointer;">
+      <div class="disc-who" style="flex:1;min-width:0;">
+        <div class="disc-avatar" style="background:${logger?.color||'#999'}22;color:${logger?.color||'#999'}">${initials(logger?.name||'??')}</div>
+        <div class="card-attrib">
+          <div class="card-attrib-from">${attr.fromLine}</div>
+          ${attr.forLine ? `<div class="card-attrib-for">${attr.forLine}</div>` : ''}
+        </div>
+        ${d.source==='playbook' ? `<span style="font-size:10px;padding:2px 6px;border-radius:3px;background:var(--blue-light);color:var(--blue-mid);font-weight:600;flex-shrink:0;">Playbook</span>` : ''}
+        ${d.source==='follow-up' ? `<span style="font-size:10px;padding:2px 6px;border-radius:3px;background:var(--amber-light);color:var(--amber);font-weight:600;flex-shrink:0;">Follow-up</span>` : ''}
+      </div>
+      <div class="disc-time">${timeAgo(d.time)}</div>
+      <div class="card-chevron">&#9660;</div>
+    </div>
+    <div class="disc-card-body collapsed">
+      <div class="disc-booth-line">
+        <span class="hall-pill hall-${d.hallCode||'?'}">${d.hall||'?'}</span>
+        ${d.name} <span style="font-size:11px;color:var(--text-hint);font-family:var(--font-mono)">#${d.booth}</span>
+      </div>
+      ${d.contact ? `<div style="font-size:11px;color:var(--text-hint);margin-top:2px;margin-bottom:6px;">Spoke with: <span style="color:var(--text-secondary);">${d.contact}</span></div>` : ''}
+      <div class="disc-note">${d.note}</div>
+      ${(() => {
+        const urls = (Array.isArray(d.photoUrls) && d.photoUrls.length) ? d.photoUrls : (d.photoUrl ? [d.photoUrl] : []);
+        if (!urls.length) return '';
+        return `<div class="feed-photo-grid">${urls.map(u => `<img src="${u}" class="feed-photo-thumb" onclick="event.stopPropagation();openLightbox('${u}')">`).join('')}</div>`;
+      })()}
+      ${renderExhibitorDetails(d.booth)}
+    </div>`;
+
+  return card;
+}
+
+function renderFeed() {
+  const forYouEl    = document.getElementById('feed-foryou');
+  const forYouHead  = document.getElementById('feed-foryou-heading');
+  const teamLogEl   = document.getElementById('feed-list');
+
+  // For You: tagged to current user individually or by their role group
+  const person = currentUser ? PEOPLE.find(p=>p.id===currentUser) : null;
+  const myTags = person ? person.tags : [];
+  const forYou = discoveries.filter(d => {
+    if (!currentUser) return false;
+    const taggedMe = (d.tagged||[]).includes(currentUser);
+    const taggedGroup = (d.taggedGroups||[]).some(g => myTags.includes(g));
+    return taggedMe || taggedGroup;
+  });
+
+  if (forYou.length > 0) {
+    forYouHead.style.display = 'block';
+    forYouEl.innerHTML = '';
+    forYou.forEach(d => {
+      const card = makeDiscCard(d);
+      card.style.border = '1.5px solid var(--blue-mid)';
+      card.style.borderRadius = 'var(--radius-md)';
+      card.style.margin = '0 16px 10px';
+      forYouEl.appendChild(card);
+    });
+  } else {
+    forYouHead.style.display = 'none';
+    forYouEl.innerHTML = '';
+  }
+
+  // Team Log: filtered by dropdown
+  const filtered = feedFilter === 'all'
+    ? discoveries
+    : discoveries.filter(d => {
+        if (d.logger === feedFilter) return true;
+        if ((d.tagged||[]).includes(feedFilter)) return true;
+        const filterPerson = PEOPLE.find(p => p.id === feedFilter);
+        const filterTags = filterPerson ? filterPerson.tags : [];
+        return (d.taggedGroups||[]).some(g => filterTags.includes(g));
+      });
+
+  if (filtered.length === 0) {
+    teamLogEl.innerHTML = `<div class="empty-state"><div class="empty-text">No discoveries yet.</div></div>`;
+  } else {
+    teamLogEl.innerHTML = '';
+    filtered.forEach(d => teamLogEl.appendChild(makeDiscCard(d)));
+  }
+
+  renderScoutDiscoveries();
+}
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  ['hunt','discover','feed','agenda','admin'].forEach((s,i)=>{ if(s===name) document.querySelectorAll('.tab')[i].classList.add('active'); });
+}
+
+function toggleDay(header) {
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+// ── STORAGE CONFIG ──────────────────────────────────────────────────────────
+const KV_URL   = 'https://good-swine-93872.upstash.io';
+const KV_TOKEN = 'gQAAAAAAAW6wAAIgcDE5YjdiYWVmMjU2OTA0MTk3YTMyMTE4NzZmMDFjZmQwOA';
+const BLOB_TOKEN = 'vercel_blob_rw_cTVDSB6Gc0KAE3ac_4VkG8BoQBG0OLKXLKggV4VJj5Th6v9';
+
+async function kvGet(key) {
+  try {
+    const r = await fetch(`${KV_URL}/get/${encodeURIComponent(key)}`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${KV_TOKEN}` }
+    });
+    if (!r.ok) return null;
+    const d = await r.json();
+    return d.result ? JSON.parse(d.result) : null;
+  } catch(e) { console.warn('KV read failed', e); return null; }
+}
+
+async function kvSet(key, value) {
+  try {
+    const serialized = JSON.stringify(value);
+    const r = await fetch(`${KV_URL}/pipeline`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${KV_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify([['SET', key, serialized]])
+    });
+    if (!r.ok) console.warn('KV write failed', r.status, await r.text());
+  } catch(e) { console.warn('KV write failed', e); }
+}
+
+async function uploadPhoto(file) {
+  try {
+    const r = await fetch(`https://blob.vercel-storage.com/${encodeURIComponent('nra2026/'+Date.now()+'-'+file.name)}`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${BLOB_TOKEN}`, 'x-content-type': file.type, 'x-add-random-suffix': '1' },
+      body: file
+    });
+    const d = await r.json();
+    return d.url || null;
+  } catch(e) { console.warn('Blob upload failed', e); return null; }
+}
+
+async function saveDiscoveries() { await kvSet('harbor:discoveries', discoveries); }
+async function saveBoothList()   { await kvSet('harbor:booths', boothList); }
+
+async function loadFromKV() {
+  const [savedDisc, savedBooths] = await Promise.all([
+    kvGet('harbor:discoveries'),
+    kvGet('harbor:booths')
+  ]);
+  if (savedDisc  && Array.isArray(savedDisc))  discoveries = savedDisc;
+  if (savedBooths !== null && Array.isArray(savedBooths)) {
+    // KV is the source of truth. An empty array means the user deleted everything;
+    // respect that and don't fall back to seeded mocks.
+    boothList = savedBooths;
+  }
+  renderFeed();
+  renderBoothItems();
+  renderScoutDiscoveries();
+}
+
+// Poll for new data every 30 seconds
+setInterval(async () => {
+  const saved = await kvGet('harbor:discoveries');
+  if (saved && Array.isArray(saved) && JSON.stringify(saved) !== JSON.stringify(discoveries)) {
+    discoveries = saved;
+    renderFeed();
+    renderScoutDiscoveries();
+  }
+}, 30000);
+
+// ── VOICE INPUT ──────────────────────────────────────────────────────────────
+const MIC_SVG = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 1a4 4 0 0 1 4 4v7a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm6 10a1 1 0 0 1 1 1 7 7 0 0 1-6 6.93V21h2a1 1 0 0 1 0 2H9a1 1 0 0 1 0-2h2v-2.07A7 7 0 0 1 5 12a1 1 0 0 1 2 0 5 5 0 0 0 10 0 1 1 0 0 1 1-1z"/></svg>`;
+
+function wrapWithVoice(el) {
+  if (!el || el.closest('.voice-field-wrap')) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'voice-field-wrap' + (el.tagName === 'TEXTAREA' ? ' is-textarea' : '');
+  el.parentNode.insertBefore(wrap, el);
+  wrap.appendChild(el);
+
+  const icon = document.createElement('div');
+  icon.className = 'voice-field-icon';
+  icon.innerHTML = MIC_SVG;
+  icon.title = 'Tap to dictate';
+  wrap.appendChild(icon);
+
+  let rec = null, active = false;
+  icon.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('Voice input not supported in this browser.'); return;
+    }
+    if (active) { rec && rec.stop(); return; }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    rec = new SR(); rec.continuous = false; rec.interimResults = false;
+    rec.onresult = ev => {
+      const raw = ev.results[0][0].transcript;
+      const clean = raw.replace(/[.,!?;:'"()\-]/g, '').trim();
+      el.value = (el.value ? el.value + ' ' : '') + clean;
+      el.dispatchEvent(new Event('input'));
+    };
+    rec.onend = () => { active = false; icon.classList.remove('recording'); };
+    rec.start(); active = true; icon.classList.add('recording');
+  });
+}
+
+// Keep addVoiceButton as alias for compatibility
+function addVoiceButton(el) { wrapWithVoice(el); }
+
+// ── PHOTO CAPTURE ────────────────────────────────────────────────────────────
+// ── MULTI-PHOTO CAPTURE ─────────────────────────────────────────────────────
+const PHOTO_MAX = 4;
+const photoStates = {}; // formId -> array of {url, name}
+
+function renderPhotoThumbs(formId) {
+  const container = document.getElementById('photos-thumbs-' + formId);
+  const addBtn    = document.getElementById('photos-addbtn-' + formId);
+  if (!container) return;
+  const arr = photoStates[formId] || [];
+  if (arr.length === 0) {
+    container.innerHTML = '';
+  } else {
+    container.innerHTML = arr.map((p, i) => `
+      <div class="photo-thumb-wrap">
+        <img src="${p.url}" class="photo-thumb" onclick="openLightbox('${p.url}')">
+        <button type="button" class="photo-thumb-x" onclick="removePhoto('${formId}', ${i})" aria-label="Remove photo">&times;</button>
+      </div>
+    `).join('');
+  }
+  if (addBtn) {
+    if (arr.length >= PHOTO_MAX) {
+      addBtn.disabled = true;
+      addBtn.textContent = `Maximum ${PHOTO_MAX} photos`;
+    } else {
+      addBtn.disabled = false;
+      addBtn.textContent = arr.length === 0 ? 'Take / choose photo' : `Add another (${arr.length}/${PHOTO_MAX})`;
+    }
+  }
+}
+
+async function handlePhotoPick(formId, fileInput) {
+  const file = fileInput.files[0];
+  fileInput.value = ''; // clear so same file can be re-picked
+  if (!file) return;
+  if (!photoStates[formId]) photoStates[formId] = [];
+  if (photoStates[formId].length >= PHOTO_MAX) return;
+
+  // Show "uploading..." placeholder
+  const container = document.getElementById('photos-thumbs-' + formId);
+  if (container) {
+    const placeholder = document.createElement('div');
+    placeholder.className = 'photo-thumb-wrap photo-thumb-loading';
+    placeholder.id = 'photo-uploading-' + formId + '-' + Date.now();
+    placeholder.textContent = 'Uploading...';
+    container.appendChild(placeholder);
+  }
+
+  const url = await uploadPhoto(file);
+  // Remove all loading placeholders for this form
+  document.querySelectorAll('.photo-thumb-loading').forEach(el => el.remove());
+
+  if (!url) {
+    alert('Photo upload failed. Please try again.');
+    renderPhotoThumbs(formId);
+    return;
+  }
+  photoStates[formId].push({ url, name: file.name });
+  renderPhotoThumbs(formId);
+}
+
+function removePhoto(formId, idx) {
+  if (!photoStates[formId]) return;
+  photoStates[formId].splice(idx, 1);
+  renderPhotoThumbs(formId);
+}
+
+function clearPhotos(formId) {
+  photoStates[formId] = [];
+  renderPhotoThumbs(formId);
+}
+
+function getPhotoUrls(formId) {
+  return (photoStates[formId] || []).map(p => p.url);
+}
+
+// Build the multi-photo UI inside a container, anchored before the submit button.
+// formId is the unique key (e.g. 'disc' or 'booth-{id}' or 'followup-{id}')
+function buildPhotoCapture(formId, submitBtn) {
+  if (!submitBtn || !submitBtn.parentNode) return;
+  // Avoid duplicate insertion
+  if (document.getElementById('photos-thumbs-' + formId)) return;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `
+    <div class="booth-item-body-label" style="margin-top:10px;">Photos (optional, up to ${PHOTO_MAX})</div>
+    <div class="photos-thumbs-grid" id="photos-thumbs-${formId}"></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+      <input type="file" id="photos-input-${formId}" accept="image/*" capture="environment" style="display:none">
+      <button type="button" id="photos-addbtn-${formId}" class="voice-btn" style="flex:1;margin:0;" onclick="document.getElementById('photos-input-${formId}').click()">Take / choose photo</button>
+    </div>`;
+  submitBtn.parentNode.insertBefore(wrap, submitBtn);
+  document.getElementById('photos-input-' + formId).addEventListener('change', function() {
+    handlePhotoPick(formId, this);
+  });
+  // Initialize empty state
+  if (!photoStates[formId]) photoStates[formId] = [];
+  renderPhotoThumbs(formId);
+}
+
+// Lightbox
+function openLightbox(url) {
+  const lb = document.getElementById('photo-lightbox');
+  const img = document.getElementById('photo-lightbox-img');
+  if (lb && img) {
+    img.src = url;
+    lb.style.display = 'flex';
+  }
+}
+function closeLightbox() {
+  const lb = document.getElementById('photo-lightbox');
+  if (lb) lb.style.display = 'none';
+}
+window.openLightbox = openLightbox;
+window.closeLightbox = closeLightbox;
+window.removePhoto = removePhoto;
+
+// ── PATCHED SUBMIT FUNCTIONS ─────────────────────────────────────────────────
+async function submitDiscPersist() {
+  const note = document.getElementById('disc-note').value.trim();
+  const contact = (document.getElementById('disc-contact')?.value || '').trim();
+  if (!selectedExhibitor) { alert('Select an exhibitor from the lookup first.'); return; }
+  if (!note) { alert('Add your impressions before sharing.'); return; }
+  if (!currentUser) { alert('Please select who you are first.'); switchIdentity(); return; }
+
+  const tagged = selectedIndiv ? [selectedIndiv] : [];
+  const taggedGroups = selectedGroup ? [selectedGroup] : [];
+
+  const photoUrls = getPhotoUrls('disc');
+
+  const disc = {
+    id: 'd'+Date.now(), logger: currentUser,
+    booth: selectedExhibitor.booth,
+    name: selectedExhibitor.name,
+    hall: selectedExhibitor.hall,
+    hallCode: selectedExhibitor.hallCode,
+    note, contact, tagged, taggedGroups: taggedGroups||[],
+    time: Date.now(), source: 'floor', photoUrls
+  };
+  discoveries.unshift(disc);
+  await saveDiscoveries();
+
+  // Reset form
+  selectedExhibitor = null;
+  document.getElementById('disc-lookup').style.display = 'none';
+  document.getElementById('disc-lookup').innerHTML = '';
+  document.getElementById('exhibitor-results').innerHTML = '';
+  document.getElementById('exhibitor-search').value = '';
+  document.getElementById('disc-note').value = '';
+  const contactEl = document.getElementById('disc-contact');
+  if (contactEl) contactEl.value = '';
+  clearPhotos('disc');
+  selectedGroup = null; selectedIndiv = null;
+  document.getElementById('group-dropdown-label').textContent = 'Select a group';
+  document.getElementById('group-dropdown-label').style.color = 'var(--text-hint)';
+  document.getElementById('indiv-dropdown-label').textContent = 'Select a person';
+  document.getElementById('indiv-dropdown-label').style.color = 'var(--text-hint)';
+  document.querySelectorAll('#group-dropdown-list .person-dropdown-item, #indiv-dropdown-list .person-dropdown-item').forEach(b => b.classList.remove('selected'));
+
+  renderFeed(); showScreen('feed');
+}
+
+async function submitBoothReportPersist(id) {
+  const b = boothList.find(x=>x.id===id);
+  if (!b) return;
+  const contact = document.getElementById('contact-'+id)?.value.trim();
+  const notes   = document.getElementById('notes-'+id)?.value.trim();
+  if (!notes) { alert('Add your impressions before sharing this discovery.'); return; }
+  if (!currentUser) { alert('Please select who you are first.'); switchIdentity(); return; }
+
+  // Multi-photo
+  const photoUrls = getPhotoUrls('booth-' + id);
+
+  let noteText = notes;
+  if (contact) noteText = `Contact: ${contact}\n\n${notes}`;
+
+  const disc = {
+    id: 'd'+Date.now(), logger: currentUser,
+    booth: b.booth, name: b.name, hall: b.hall, hallCode: b.hallCode,
+    note: noteText, tagged: [], taggedGroups: [],
+    time: Date.now(), source: 'playbook', photoUrls
+  };
+  discoveries.unshift(disc);
+  b.reported = true; b.done = true;
+  clearPhotos('booth-' + id);
+
+  await Promise.all([saveDiscoveries(), saveBoothList()]);
+  renderFeed(); renderBoothItems();
+}
+
+async function submitBoothFollowupPersist(id) {
+  const b = boothList.find(x=>x.id===id);
+  if (!b) return;
+  const contact = document.getElementById('fcontact-'+id)?.value.trim();
+  const notes   = document.getElementById('fnotes-'+id)?.value.trim();
+  if (!notes) { alert('Add your follow-up notes before sharing.'); return; }
+  if (!currentUser) { alert('Please select who you are first.'); switchIdentity(); return; }
+
+  const photoUrls = getPhotoUrls('followup-' + id);
+
+  let noteText = notes;
+  if (contact) noteText = `Contact: ${contact}\n\n${notes}`;
+
+  const disc = {
+    id: 'd'+Date.now(), logger: currentUser,
+    booth: b.booth, name: b.name, hall: b.hall, hallCode: b.hallCode,
+    note: noteText, tagged: [], taggedGroups: [],
+    time: Date.now(), source: 'follow-up', photoUrls
+  };
+  discoveries.unshift(disc);
+  clearPhotos('followup-' + id);
+
+  await saveDiscoveries();
+  renderFeed(); renderBoothItems();
+}
+
+async function addBoothPersist() {
+  const num    = document.getElementById('add-booth-num').value.trim();
+  const reason = document.getElementById('add-reason').value.trim();
+  if (!num) return;
+  const f = BOOTHS[num];
+  // Prefer the name the user actually tapped in search (handles sub-brands at shared booths).
+  // Fall back to BOOTHS lookup when booth number was entered without a search selection.
+  const useTapped = selectedManageExhibitor && selectedManageExhibitor.booth === num;
+  boothList.push({
+    id: 'b'+Date.now(), booth: num,
+    name: useTapped ? selectedManageExhibitor.name : (f?f.n:'Booth '+num),
+    hall: useTapped ? selectedManageExhibitor.hall : (f?f.h:'Unknown'),
+    hallCode: useTapped ? selectedManageExhibitor.hallCode : (f?f.c:'?'),
+    reason, assignees: assignSelected ? [assignSelected] : [], done: false
+  });
+  selectedManageExhibitor = null;
+  document.getElementById('add-booth-num').value='';
+  document.getElementById('add-reason').value='';
+  document.getElementById('add-lookup').style.display='none';
+  assignSelected=null;
+  document.getElementById('assign-dropdown-label').textContent='Select a person';
+  document.getElementById('assign-dropdown-label').style.color='var(--text-hint)';
+  document.querySelectorAll('#assign-dropdown-list .person-dropdown-item').forEach(b=>b.classList.remove('selected'));
+  await saveBoothList();
+  renderBoothItems();
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+
+function seedDawn() {
+  const dawn = [
+    {booth:'4402',reason:'Coca-Cola — relationship check, new foodservice program intel'},
+    {booth:'4045',reason:'Kraft Heinz AFH — category review and pipeline'},
+    {booth:'7862',reason:'JBS — protein pricing and program update'},
+    {booth:'13306',reason:'Ajinomoto — existing vendor, event follow-through'},
+    {booth:'6634',reason:'Buyers Edge — contract and rebate alignment'}
+  ];
+  dawn.forEach(item=>{
+    const f=BOOTHS[item.booth];
+    boothList.push({
+      id:'b'+Math.random().toString(36).slice(2),
+      booth:item.booth, name:f?f.n:'Booth '+item.booth,
+      hall:f?f.h:'Unknown', hallCode:f?f.c:'?',
+      reason:item.reason, assignees:['dawn'], done:false
+    });
+  });
+}
+
+// Load exhibitor data from the project's source JSON file.
+// Strategy: cache-first. On first load, fetch the source file, translate it
+// into the lookups the app needs, and save to the phone's local storage.
+// On every subsequent load, use the local copy instantly (works offline).
+// In the background, try to refresh from the source so updates flow through.
+const EXHIBITOR_CACHE_KEY = 'harbor_exhibitor_cache_v1';
+const EXHIBITOR_SOURCE_URL = 'NRA_Show_2026_Exhibitors.json';
+
+function translateSourceToLookups(sourceArray) {
+  // Source shape: array of exhibitor records with fields like name, booth, hall,
+  // categories, badges, description. Booth and hall can be a string/object or
+  // an array (for multi-booth exhibitors).
+  // Output shape: BOOTHS map keyed by booth number, SEARCH_DATA flat array.
+  const BOOTHS = {};
+  const SEARCH_DATA = [];
+  for (const e of sourceArray) {
+    const name = (e.name || '').trim();
+    if (!name) continue;
+    const description = e.description || '';
+    const categories = e.categories || [];
+    const badges = e.badges || [];
+    const featured = e.featured || false;
+
+    // Normalize to a list of {booth, hallCode, hallName} entries.
+    let locations = [];
+    if (Array.isArray(e.booth)) {
+      if (e.booth.length === 0) continue; // exhibitor with no booth - skip
+      for (let i = 0; i < e.booth.length; i++) {
+        const b = String(e.booth[i]);
+        const h = Array.isArray(e.hall) ? e.hall[i] : e.hall;
+        const hc = (h && h.code) || '?';
+        const hn = (h && h.name) || 'Unknown';
+        locations.push({ booth: b, hallCode: hc, hallName: hn });
+      }
+    } else {
+      const b = e.booth ? String(e.booth) : '';
+      if (!b) continue;
+      const h = e.hall;
+      const hc = (h && h.code) || '?';
+      const hn = (h && h.name) || 'Unknown';
+      locations.push({ booth: b, hallCode: hc, hallName: hn });
+    }
+
+    for (const loc of locations) {
+      BOOTHS[loc.booth] = {
+        n: name,
+        h: loc.hallName,
+        c: loc.hallCode,
+        d: description,
+        cat: categories,
+        bg: badges,
+        f: featured
+      };
+      SEARCH_DATA.push([loc.booth, name, loc.hallCode]);
+    }
+  }
+  SEARCH_DATA.sort((a, b) => a[1].toLowerCase().localeCompare(b[1].toLowerCase()));
+  return { BOOTHS, SEARCH_DATA };
+}
+
+async function fetchAndCacheExhibitors() {
+  const response = await fetch(EXHIBITOR_SOURCE_URL);
+  if (!response.ok) throw new Error('HTTP ' + response.status);
+  const sourceArray = await response.json();
+  const lookups = translateSourceToLookups(sourceArray);
+  try {
+    localStorage.setItem(EXHIBITOR_CACHE_KEY, JSON.stringify(lookups));
+  } catch (e) {
+    // Storage full or disabled - app still works for this session.
+    console.warn('Could not cache exhibitor data:', e);
+  }
+  return lookups;
+}
+
+async function loadExhibitorData() {
+  // Try local cache first.
+  let cached = null;
+  try {
+    const raw = localStorage.getItem(EXHIBITOR_CACHE_KEY);
+    if (raw) cached = JSON.parse(raw);
+  } catch (e) {
+    cached = null;
+  }
+
+  if (cached && cached.BOOTHS && cached.SEARCH_DATA) {
+    // Use cache immediately. Refresh in background.
+    BOOTHS = cached.BOOTHS;
+    SEARCH_DATA = cached.SEARCH_DATA;
+    fetchAndCacheExhibitors().then(fresh => {
+      BOOTHS = fresh.BOOTHS;
+      SEARCH_DATA = fresh.SEARCH_DATA;
+    }).catch(() => { /* offline or fetch failed - cached copy is fine */ });
+    return;
+  }
+
+  // No cache - must fetch before app can be useful.
+  // Show a loading indicator so the screen isn't blank.
+  const loader = document.createElement('div');
+  loader.id = 'exhibitor-loader';
+  loader.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;font-family:var(--font);color:var(--text-secondary);font-size:14px;text-align:center;padding:20px;';
+  loader.textContent = 'Loading exhibitor list...';
+  document.body.appendChild(loader);
+
+  try {
+    const fresh = await fetchAndCacheExhibitors();
+    BOOTHS = fresh.BOOTHS;
+    SEARCH_DATA = fresh.SEARCH_DATA;
+  } catch (err) {
+    console.error('Failed to load exhibitor data:', err);
+    loader.innerHTML = 'Could not load exhibitor list.<br>Check your connection and reload.';
+    loader.style.color = 'var(--red, #c33)';
+    throw err;
+  }
+  loader.remove();
+}
+
+async function initApp() {
+  await loadExhibitorData();
+
+  buildIdentityOverlay();
+  buildAssignScroll();
+  buildTagGroupsScroll();
+  buildTagPeopleScroll();
+  buildFeedFilters();
+  seedDawn();
+
+  // Wire persistent submit functions
+  window.submitDisc = submitDiscPersist;
+  window.addBooth   = addBoothPersist;
+  window.submitBoothReport = submitBoothReportPersist;
+  window.submitBoothFollowup = submitBoothFollowupPersist;
+
+  // Wrap renderBoothItems to add voice/photo after each render
+  const _origRBI = renderBoothItems;
+  renderBoothItems = function() {
+    _origRBI();
+    document.querySelectorAll('.booth-capture-input, .booth-capture-textarea').forEach(el => {
+      if (!el.closest('.voice-field-wrap')) wrapWithVoice(el);
+    });
+    document.querySelectorAll('.booth-submit-btn').forEach(btn => {
+      const onclickAttr = btn.getAttribute('onclick') || '';
+      const match = onclickAttr.match(/'([^']+)'/);
+      const id = match?.[1];
+      if (!id) return;
+      // Determine form key based on which submit handler the button calls
+      const formKey = onclickAttr.includes('submitBoothFollowup')
+        ? 'followup-' + id
+        : 'booth-' + id;
+      // Only inject if not already present
+      if (!document.getElementById('photos-thumbs-' + formKey)) {
+        buildPhotoCapture(formKey, btn);
+      }
+    });
+  };
+
+  // Wire voice icons to static text fields
+  ['add-reason', 'disc-note', 'disc-contact', 'exhibitor-search', 'manage-exhibitor-search'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) wrapWithVoice(el);
+  });
+
+  // Setup multi-photo capture on Discovery form (anchored to its submit button)
+  (function setupDiscoveryPhotos() {
+    const screen = document.getElementById('screen-discover');
+    if (!screen) return;
+    const submitBtn = screen.querySelector('.btn-primary');
+    if (submitBtn) buildPhotoCapture('disc', submitBtn);
+  })();
+
+  document.getElementById('exhibitor-results').innerHTML = '<div class="search-hint">Type a name or booth number</div>';
+
+  initIdentity();
+  loadFromKV();
+}
+
+initApp();
+
+</script>
+</body>
+</html>
