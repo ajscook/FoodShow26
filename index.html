@@ -14,26 +14,40 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --blue: #60A5FA;
-    --blue-dark: #3B82F6;
-    --blue-light: rgba(96,165,250,0.18);
-    --blue-mid: #3B7AC4;
-    --green: #4BAD4A;
-    --green-dark: #368035;
+    /* Single muted blue carrying every "interactive / system" signal. */
+    --blue: #7A9BC4;
+    --blue-dark: #6B8FB5;
+    --blue-light: rgba(122,155,196,0.16);
+    --blue-mid: #7A9BC4;
+
+    /* Green: Harbor's color. Reserved exclusively for From Departments
+       origin signaling on Explore cards (left border + count). Not used
+       anywhere else in the system. Aliases below redirect any other
+       legacy --green references to blue so green never leaks. */
+    --green-harbor: #4BAD4A;
+    --green: #7A9BC4;
+    --green-dark: #6B8FB5;
     --green-deep: #0F1410;
-    --green-light: rgba(75,173,74,0.12);
-    --amber: #D4A017;
-    --amber-light: rgba(212,160,23,0.12);
-    --yellow: #F5C518;
-    --white: #FFFFFF;
-    --off-white: #111214;
-    --surface: #191C1F;
-    --surface-raised: #21252A;
-    --border: rgba(255,255,255,0.07);
-    --border-strong: rgba(255,255,255,0.14);
-    --text-primary: #F2F4F8;
-    --text-secondary: #B0BCC8;
-    --text-hint: #6E7F90;
+    --green-light: rgba(122,155,196,0.16);
+
+    /* Single warm amber, reserved for "your attention" (currently unused
+       after engaged-state was removed). */
+    --amber: #C8902E;
+    --amber-light: rgba(200,144,46,0.14);
+    --yellow: #C8902E;
+
+    /* Recording red — the one place red earns a place in the system. */
+    --record-red: #E24B4A;
+
+    --white: #F4F1EC;
+    --off-white: #131211;
+    --surface: #1A1917;
+    --surface-raised: #232220;
+    --border: rgba(244,241,236,0.10);
+    --border-strong: rgba(244,241,236,0.20);
+    --text-primary: #F4F1EC;
+    --text-secondary: #B5B0A8;
+    --text-hint: #7A736A;
     --shadow-sm: 0 1px 4px rgba(0,0,0,0.4);
     --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
     --radius-sm: 8px;
@@ -94,7 +108,7 @@
 
   .header-identity-bar {
     background: transparent;
-    border: 1.5px solid var(--blue);
+    border: 1px solid var(--border-strong);
     border-radius: var(--radius-md);
     margin: 8px 16px;
     padding: 0 16px;
@@ -106,25 +120,33 @@
     cursor: pointer;
     user-select: none;
   }
-  .header-identity-bar:active { background: var(--blue-light); }
+  .header-identity-bar:active { background: var(--surface); }
+  .header-identity-bar.locked {
+    cursor: default;
+    border-color: var(--border);
+  }
+  .header-identity-bar.locked .header-identity-arrow {
+    display: none;
+  }
+  .header-identity-bar.locked:active { background: transparent; }
   .header-identity-bar:focus,
   .header-identity-bar:focus-within { outline: none; }
   .header-identity-name:focus { outline: none; }
   .header-identity-label {
     font-size: 11px;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--text-hint);
+    letter-spacing: 0;
+    text-transform: none;
     margin-right: 8px;
     flex-shrink: 0;
   }
   .header-identity-name {
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--text-primary);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+    text-transform: none;
+    letter-spacing: 0;
     flex: 1;
   }
   .header-identity-name.placeholder {
@@ -141,82 +163,60 @@
   }
   .header-identity-bar.open .header-identity-arrow { transform: rotate(180deg); }
 
-  /* Home button - sits to the right of the identity bar */
-  .header-row {
-    display: flex;
-    align-items: stretch;
-    gap: 8px;
-    margin: 8px 16px;
-  }
-  .header-row .header-identity-bar {
-    margin: 0;
-    flex: 1;
-  }
-  .header-home-btn {
-    background: transparent;
-    border: 1.5px solid var(--blue);
-    border-radius: var(--radius-md);
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    flex-shrink: 0;
-    padding: 0;
-  }
-  .header-home-btn:active { background: var(--surface); }
-  .header-home-btn svg {
-    width: 20px;
-    height: 20px;
-    stroke: var(--green);
-    fill: none;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
   /* Home screen */
   .home-block {
     padding: 20px 16px 40px;
   }
   .home-intro {
     font-size: 13px;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-bottom: 16px;
+    font-weight: 500;
+    color: var(--text-hint);
+    letter-spacing: 0;
+    text-transform: none;
+    margin-bottom: 14px;
     text-align: center;
+    line-height: 1.4;
+  }
+  /* Horizontal bar layout. Each row is a request, ordered loudest to quietest.
+     The left border thickness carries the weight signal: a louder request has
+     a thicker left stripe, a quieter one has a thin stripe. The user reads
+     the column as a vertical gradient of urgency without a legend. */
+  .request-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
   .request-card {
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--blue);
+    /* --weight is 0..1; the left stripe scales from 2px (quiet) to 8px (loud) */
+    --weight: 0.5;
+    border: 1px solid var(--border-strong);
+    border-left: calc(2px + (var(--weight) * 6px)) solid var(--blue);
     border-radius: var(--radius-md);
-    margin-bottom: 10px;
-    overflow: hidden;
     background: transparent;
-  }
-  .request-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     padding: 14px 16px;
     cursor: pointer;
     user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 12px;
+    transition: background 0.12s, transform 0.05s ease-out;
   }
-  .request-head:active { background: var(--surface); }
+  .request-card:active {
+    background: var(--surface);
+    transform: scale(0.99);
+  }
   .request-head-text {
     flex: 1;
     min-width: 0;
   }
   .request-name {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 700;
     color: var(--text-primary);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+    text-transform: none;
+    letter-spacing: 0;
+    line-height: 1.25;
   }
   .request-summary {
     font-size: 12px;
@@ -225,18 +225,15 @@
     line-height: 1.4;
   }
   .request-arrow {
-    font-size: 10px;
-    color: var(--green);
+    font-size: 14px;
+    color: var(--text-hint);
     flex-shrink: 0;
-    transition: transform 0.15s;
+    line-height: 1;
   }
-  .request-card.open .request-arrow { transform: rotate(180deg); }
+  /* request-body is consumed only by the modal; never shown on Home. */
   .request-body {
     display: none;
-    padding: 4px 16px 16px;
-    border-top: 1px solid var(--border);
   }
-  .request-card.open .request-body { display: block; }
   .request-section {
     margin-top: 12px;
   }
@@ -259,31 +256,103 @@
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.55);
+    background: rgba(0,0,0,0);
     z-index: 5000;
     align-items: center;
     justify-content: center;
     padding: 20px;
+    transition: background 0.3s ease-out;
   }
-  .welcome-overlay.open { display: flex; }
+  .welcome-overlay.open {
+    display: flex;
+    background: rgba(0,0,0,0.55);
+  }
   .welcome-modal {
-    background: var(--off-white);
-    border: 1.5px solid var(--green);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
     border-radius: var(--radius-md);
-    max-width: 380px;
+    max-width: 320px;
     width: 100%;
-    padding: 44px 28px 36px;
+    padding: 32px 24px 36px;
     position: relative;
     text-align: center;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
   }
+  .welcome-overlay.open .welcome-modal {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Request modal - opened from a Home card tap */
+  .request-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0);
+    z-index: 5000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    transition: background 0.3s ease-out;
+  }
+  .request-modal-overlay.open {
+    display: flex;
+    background: rgba(0,0,0,0.55);
+  }
+  .request-modal {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    max-width: 360px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 28px 24px 28px;
+    position: relative;
+    text-align: left;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+  }
+  .request-modal-overlay.open .request-modal {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .request-modal-close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 28px;
+    line-height: 1;
+    padding: 4px 10px;
+    cursor: pointer;
+  }
+  .request-modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 24px 14px 0;
+    line-height: 1.3;
+  }
+  .request-modal-body {
+    color: var(--text-primary);
+  }
+  /* The body's inner sections are reused from the .request-body markup
+     on Home; their existing styles (.request-section, etc.) apply here
+     unchanged. */
   .welcome-close {
     position: absolute;
-    bottom: 10px;
+    top: 10px;
     right: 12px;
     background: transparent;
     border: none;
-    color: var(--blue);
-    font-size: 32px;
+    color: var(--text-secondary);
+    font-size: 28px;
     line-height: 1;
     padding: 4px 10px;
     cursor: pointer;
@@ -292,9 +361,9 @@
     font-size: 22px;
     font-weight: 700;
     color: var(--text-primary);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin-bottom: 26px;
+    text-transform: none;
+    letter-spacing: 0;
+    margin-bottom: 20px;
   }
   .welcome-body {
     font-size: 15px;
@@ -311,9 +380,9 @@
     font-size: 14px;
     font-weight: 700;
     color: var(--text-primary);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin: 12px 0 16px;
+    text-transform: none;
+    letter-spacing: 0;
+    margin: 12px 0 12px;
   }
 
   /* Identity dropdown panel */
@@ -324,7 +393,7 @@
     left: 0;
     right: 0;
     background: var(--surface-raised);
-    border: 1.5px solid var(--green);
+    border: 1px solid var(--border-strong);
     border-top: none;
     z-index: 500;
     max-height: 380px;
@@ -334,10 +403,10 @@
   .identity-dropdown.open { display: block; }
   .identity-dropdown-section {
     padding: 8px 16px 4px;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-hint);
     background: var(--surface);
     border-bottom: 1px solid var(--border);
@@ -353,11 +422,11 @@
   }
   .identity-dropdown-item:last-child { border-bottom: none; }
   .identity-dropdown-item:active { background: var(--surface); }
-  .identity-dropdown-item.selected { background: var(--surface); border-left: 3px solid var(--green); padding-left: 13px; }
+  .identity-dropdown-item.selected { background: var(--surface); border-left: 3px solid var(--blue); padding-left: 13px; }
   .identity-dropdown-item-name { font-size: 13px; font-weight: 500; color: var(--text-primary); }
   .identity-dropdown-item-tags { font-size: 10px; color: var(--text-hint); }
 
-  /* TAB BAR (bottom-fixed pills) */
+  /* TAB BAR (text labels with active underline, calm by default) */
   .tab-bar {
     position: fixed;
     bottom: 0;
@@ -366,38 +435,56 @@
     z-index: 100;
     background: var(--off-white);
     border-top: 1px solid var(--border);
-    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
     display: flex;
-    justify-content: center;
-    gap: 10px;
+    justify-content: space-around;
+    align-items: stretch;
+    gap: 4px;
     max-width: 430px;
     margin: 0 auto;
   }
   .tab {
-    flex: 0 1 auto;
-    min-width: 88px;
+    flex: 1 1 0;
+    min-width: 0;
     height: 44px;
-    padding: 0 18px;
-    border-radius: var(--radius-md);
-    border: 1.5px solid var(--blue);
+    padding: 0 8px;
     background: transparent;
+    border: none;
+    border-radius: 0;
     cursor: pointer;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    gap: 4px;
+    position: relative;
+    transition: color 0.15s;
   }
-  .tab.active {
+  .tab::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%) scaleX(0);
+    width: 24px;
+    height: 2px;
     background: var(--blue);
-    border-color: var(--blue);
+    transition: transform 0.15s;
+    border-radius: 1px;
+  }
+  .tab.active::after {
+    transform: translateX(-50%) scaleX(1);
   }
   .tab-label {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--text-secondary);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-hint);
+    letter-spacing: 0.02em;
+    text-transform: none;
     line-height: 1;
+  }
+  .tab.active .tab-label {
+    color: var(--text-primary);
   }
 
   /* Memo button - circular, lives in tab bar but visually distinct */
@@ -406,13 +493,14 @@
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    border: 1.5px solid var(--green);
+    border: 1.5px solid var(--blue);
     background: transparent;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
+    align-self: center;
   }
   .memo-btn:active { background: var(--surface); }
   .memo-btn svg {
@@ -423,6 +511,28 @@
     stroke-width: 1.8;
     stroke-linecap: round;
     stroke-linejoin: round;
+  }
+
+  /* Locked state: when no identity is selected, the tabs (other than Home)
+     and the memo button are dimmed and visually unavailable. Tapping them
+     triggers a green pulse on the identity bar instead of navigating. */
+  .tab.locked,
+  .memo-btn.locked {
+    opacity: 0.35;
+  }
+  .memo-btn.locked svg {
+    stroke: var(--text-hint);
+  }
+
+  /* One-shot green pulse on the identity bar to direct the user's
+     attention there when they tap a locked control. */
+  .header-identity-bar.pulse {
+    animation: identityPulse 0.8s ease-out 2;
+  }
+  @keyframes identityPulse {
+    0%   { border-color: var(--border-strong); box-shadow: 0 0 0 0 rgba(75,173,74,0.0); }
+    50%  { border-color: #4BAD4A;              box-shadow: 0 0 0 4px rgba(75,173,74,0.35); }
+    100% { border-color: var(--border-strong); box-shadow: 0 0 0 0 rgba(75,173,74,0.0); }
   }
 
   /* Memo popup overlay */
@@ -535,7 +645,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: transform 0.05s ease-out;
   }
+  .memo-action:active .memo-action-circle { transform: scale(0.96); }
+  .memo-action:disabled .memo-action-circle { transform: none; }
   .memo-action-circle svg {
     width: 24px;
     height: 24px;
@@ -562,9 +675,6 @@
   .memo-action:disabled {
     cursor: not-allowed;
   }
-  .tab.active .tab-label {
-    color: var(--white);
-  }
 
   /* SCREENS */
   .screen { display: none; padding-bottom: 100px; animation: fadeIn 0.2s ease; }
@@ -572,17 +682,17 @@
   @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
   .section-head {
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 600;
-    color: var(--text-hint);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 16px 16px 6px;
+    color: var(--text-secondary);
+    letter-spacing: 0;
+    text-transform: none;
+    padding: 16px 16px 8px;
   }
 
   /* TRIP SCREEN */
   .links-grid {
-    background: #0D0F11;
+    background: var(--off-white);
     padding: 12px;
     display: flex;
     flex-wrap: wrap;
@@ -596,27 +706,27 @@
     text-align: center;
     width: calc(33.333% - 6px);
     padding: 12px 8px;
-    font-size: 11px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.85);
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
     text-decoration: none;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     line-height: 1.3;
-    transition: background 0.15s, border-color 0.15s;
+    transition: border-color 0.15s, color 0.15s;
   }
-  .link-chip:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.25); }
+  .link-chip:hover { border-color: var(--blue); color: var(--text-primary); }
 
   .trip-note {
-    background: var(--surface-raised);
-    border-left: 3px solid var(--green);
+    background: var(--surface);
+    border-left: 3px solid var(--blue);
     margin: 12px 16px;
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
     padding: 8px 12px;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-secondary);
     line-height: 1.5;
   }
@@ -638,17 +748,17 @@
     user-select: none;
   }
   .day-header:active { background: var(--surface-raised); }
-  .day-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
-  .day-date { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+  .day-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+  .day-date { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
   .day-icon {
     width: 32px; height: 32px;
     border-radius: var(--radius-sm);
-    background: var(--surface-raised);
-    border: 1px solid var(--green);
+    background: transparent;
+    border: 1px solid var(--border-strong);
     display: flex; align-items: center; justify-content: center;
     font-size: 13px;
     font-weight: 700;
-    color: var(--green);
+    color: var(--text-secondary);
     font-family: var(--font-mono);
     flex-shrink: 0;
   }
@@ -669,8 +779,8 @@
     padding-top: 1px;
   }
   .event-desc { font-size: 13px; color: var(--text-primary); line-height: 1.45; }
-  .event-link { color: var(--blue-mid); text-decoration: none; border-bottom: 1px solid rgba(59,122,196,0.3); }
-  .event-link:hover { border-bottom-color: var(--blue-mid); }
+  .event-link { color: var(--blue); text-decoration: none; border-bottom: 1px solid rgba(122,155,196,0.3); }
+  .event-link:hover { border-bottom-color: var(--blue); }
   .event-badge {
     display: inline-block;
     font-size: 10px;
@@ -680,8 +790,8 @@
     margin-left: 6px;
     vertical-align: middle;
   }
-  .badge-show { background: transparent; color: var(--blue-mid); border: 1px solid var(--blue-mid); }
-  .badge-event { background: transparent; color: var(--green); border: 1px solid var(--green); }
+  .badge-show { background: transparent; color: var(--blue); border: 1px solid var(--blue); }
+  .badge-event { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-strong); }
 
   /* PLACEHOLDERS for Explore and Discover (filled in later passes) */
   .placeholder {
@@ -722,8 +832,8 @@
     top: 10px;
     transform: none;
   }
-  .voice-field-icon:hover { color: var(--green); }
-  .voice-field-icon.recording { color: #E24B4A; animation: recordPulse 1.2s infinite; }
+  .voice-field-icon:hover { color: var(--blue); }
+  .voice-field-icon.recording { color: var(--record-red); animation: recordPulse 1.2s infinite; }
   .voice-field-icon svg { width: 16px; height: 16px; fill: currentColor; }
   @keyframes recordPulse {
     0%,100% { opacity: 1; }
@@ -870,48 +980,50 @@
     line-height: 1.5;
   }
   .form-input:focus,
-  .form-textarea:focus { border-color: var(--green); }
+  .form-textarea:focus { border-color: var(--blue); }
 
   .exhibitor-search-input {
     font-size: 16px;
     padding: 14px 16px;
-    border-color: var(--green);
+    border-color: var(--blue);
   }
   .voice-field-wrap:has(> .exhibitor-search-input) .voice-field-icon {
-    color: var(--green);
+    color: var(--blue);
   }
 
   .form-label {
     display: block;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--text-secondary);
     margin-bottom: 6px;
     margin-top: 4px;
-    letter-spacing: 0.02em;
+    letter-spacing: 0;
   }
 
   .btn-primary {
     width: 100%;
     padding: 12px;
-    background: var(--green);
-    color: var(--green-deep);
+    background: var(--blue);
+    color: var(--off-white);
     font-family: var(--font);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
     border: none;
     border-radius: var(--radius-sm);
     cursor: pointer;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     margin-top: 6px;
-    transition: background 0.15s;
+    transition: background 0.15s, transform 0.05s ease-out;
   }
-  .btn-primary:hover { background: var(--green-dark); }
+  .btn-primary:hover { background: var(--blue-dark); }
+  .btn-primary:active { transform: scale(0.98); }
   .btn-primary:disabled {
     background: var(--surface-raised);
     color: var(--text-hint);
     cursor: not-allowed;
+    transform: none;
   }
 
   .btn-secondary {
@@ -920,14 +1032,47 @@
     background: transparent;
     color: var(--text-secondary);
     font-family: var(--font);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
-    border: 1.5px solid var(--border-strong);
+    border: 1px solid var(--border-strong);
     border-radius: var(--radius-sm);
     cursor: pointer;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     margin-top: 8px;
+  }
+
+  /* Details disclosure on Discover - keeps capture surface short */
+  .details-toggle {
+    width: 100%;
+    padding: 8px 0;
+    background: transparent;
+    border: none;
+    color: var(--text-hint);
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 4px 0 0;
+  }
+  .details-toggle:active { color: var(--text-secondary); }
+  .details-toggle-arrow {
+    font-size: 9px;
+    transition: transform 0.15s;
+  }
+  .details-toggle.open .details-toggle-arrow {
+    transform: rotate(180deg);
+  }
+  .details-block {
+    display: none;
+    padding-top: 4px;
+  }
+  .details-block.open {
+    display: block;
   }
 
   /* My report — button on Discover and overlay screen */
@@ -936,23 +1081,33 @@
   }
   .btn-report {
     width: 100%;
-    padding: 12px;
+    padding: 12px 14px;
     background: transparent;
     color: var(--text-primary);
     font-family: var(--font);
     font-size: 13px;
-    font-weight: 600;
-    border: 1.5px solid var(--border-strong);
-    border-left: 3px solid var(--blue);
+    font-weight: 700;
+    border: 1px solid var(--border-strong);
     border-radius: var(--radius-sm);
     cursor: pointer;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
+    text-align: center;
+    position: relative;
+    transition: border-color 0.15s;
   }
+  .btn-report:hover { border-color: var(--text-secondary); }
   .btn-report:disabled {
     color: var(--text-hint);
     cursor: not-allowed;
-    border-left-color: var(--border-strong);
+  }
+  .btn-report-arrow {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-hint);
+    font-size: 10px;
   }
   .report-overlay {
     display: none;
@@ -1446,6 +1601,11 @@
   .sort-picker-wrap {
     position: relative;
   }
+  .sort-picker-row {
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px 16px 4px;
+  }
   .sort-picker-trigger {
     background: var(--surface-raised);
     border: 1.5px solid var(--border-strong);
@@ -1509,50 +1669,79 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px 6px;
+    padding: 14px 16px 8px;
   }
   .explore-section-title {
-    font-size: 10px;
+    font-size: 14px;
     font-weight: 600;
-    color: var(--text-hint);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    color: var(--text-secondary);
+    letter-spacing: 0;
+    text-transform: none;
   }
   .explore-section-count {
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--text-secondary);
-    background: var(--surface-raised);
-    padding: 2px 8px;
-    border-radius: 10px;
-    min-width: 22px;
-    text-align: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-hint);
+    background: transparent;
+    padding: 0;
+    min-width: 0;
+    text-align: right;
     font-family: var(--font-mono);
   }
 
   /* EXPLORE: cards */
   .explore-card {
     background: var(--surface);
-    border: 1.5px solid var(--blue-mid);
+    border: 1px solid var(--border-strong);
     border-radius: var(--radius-md);
     margin: 0 16px 10px;
     overflow: hidden;
     box-shadow: var(--shadow-sm);
     position: relative;
   }
-  .explore-card.origin-dept { border-color: var(--green); }
-  .explore-card.origin-peer { border-color: var(--blue-mid); }
-  .explore-card.engaged { border-color: var(--amber); }
 
-  /* Mixed origin: orthogonal split borders.
-     Green forms top + left edges. Blue forms bottom + right edges.
-     Achieved by setting the four border sides individually.
-     NOTE: engaged state overrides this - engaged cards are always solid amber. */
-  .explore-card.origin-mixed:not(.engaged) {
-    border-top: 1.5px solid var(--green);
-    border-left: 1.5px solid var(--green);
-    border-bottom: 1.5px solid var(--blue-mid);
-    border-right: 1.5px solid var(--blue-mid);
+  /* Origin signal: thick left-border accent.
+     Green = From Departments (Harbor's color).
+     Blue  = From Teammates.
+     Mixed = green left + blue right. */
+  .explore-card.origin-dept {
+    border-left: 4px solid var(--green-harbor);
+  }
+  .explore-card.origin-peer {
+    border-left: 4px solid var(--blue);
+  }
+  .explore-card.origin-mixed {
+    border-left: 4px solid var(--green-harbor);
+    border-right: 4px solid var(--blue);
+  }
+
+  /* Engaged cards live in the Engaged section. The amber accent applies
+     to the left border and the count, same shape as the dept/peer rules
+     above — just a different color. Once a card is engaged it leaves the
+     From Departments / From Teammates sections, so there is no need for
+     a separate "engaged" overlay on those cards. */
+  .explore-card.engaged {
+    border-left: 4px solid var(--amber);
+  }
+  /* Engaged overrides the mixed-origin right border too — engaged cards
+     show the amber signal cleanly without lingering origin marks. */
+  .explore-card.engaged.origin-mixed {
+    border-right: 1px solid var(--border-strong);
+  }
+  .explore-card.engaged .explore-card-count {
+    color: var(--amber);
+    border-color: var(--amber);
+  }
+
+  /* One-shot glow when a card transitions into Engaged. The animation
+     plays once on first paint after submitResponse, then settles. */
+  .explore-card.just-engaged {
+    animation: engagedGlow 1s ease-out 1;
+  }
+  @keyframes engagedGlow {
+    0%   { box-shadow: 0 0 0 0 rgba(200,144,46,0.0); }
+    30%  { box-shadow: 0 0 0 6px rgba(200,144,46,0.45); }
+    100% { box-shadow: 0 0 0 0 rgba(200,144,46,0.0); }
   }
 
   .explore-card-eb-badge {
@@ -1586,18 +1775,29 @@
 
   .explore-card-count {
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 700;
-    color: var(--white);
+    color: var(--text-hint);
     background: transparent;
-    border: 1px solid var(--white);
+    border: 1px solid var(--border-strong);
     border-radius: 50%;
-    width: 28px;
-    height: 28px;
+    width: 22px;
+    height: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+  }
+  /* Count number takes the origin color. Mixed cards use green for the
+     count since green is the higher-priority signal (department first). */
+  .explore-card.origin-dept .explore-card-count,
+  .explore-card.origin-mixed .explore-card-count {
+    color: var(--green-harbor);
+    border-color: var(--green-harbor);
+  }
+  .explore-card.origin-peer .explore-card-count {
+    color: var(--blue);
+    border-color: var(--blue);
   }
 
   .explore-card-info {
@@ -1605,7 +1805,7 @@
     min-width: 0;
   }
   .explore-card-name {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 700;
     color: var(--text-primary);
     line-height: 1.25;
@@ -1654,17 +1854,17 @@
     align-self: center;
   }
   .explore-card-from-label {
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-hint);
-    margin-bottom: 2px;
+    margin-bottom: 1px;
   }
   .explore-card-from-name {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-hint);
     line-height: 1.3;
     white-space: nowrap;
   }
@@ -1695,7 +1895,7 @@
   .explore-entry {
     padding: 12px 14px;
     border-bottom: 1px solid var(--border);
-    background: rgba(0,0,0,0.15);
+    background: transparent;
   }
   .explore-entry:last-child { border-bottom: none; }
   .explore-entry-from {
@@ -1841,13 +2041,13 @@
     margin-bottom: 8px;
     transition: border-color 0.15s;
   }
-  .response-form-textarea:focus { border-color: var(--green); }
+  .response-form-textarea:focus { border-color: var(--blue); }
 
   /* Exhibitor details (categories, badges, description) */
   .exhibitor-details-block {
     padding: 10px 14px;
     border-top: 1px solid var(--border);
-    background: rgba(0,0,0,0.1);
+    background: transparent;
   }
   .exhibitor-details-row {
     display: flex;
@@ -1942,30 +2142,42 @@
   .sent-toggle {
     width: 100%;
     background: transparent;
-    border: 1.5px solid var(--border-strong);
+    border: 1px solid var(--border-strong);
     border-radius: var(--radius-sm);
     padding: 12px 14px;
     color: var(--text-primary);
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     font-family: var(--font);
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: block;
+    text-align: center;
+    position: relative;
     transition: border-color 0.15s, background 0.15s;
   }
   .sent-toggle:hover { border-color: var(--text-secondary); }
-  .sent-toggle.open { border-color: var(--green); }
+  .sent-toggle.open { border-color: var(--blue); }
+  .sent-toggle-label {
+    letter-spacing: 0.06em;
+  }
+  .sent-toggle-right {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
   .sent-toggle-count {
-    background: var(--surface-raised);
-    color: var(--text-secondary);
+    background: transparent;
+    color: var(--text-hint);
     font-family: var(--font-mono);
     font-size: 11px;
-    padding: 2px 8px;
-    border-radius: 10px;
-    min-width: 22px;
-    text-align: center;
+    font-weight: 600;
+    padding: 0;
+    min-width: 0;
+    text-align: right;
   }
   .sent-toggle-arrow {
     color: var(--text-hint);
@@ -1994,9 +2206,9 @@
     margin-bottom: 4px;
   }
   .sent-item-name {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--white);
     flex: 1;
     min-width: 0;
   }
@@ -2020,10 +2232,13 @@
     word-wrap: break-word;
     margin-bottom: 6px;
   }
+  /* Sent-to line: bottom-right aligned; recipient names rendered in white
+     so the receiving teammate stands out against the surrounding caption. */
   .sent-item-recipients {
     font-size: 10px;
     color: var(--text-hint);
-    margin-bottom: 6px;
+    text-align: right;
+    margin-top: 6px;
   }
   .sent-item-recipients strong {
     color: var(--text-secondary);
@@ -2031,6 +2246,10 @@
     letter-spacing: 0.06em;
     text-transform: uppercase;
     margin-right: 4px;
+  }
+  .sent-item-recipients-names {
+    color: var(--white);
+    font-weight: 600;
   }
   .sent-item-responses {
     font-size: 11px;
@@ -2043,7 +2262,7 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--green);
+    color: var(--text-hint);
     margin-bottom: 4px;
   }
   .sent-item-response {
@@ -2053,9 +2272,16 @@
   .sent-item-response:last-child { border-bottom: none; }
   .sent-item-response-from {
     font-size: 11px;
-    color: var(--text-primary);
+    color: var(--white);
     font-weight: 600;
     margin-bottom: 2px;
+  }
+  .sent-item-response-from-label {
+    color: var(--text-hint);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-right: 4px;
   }
   .sent-item-response-note {
     font-size: 12px;
@@ -2093,7 +2319,7 @@
   }
   .export-result.show { display: block; }
   .export-result-success { color: var(--green); }
-  .export-result-error { color: #E24B4A; }
+  .export-result-error { color: var(--record-red); }
 </style>
 </head>
 <body>
@@ -2105,32 +2331,27 @@
       <div id="header-fallback" style="display:none;color:white;font-size:18px;font-weight:700;letter-spacing:0.06em;">HARBOR SOLUTIONS</div>
     </div>
 
-    <div class="header-row">
-      <div class="header-identity-bar" id="header-identity" onclick="toggleIdentityDropdown()">
-        <span class="header-identity-label">Viewing as</span>
-        <span class="header-identity-name placeholder" id="header-identity-name">[Select]</span>
-        <span class="header-identity-arrow">&#9660;</span>
-        <div class="identity-dropdown" id="identity-dropdown"></div>
-      </div>
-      <button type="button" class="header-home-btn" onclick="showScreen('home')" aria-label="Home">
-        <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 9.5V21h5v-7h4v7h5V9.5"/></svg>
-      </button>
+    <div class="header-identity-bar" id="header-identity" onclick="toggleIdentityDropdown()">
+      <span class="header-identity-label">Viewing as</span>
+      <span class="header-identity-name placeholder" id="header-identity-name">[Select]</span>
+      <span class="header-identity-arrow">&#9660;</span>
+      <div class="identity-dropdown" id="identity-dropdown"></div>
     </div>
   </div>
 
   <!-- HOME -->
   <div id="screen-home" class="screen active">
     <div class="home-block">
-      <div class="home-intro">Requests from the Field</div>
+      <div class="home-intro">What the team is asking us to look into.</div>
 
-      <div class="request-card" onclick="toggleRequest(this)">
-        <div class="request-head">
-          <div class="request-head-text">
-            <div class="request-name">Center-of-plate value rebuild</div>
-            <div class="request-summary">Hold price points without dropping perceived quality</div>
-          </div>
-          <div class="request-arrow">&#9660;</div>
+      <div class="request-stack">
+
+      <div class="request-card" style="--weight: 1.0" onclick="toggleRequest(this)">
+        <div class="request-head-text">
+          <div class="request-name">Center-of-plate value rebuild</div>
+          <div class="request-summary">Hold price points without dropping perceived quality</div>
         </div>
+        <div class="request-arrow">&#9654;</div>
         <div class="request-body">
           <div class="request-section">
             <div class="request-section-label">Why</div>
@@ -2147,14 +2368,12 @@
         </div>
       </div>
 
-      <div class="request-card" onclick="toggleRequest(this)">
-        <div class="request-head">
-          <div class="request-head-text">
-            <div class="request-name">Protein, reimagined</div>
-            <div class="request-summary">Proteins that read as a feature, not a substitute</div>
-          </div>
-          <div class="request-arrow">&#9660;</div>
+      <div class="request-card" style="--weight: 0.75" onclick="toggleRequest(this)">
+        <div class="request-head-text">
+          <div class="request-name">Protein, reimagined</div>
+          <div class="request-summary">Proteins that read as a feature, not a substitute</div>
         </div>
+        <div class="request-arrow">&#9654;</div>
         <div class="request-body">
           <div class="request-section">
             <div class="request-section-label">Why</div>
@@ -2171,62 +2390,12 @@
         </div>
       </div>
 
-      <div class="request-card" onclick="toggleRequest(this)">
-        <div class="request-head">
-          <div class="request-head-text">
-            <div class="request-name">Bakery and dessert upgrades</div>
-            <div class="request-summary">Small upgrades, large perceived-quality gains</div>
-          </div>
-          <div class="request-arrow">&#9660;</div>
+      <div class="request-card" style="--weight: 0.5" onclick="toggleRequest(this)">
+        <div class="request-head-text">
+          <div class="request-name">Packaging and containers</div>
+          <div class="request-summary">Takeout that holds heat, doesn't leak, doesn't kill margin</div>
         </div>
-        <div class="request-body">
-          <div class="request-section">
-            <div class="request-section-label">Why</div>
-            <div class="request-section-text">Independent operators do not have R&amp;D budgets, and bakery and dessert are where small upgrades produce the largest perceived-quality gains for the lowest cost per cover. A better bun, a better roll, a signature dessert; these are the items diners remember and post about, and they cost the operator pennies to upgrade.</div>
-          </div>
-          <div class="request-section">
-            <div class="request-section-label">What</div>
-            <div class="request-section-text">Find buns, rolls, breads, and desserts that lift perceived quality at low cost-per-cover.</div>
-          </div>
-          <div class="request-section">
-            <div class="request-section-label">Who</div>
-            <div class="request-section-text">Matt, and connects back to Tony's burger.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="request-card" onclick="toggleRequest(this)">
-        <div class="request-head">
-          <div class="request-head-text">
-            <div class="request-name">Authentic and catering-ready</div>
-            <div class="request-summary">Hispanic-authentic SKUs and catering-format pack sizes</div>
-          </div>
-          <div class="request-arrow">&#9660;</div>
-        </div>
-        <div class="request-body">
-          <div class="request-section">
-            <div class="request-section-label">Why</div>
-            <div class="request-section-text">Two real shifts are happening at once: independent operators serving authentic ethnic cuisine are growing in markets like Seattle, and operators across the board are leaning into catering as a margin channel that does not require more dining room seats. SKUs that serve either trend open accounts the standard catalog cannot.</div>
-          </div>
-          <div class="request-section">
-            <div class="request-section-label">What</div>
-            <div class="request-section-text">Find Hispanic-authentic SKUs and catering-format pack sizes that independent operators can run with.</div>
-          </div>
-          <div class="request-section">
-            <div class="request-section-label">Who</div>
-            <div class="request-section-text">Fernando.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="request-card" onclick="toggleRequest(this)">
-        <div class="request-head">
-          <div class="request-head-text">
-            <div class="request-name">Packaging and containers</div>
-            <div class="request-summary">Takeout that holds heat, doesn't leak, doesn't kill margin</div>
-          </div>
-          <div class="request-arrow">&#9660;</div>
-        </div>
+        <div class="request-arrow">&#9654;</div>
         <div class="request-body">
           <div class="request-section">
             <div class="request-section-label">Why</div>
@@ -2243,6 +2412,52 @@
         </div>
       </div>
 
+      <div class="request-card" style="--weight: 0.25" onclick="toggleRequest(this)">
+        <div class="request-head-text">
+          <div class="request-name">Bakery and dessert upgrades</div>
+          <div class="request-summary">Small upgrades, large perceived-quality gains</div>
+        </div>
+        <div class="request-arrow">&#9654;</div>
+        <div class="request-body">
+          <div class="request-section">
+            <div class="request-section-label">Why</div>
+            <div class="request-section-text">Independent operators do not have R&amp;D budgets, and bakery and dessert are where small upgrades produce the largest perceived-quality gains for the lowest cost per cover. A better bun, a better roll, a signature dessert; these are the items diners remember and post about, and they cost the operator pennies to upgrade.</div>
+          </div>
+          <div class="request-section">
+            <div class="request-section-label">What</div>
+            <div class="request-section-text">Find buns, rolls, breads, and desserts that lift perceived quality at low cost-per-cover.</div>
+          </div>
+          <div class="request-section">
+            <div class="request-section-label">Who</div>
+            <div class="request-section-text">Matt, and connects back to Tony's burger.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="request-card" style="--weight: 0.0" onclick="toggleRequest(this)">
+        <div class="request-head-text">
+          <div class="request-name">Authentic and catering-ready</div>
+          <div class="request-summary">Hispanic-authentic SKUs and catering-format pack sizes</div>
+        </div>
+        <div class="request-arrow">&#9654;</div>
+        <div class="request-body">
+          <div class="request-section">
+            <div class="request-section-label">Why</div>
+            <div class="request-section-text">Two real shifts are happening at once: independent operators serving authentic ethnic cuisine are growing in markets like Seattle, and operators across the board are leaning into catering as a margin channel that does not require more dining room seats. SKUs that serve either trend open accounts the standard catalog cannot.</div>
+          </div>
+          <div class="request-section">
+            <div class="request-section-label">What</div>
+            <div class="request-section-text">Find Hispanic-authentic SKUs and catering-format pack sizes that independent operators can run with.</div>
+          </div>
+          <div class="request-section">
+            <div class="request-section-label">Who</div>
+            <div class="request-section-text">Fernando.</div>
+          </div>
+        </div>
+      </div>
+
+      </div>
+
     </div>
   </div>
 
@@ -2252,6 +2467,15 @@
       Select an identity at the top of the screen to see what's been shared with you.
     </div>
     <div class="hall-banner" id="hall-banner"></div>
+    <div class="sort-picker-row" id="sort-picker-row" style="display:none;">
+      <div class="sort-picker-wrap">
+        <div class="sort-picker-trigger" id="sort-trigger" onclick="toggleSortPicker()">
+          <span id="sort-picker-label">By hall</span>
+          <span class="sort-picker-arrow">&#9660;</span>
+        </div>
+        <div class="sort-picker-list" id="sort-picker-list"></div>
+      </div>
+    </div>
     <div id="explore-sections"></div>
   </div>
 
@@ -2261,7 +2485,10 @@
     <div id="discover-existing-notice"></div>
 
     <div class="report-button-wrap">
-      <button class="btn-report" id="report-open-btn" onclick="openReport()">See my record</button>
+      <button class="btn-report" id="report-open-btn" onclick="openReport()">
+        <span id="report-open-btn-label">My Record</span>
+        <span class="btn-report-arrow">&#9660;</span>
+      </button>
     </div>
 
     <div class="discover-wrap">
@@ -2273,20 +2500,7 @@
     <div id="discover-form-block" style="display:none;">
       <div class="section-head">What stood out?</div>
       <div class="discover-wrap">
-        <label class="form-label">Who you spoke with (optional)</label>
-        <input class="form-input" id="disc-contact" type="text" placeholder="Contact name" autocomplete="off">
-
-        <label class="form-label">Notes</label>
         <textarea class="form-textarea" id="disc-note" rows="4" placeholder="Impressions, products, follow-up needed..."></textarea>
-
-        <div id="dot-question-block" style="display:none;">
-          <label class="form-label">Are they on DOT?</label>
-          <div class="dot-toggle-row">
-            <button type="button" class="dot-btn" id="dot-btn-yes" onclick="setDotAnswer('yes')">Yes</button>
-            <button type="button" class="dot-btn" id="dot-btn-no" onclick="setDotAnswer('no')">No</button>
-          </div>
-          <div class="dot-followup" id="dot-followup"></div>
-        </div>
 
         <label class="form-label">Send to</label>
         <div class="picker-wrap">
@@ -2297,6 +2511,24 @@
           <div class="picker-list" id="recipient-list"></div>
         </div>
 
+        <button type="button" class="details-toggle" id="details-toggle" onclick="toggleDiscoverDetails()">
+          <span>Add details</span>
+          <span class="details-toggle-arrow">&#9660;</span>
+        </button>
+        <div id="discover-details-block" class="details-block">
+          <label class="form-label">Who you spoke with</label>
+          <input class="form-input" id="disc-contact" type="text" placeholder="Contact name" autocomplete="off">
+
+          <div id="dot-question-block" style="display:none;">
+            <label class="form-label">Are they on DOT?</label>
+            <div class="dot-toggle-row">
+              <button type="button" class="dot-btn" id="dot-btn-yes" onclick="setDotAnswer('yes')">Yes</button>
+              <button type="button" class="dot-btn" id="dot-btn-no" onclick="setDotAnswer('no')">No</button>
+            </div>
+            <div class="dot-followup" id="dot-followup"></div>
+          </div>
+        </div>
+
         <button class="btn-primary" id="disc-submit-btn" onclick="submitEntry()">Submit</button>
         <button class="btn-secondary" onclick="resetDiscoverForm()">Clear</button>
       </div>
@@ -2305,8 +2537,8 @@
     <!-- Things I've sent (sender's outbound view) -->
     <div class="sent-section">
       <button class="sent-toggle" id="sent-toggle" onclick="toggleSentSection()">
-        <span>Discoveries I've Shared</span>
-        <span style="display:flex;align-items:center;gap:8px;">
+        <span class="sent-toggle-label">MY DISCOVERIES</span>
+        <span class="sent-toggle-right">
           <span class="sent-toggle-count" id="sent-toggle-count">0</span>
           <span class="sent-toggle-arrow">&#9660;</span>
         </span>
@@ -2330,7 +2562,7 @@
 
   <!-- TRIP -->
   <div id="screen-trip" class="screen">
-    <div class="section-head" style="background:#0D0F11;margin:0;padding:14px 12px 6px;">Useful Links</div>
+    <div class="section-head" style="margin:0;padding:14px 16px 8px;">Useful Links</div>
     <div class="links-grid">
       <a class="link-chip" href="https://www.hilton.com/en/hotels/chiphhh-palmer-house/" target="_blank">Palmer House</a>
       <a class="link-chip" href="https://www.nationalrestaurantshow.com/home/" target="_blank">NRA Show</a>
@@ -2425,11 +2657,14 @@
   </div>
 
   <div class="tab-bar">
-    <div class="tab active" onclick="showScreen('explore')">
+    <div class="tab active" onclick="showScreen('home')">
+      <div class="tab-label">Home</div>
+    </div>
+    <div class="tab" onclick="showScreen('explore')">
       <div class="tab-label">Explore</div>
     </div>
     <div class="tab" onclick="showScreen('discover')">
-      <div class="tab-label">Discover</div>
+      <div class="tab-label">Discovery</div>
     </div>
     <div class="tab" onclick="showScreen('trip')">
       <div class="tab-label">Trip</div>
@@ -2459,8 +2694,8 @@
 </div>
 
 <!-- Welcome modal - shown when landing on Home, once per session -->
-<div id="welcome-overlay" class="welcome-overlay">
-  <div class="welcome-modal">
+<div id="welcome-overlay" class="welcome-overlay" onclick="if(event.target===this)closeWelcome()">
+  <div class="welcome-modal" onclick="event.stopPropagation()">
     <button type="button" class="welcome-close" onclick="closeWelcome()" aria-label="Close">&times;</button>
     <div class="welcome-title">Welcome to the Big Show!</div>
     <div class="welcome-body">
@@ -2468,6 +2703,15 @@
       <div class="welcome-section-title">You're Frontline Solutions</div>
       <p>We're here to close the distance between sales and category management, and we're here to find new value for the customers you serve every day. You're the street-level wisdom in this company. The floor is where that wisdom meets the data, and where both go looking for what's next.</p>
     </div>
+  </div>
+</div>
+
+<!-- Request popup - shows full why-what-who when a Home card is tapped -->
+<div id="request-modal-overlay" class="request-modal-overlay" onclick="if(event.target===this)closeRequestModal()">
+  <div class="request-modal" onclick="event.stopPropagation()">
+    <button type="button" class="request-modal-close" onclick="closeRequestModal()" aria-label="Close">&times;</button>
+    <div class="request-modal-title" id="request-modal-title"></div>
+    <div class="request-modal-body" id="request-modal-body"></div>
   </div>
 </div>
 
@@ -2501,25 +2745,25 @@
 <script>
 // ── IDENTITY MODEL ──────────────────────────────────────────────────────────
 
-const ROLE_TAGS = ['Sales','Leadership','Cat Management','Solutions','Procurement'];
+const ROLE_TAGS = ['Sales','Cat Management','Solutions'];
 
 const PEOPLE = [
-  {id:'dan',name:'Dan Seth',first:'Dan',role:'VP Sales',tags:['Sales','Leadership'],color:'#534AB7'},
-  {id:'christina',name:'Christina Kost',first:'Christina',role:'TSC',tags:['Sales'],color:'#1D9E75'},
-  {id:'brian_l',name:'Brian Lippert',first:'Brian',role:'TSC',tags:['Sales'],color:'#D85A30'},
-  {id:'tammy',name:'Tammy Pratt',first:'Tammy',role:'TSC',tags:['Sales'],color:'#D4537E'},
-  {id:'david',name:'David Radford',first:'David',role:'TSC',tags:['Sales'],color:'#BA7517'},
-  {id:'wade',name:'Wade Triplett',first:'Wade',role:'Cat Mgmt',tags:['Cat Management'],color:'#378ADD'},
-  {id:'andy',name:'Andy Cook',first:'Andy',role:'Solutions',tags:['Solutions'],color:'#4BAD4A'},
-  {id:'tony',name:'Tony Radelich',first:'Tony',role:'TSC',tags:['Sales'],color:'#E24B4A'},
-  {id:'brian_w',name:'Brian Wright',first:'Brian',role:'TSC',tags:['Sales'],color:'#7F77DD'},
-  {id:'jeff',name:'Jeff Paradise',first:'Jeff',role:'VP Street Sales',tags:['Sales','Leadership'],color:'#0F6E56'},
-  {id:'kawika',name:'Kawika McGrath',first:'Kawika',role:'DM',tags:['Sales','Leadership'],color:'#993C1D'},
-  {id:'michelle',name:'Michelle McClure',first:'Michelle',role:'Supply Chain',tags:['Procurement'],color:'#993556'},
-  {id:'kristie',name:'Kristie Love',first:'Kristie',role:'Casinos',tags:['Sales'],color:'#185FA5'},
-  {id:'dawn',name:'Dawn Schafer',first:'Dawn',role:'Cat Mgmt',tags:['Cat Management'],color:'#3B6D11'},
-  {id:'kevin',name:'Kevin Pribilsky',first:'Kevin',role:'President',tags:['Sales','Leadership','Cat Management','Procurement'],color:'#1B5EA6'},
-  {id:'darrin',name:'Darrin Soderberg',first:'Darrin',role:'VP Cat Mgmt',tags:['Sales','Leadership','Cat Management','Procurement'],color:'#854F0B'}
+  {id:'dan',name:'Dan Seth',first:'Dan',tags:['Sales'],color:'#534AB7'},
+  {id:'christina',name:'Christina Kost',first:'Christina',tags:['Sales'],color:'#1D9E75'},
+  {id:'brian_l',name:'Brian Lippert',first:'Brian',tags:['Sales'],color:'#D85A30'},
+  {id:'tammy',name:'Tammy Pratt',first:'Tammy',tags:['Sales'],color:'#D4537E'},
+  {id:'david',name:'David Radford',first:'David',tags:['Sales'],color:'#BA7517'},
+  {id:'wade',name:'Wade Triplett',first:'Wade',tags:['Cat Management'],color:'#378ADD'},
+  {id:'andy',name:'Andy Cook',first:'Andy',tags:['Solutions'],color:'#4BAD4A'},
+  {id:'tony',name:'Tony Radelich',first:'Tony',tags:['Sales'],color:'#E24B4A'},
+  {id:'brian_w',name:'Brian Wright',first:'Brian',tags:['Sales'],color:'#7F77DD'},
+  {id:'jeff',name:'Jeff Paradise',first:'Jeff',tags:['Sales'],color:'#0F6E56'},
+  {id:'kawika',name:'Kawika McGrath',first:'Kawika',tags:['Sales'],color:'#993C1D'},
+  {id:'michelle',name:'Michelle McClure',first:'Michelle',tags:['Cat Management'],color:'#993556'},
+  {id:'kristie',name:'Kristie Love',first:'Kristie',tags:['Sales'],color:'#185FA5'},
+  {id:'dawn',name:'Dawn Schafer',first:'Dawn',tags:['Cat Management'],color:'#3B6D11'},
+  {id:'kevin',name:'Kevin Pribilsky',first:'Kevin',tags:['Sales','Cat Management'],color:'#1B5EA6'},
+  {id:'darrin',name:'Darrin Soderberg',first:'Darrin',tags:['Cat Management'],color:'#854F0B'}
 ];
 
 const DEPARTMENTS = [
@@ -2530,6 +2774,15 @@ const DEPARTMENTS = [
 const HARBOR = {id:'harbor', name:'Harbor (all team)', kind:'harbor'};
 
 let currentIdentity = null; // {id, kind: 'person'|'department'|'harbor'}
+
+// Format a tag list for places where there's room to spell things out
+// (identity dropdown, recipient picker). Tighter UI surfaces still use
+// the raw tag values directly.
+function formatTagsForDisplay(tags) {
+  return (tags || [])
+    .map(t => t === 'Cat Management' ? 'Category Management' : t)
+    .join(', ');
+}
 
 // Resolve any identity id to a display object
 function resolveIdentity(id) {
@@ -2927,7 +3180,7 @@ function buildIdentityDropdown() {
   dd.appendChild(makeSection('People'));
   const sortedPeople = [...PEOPLE].sort((a,b) => a.first.localeCompare(b.first));
   sortedPeople.forEach(p => {
-    dd.appendChild(makeIdentityItem(p.id, p.name, p.role, 'person'));
+    dd.appendChild(makeIdentityItem(p.id, p.name, formatTagsForDisplay(p.tags), 'person'));
   });
 
   dd.appendChild(makeSection('Departments'));
@@ -3007,8 +3260,9 @@ function selectIdentity(id, kind, userInitiated) {
     el.classList.toggle('selected', el.dataset.identityId === id);
   });
 
-  // Persist
-  try { localStorage.setItem(IDENTITY_STORAGE_KEY, id); } catch(e) {}
+  // Identity is intentionally not persisted across sessions. Every load
+  // starts in [Select] state so the user picks deliberately rather than
+  // inheriting a stale identity from a previous use.
 
   closeIdentityDropdown();
 
@@ -3018,6 +3272,7 @@ function selectIdentity(id, kind, userInitiated) {
   renderExplore();
   updateSentCount();
   updateReportButtonState();
+  updateLockedAffordances();
   // If sent list is open, refresh it
   if (document.getElementById('sent-list')?.classList.contains('open')) renderSentList();
 
@@ -3026,15 +3281,19 @@ function selectIdentity(id, kind, userInitiated) {
 }
 
 function restoreIdentity() {
-  let saved = null;
-  try { saved = localStorage.getItem(IDENTITY_STORAGE_KEY); } catch(e) {}
-  if (!saved) return;
-  const ident = resolveIdentity(saved);
-  if (!ident) return;
-  selectIdentity(saved, ident.kind);
+  // Identity is no longer persisted. Clear any value left over from a
+  // previous build so users who visited before this change do not get
+  // a one-time restore on their next load.
+  try { localStorage.removeItem(IDENTITY_STORAGE_KEY); } catch(e) {}
 }
 
 function toggleIdentityDropdown() {
+  // Identity is only changeable from the Home screen. On other screens the
+  // identity bar still displays who is viewing, but tapping it is inert.
+  // This prevents accidental identity switches on the show floor (e.g. from
+  // a phone in a pocket) and keeps the change deliberate.
+  const homeActive = document.getElementById('screen-home')?.classList.contains('active');
+  if (!homeActive) return;
   const bar = document.getElementById('header-identity');
   const dd  = document.getElementById('identity-dropdown');
   const open = dd.classList.toggle('open');
@@ -3121,6 +3380,13 @@ function selectExhibitor(booth, name, hall, hallCode) {
   const info = BOOTHS[booth];
   const isFood = info && Array.isArray(info.cat) && info.cat.includes('Food');
   document.getElementById('dot-question-block').style.display = isFood ? 'block' : 'none';
+  // If DOT applies, auto-open the Add details disclosure so the user sees it
+  if (isFood) {
+    const dt = document.getElementById('details-toggle');
+    const db = document.getElementById('discover-details-block');
+    if (dt) dt.classList.add('open');
+    if (db) db.classList.add('open');
+  }
   // Reset DOT state on new selection
   dotAnswer = null;
   document.getElementById('dot-btn-yes').classList.remove('selected');
@@ -3197,7 +3463,7 @@ function buildRecipientPicker() {
     item.className = 'picker-item';
     item.dataset.kind = 'person';
     item.dataset.value = p.id;
-    item.innerHTML = `<span>${p.name}</span><span class="picker-item-sub">${p.role}</span>`;
+    item.innerHTML = `<span>${p.name}</span><span class="picker-item-sub">${formatTagsForDisplay(p.tags)}</span>`;
     item.onclick = () => toggleRecipientPerson(p.id, item);
     list.appendChild(item);
   });
@@ -3383,6 +3649,16 @@ function checkForExistingEntry() {
   </div>`;
 }
 
+// ── HAPTIC FEEDBACK ─────────────────────────────────────────────────────────
+// Single short pulse on capture-success moments (Discovery submit, memo save,
+// response submit). The Vibration API exists on Android and on iOS Safari in
+// some contexts; where unavailable, this is a silent no-op.
+function captureHaptic() {
+  try {
+    if (navigator.vibrate) navigator.vibrate(20);
+  } catch (e) { /* silent */ }
+}
+
 // ── DISCOVER: SUBMIT ────────────────────────────────────────────────────────
 
 async function submitEntry() {
@@ -3457,6 +3733,7 @@ async function submitEntry() {
   }
 
   await saveEntries();
+  captureHaptic();
   resetDiscoverForm();
   renderExplore();
   updateSentCount();
@@ -3493,7 +3770,22 @@ function resetFormFields() {
   clearPhotos('disc');
   document.querySelectorAll('#recipient-list .picker-item').forEach(item => item.classList.remove('selected'));
   updateRecipientLabel();
+  // Reset Add details to collapsed
+  const dt = document.getElementById('details-toggle');
+  const db = document.getElementById('discover-details-block');
+  if (dt) dt.classList.remove('open');
+  if (db) db.classList.remove('open');
 }
+
+function toggleDiscoverDetails() {
+  const dt = document.getElementById('details-toggle');
+  const db = document.getElementById('discover-details-block');
+  if (!dt || !db) return;
+  const opening = !dt.classList.contains('open');
+  dt.classList.toggle('open', opening);
+  db.classList.toggle('open', opening);
+}
+window.toggleDiscoverDetails = toggleDiscoverDetails;
 
 // ── EXPLORE: HELPERS ────────────────────────────────────────────────────────
 
@@ -3614,15 +3906,12 @@ function assignSection(card, viewerKind) {
 // ── EXPLORE: SORT ───────────────────────────────────────────────────────────
 
 const SORT_OPTIONS = [
-  { value: 'alpha',  label: 'Alphabetical'  },
-  { value: 'recent', label: 'Most recent'   },
-  { value: 'count',  label: 'Most flagged'  },
-  { value: 'hall',   label: 'By hall'       },
-  { value: 'booth',  label: 'By booth #'    },
-  { value: 'oldest', label: 'Oldest first'  }
+  { value: 'hall',        label: 'By hall'        },
+  { value: 'tag',         label: 'By tag'         },
+  { value: 'discoveries', label: 'By discoveries' }
 ];
 
-let currentSort = 'alpha';
+let currentSort = 'hall';
 
 function buildSortPicker() {
   const list = document.getElementById('sort-picker-list');
@@ -3677,29 +3966,19 @@ document.addEventListener('click', (e) => {
 function applySort(cards, mode) {
   const sorted = [...cards];
   switch (mode) {
-    case 'recent':
-      sorted.sort((a, b) => b.latestTs - a.latestTs);
+    case 'tag':
+      sorted.sort((a, b) => {
+        const aTag = (BOOTHS[a.booth]?.cat?.[0] || '').toLowerCase();
+        const bTag = (BOOTHS[b.booth]?.cat?.[0] || '').toLowerCase();
+        return aTag.localeCompare(bTag) || a.name.localeCompare(b.name);
+      });
       break;
-    case 'oldest':
-      sorted.sort((a, b) => a.latestTs - b.latestTs);
-      break;
-    case 'count':
+    case 'discoveries':
       sorted.sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
       break;
     case 'hall':
-      sorted.sort((a, b) => (a.hallCode || '').localeCompare(b.hallCode || '') || a.name.localeCompare(b.name));
-      break;
-    case 'booth':
-      sorted.sort((a, b) => {
-        const an = parseInt(a.booth, 10);
-        const bn = parseInt(b.booth, 10);
-        if (!isNaN(an) && !isNaN(bn)) return an - bn;
-        return (a.booth || '').localeCompare(b.booth || '');
-      });
-      break;
-    case 'alpha':
     default:
-      sorted.sort((a, b) => a.name.localeCompare(b.name));
+      sorted.sort((a, b) => (a.hallCode || '').localeCompare(b.hallCode || '') || a.name.localeCompare(b.name));
       break;
   }
   return sorted;
@@ -3709,16 +3988,22 @@ function applySort(cards, mode) {
 
 // Track which cards are expanded (UI state, not persisted)
 const expandedCards = new Set();
+// Track booths whose card just transitioned into Engaged so we can play
+// a one-shot amber glow on their next render. Cleared when the animation
+// has had a chance to play.
+const justEngagedBooths = new Set();
 
 function renderExplore() {
   const sectionsContainer = document.getElementById('explore-sections');
   const emptyIdentity = document.getElementById('explore-empty-identity');
   const banner = document.getElementById('hall-banner');
+  const sortRow = document.getElementById('sort-picker-row');
 
   if (!currentIdentity) {
     emptyIdentity.style.display = 'block';
     sectionsContainer.innerHTML = '';
     banner.style.display = 'none';
+    if (sortRow) sortRow.style.display = 'none';
     return;
   }
   emptyIdentity.style.display = 'none';
@@ -3738,6 +4023,19 @@ function renderExplore() {
     }
   } else {
     banner.style.display = 'none';
+  }
+
+  // Sort picker: only show when there are cards to sort
+  if (sortRow) {
+    if (cards.length > 0) {
+      sortRow.style.display = 'flex';
+      buildSortPicker();
+      const lbl = document.getElementById('sort-picker-label');
+      const opt = SORT_OPTIONS.find(o => o.value === currentSort);
+      if (lbl && opt) lbl.textContent = opt.label;
+    } else {
+      sortRow.style.display = 'none';
+    }
   }
 
   if (cards.length === 0) {
@@ -3779,6 +4077,14 @@ function renderExplore() {
   });
 
   sectionsContainer.innerHTML = html;
+
+  // Clear the just-engaged set after the render commits. The glow class
+  // is applied via renderExploreCard while building the html, and the
+  // CSS animation runs once on first paint. Clearing here means subsequent
+  // re-renders will not replay the animation on the same card.
+  if (justEngagedBooths.size > 0) {
+    setTimeout(() => justEngagedBooths.clear(), 1100);
+  }
 }
 
 function renderExploreSection(title, cards, sectionKey) {
@@ -3803,6 +4109,7 @@ function renderExploreCard(card) {
   const originClass = `origin-${card.origin}`;
   const engagedClass = card.engaged ? ' engaged' : '';
   const expandedClass = isExpanded ? ' expanded' : '';
+  const justEngagedClass = (card.engaged && justEngagedBooths.has(String(card.booth))) ? ' just-engaged' : '';
   const isEbPartner = ["1488","1671","1863","2454","2712","3472","5607","6245","7207","7659","7850","7980","8067","11518","12006","12807","13102","13239","13306","13345","13823"].includes(String(card.booth));
 
   // Resting-state attribution: first sender (oldest entry) + N count of others
@@ -3831,7 +4138,7 @@ function renderExploreCard(card) {
   const firstCat = info && info.cat && info.cat.length ? info.cat[0] : '';
 
   return `
-    <div class="explore-card ${originClass}${engagedClass}${expandedClass}" data-booth="${card.booth}">
+    <div class="explore-card ${originClass}${engagedClass}${expandedClass}${justEngagedClass}" data-booth="${card.booth}">
       ${isEbPartner ? `<div class="explore-card-eb-badge" title="EB partner"><img src="assets/H.png" alt="EB partner"></div>` : ''}
       <div class="explore-card-header" onclick="toggleExploreCard('${card.booth}')">
         <div class="explore-card-count">${card.count}</div>
@@ -4032,6 +4339,10 @@ async function submitResponse(entryId) {
   }
 
   await saveEntries();
+  captureHaptic();
+  // Mark the booth as just-engaged so the next render applies a one-shot
+  // amber glow on the card. The class is removed after the animation runs.
+  if (entry.booth) justEngagedBooths.add(String(entry.booth));
   renderExplore();
 }
 window.submitResponse = submitResponse;
@@ -4088,7 +4399,7 @@ function renderSentItem(entry) {
       const name = responder ? responder.name : r.responder;
       return `
         <div class="sent-item-response">
-          <div class="sent-item-response-from">${escapeHtml(name)} &middot; <span style="color:var(--text-hint);font-family:var(--font-mono);font-weight:400;">${timeAgo(r.updatedAt || r.createdAt)}</span></div>
+          <div class="sent-item-response-from"><span class="sent-item-response-from-label">FROM</span>${escapeHtml(name)} &middot; <span style="color:var(--text-hint);font-family:var(--font-mono);font-weight:400;">${timeAgo(r.updatedAt || r.createdAt)}</span></div>
           <div class="sent-item-response-note">${escapeHtml(r.note)}</div>
         </div>`;
     }).join('');
@@ -4099,6 +4410,10 @@ function renderSentItem(entry) {
       </div>`;
   }
 
+  const recipientsLine = recipientNames.length
+    ? `<div class="sent-item-recipients"><strong>Sent to:</strong><span class="sent-item-recipients-names">${recipientNames.map(escapeHtml).join(', ')}</span></div>`
+    : `<div class="sent-item-recipients"><strong>Sent to:</strong><span class="sent-item-recipients-names">no one tagged</span></div>`;
+
   return `
     <div class="sent-item">
       <div class="sent-item-header">
@@ -4107,12 +4422,12 @@ function renderSentItem(entry) {
       </div>
       <div class="sent-item-meta">
         <span class="hall-pill hall-${entry.hallCode || '?'}">${entry.hall || '?'}</span>
-        <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-hint);">#${entry.booth}</span>
+        <span class="booth-pill">#${entry.booth}</span>
       </div>
       ${entry.contact ? `<div style="font-size:11px;color:var(--text-hint);margin-bottom:4px;"><strong style="color:var(--text-secondary);">Spoke with:</strong> ${escapeHtml(entry.contact)}</div>` : ''}
       <div class="sent-item-note">${escapeHtml(entry.note)}</div>
-      ${recipientNames.length ? `<div class="sent-item-recipients"><strong>Sent to:</strong>${recipientNames.map(escapeHtml).join(', ')}</div>` : `<div class="sent-item-recipients"><strong>Sent to:</strong>no one tagged</div>`}
       ${responsesHtml}
+      ${recipientsLine}
     </div>
   `;
 }
@@ -4138,7 +4453,6 @@ function buildExportPayload() {
     people: PEOPLE.map(p => ({
       id: p.id,
       name: p.name,
-      role: p.role,
       tags: p.tags
     })),
     departments: DEPARTMENTS.map(d => ({
@@ -4246,7 +4560,9 @@ const MEMO_PHOTO_MAX = 2;
 
 function openMemo() {
   if (!currentIdentity) {
-    alert('Select your name first to record a memo.');
+    // Locked: nudge user to select an identity first.
+    showScreen('home');
+    pulseIdentityBar();
     return;
   }
   // Reset state
@@ -4394,6 +4710,7 @@ async function saveMemo() {
   };
   entries.push(memo);
   await saveEntries();
+  captureHaptic();
 
   if (document.getElementById('report-overlay')?.classList.contains('open')) renderReport();
 
@@ -4419,19 +4736,25 @@ function reportSubjectIsValid() {
 
 function updateReportButtonState() {
   const btn = document.getElementById('report-open-btn');
-  if (!btn) return;
+  const lbl = document.getElementById('report-open-btn-label');
+  const arrow = btn?.querySelector('.btn-report-arrow');
+  if (!btn || !lbl) return;
   if (reportSubjectIsValid()) {
     btn.disabled = false;
-    btn.textContent = 'See my record';
+    lbl.textContent = 'My Record';
+    if (arrow) arrow.style.display = '';
   } else if (currentIdentity && currentIdentity.kind === 'department') {
     btn.disabled = true;
-    btn.textContent = 'Record available for individuals';
+    lbl.textContent = 'Record available for individuals';
+    if (arrow) arrow.style.display = 'none';
   } else if (currentIdentity && currentIdentity.kind === 'harbor') {
     btn.disabled = true;
-    btn.textContent = 'Record available for individuals';
+    lbl.textContent = 'Record available for individuals';
+    if (arrow) arrow.style.display = 'none';
   } else {
     btn.disabled = true;
-    btn.textContent = 'Select your name to see your record';
+    lbl.textContent = 'Select your name to see your record';
+    if (arrow) arrow.style.display = 'none';
   }
 }
 
@@ -5116,6 +5439,101 @@ async function loadDemoScenario() {
   // Christina also engaged on a peer flag
   addResponse('demo_p1', 'kristie', 'Tammy thanks for the heads up on rebellyous. Two of my college accounts will likely move on this. Following up.', 130);
 
+  // ── DEMO VOICE MEMOS ─────────────────────────────────────────────────────
+  // 2–3 memos per person, spread across the show days. Roughly half thematically
+  // touch the five Home requests (center-of-plate value, protein reimagined,
+  // packaging, bakery/dessert, authentic/catering). Photos are picsum
+  // placeholders so the demo shows what the photo affordance looks like.
+  // This entire block is demo-only and not persisted in production.
+  const pic = (seed) => `https://picsum.photos/seed/${seed}/600/400`;
+  const addMemo = (creatorId, minsAgo, note, photoUrls = []) => {
+    const ts = m(minsAgo);
+    const person = PEOPLE.find(p => p.id === creatorId);
+    entries.push({
+      id: 'demo_memo_' + creatorId + '_' + minsAgo,
+      kind: 'memo',
+      creator: creatorId,
+      creatorKind: 'person',
+      note,
+      photoUrls,
+      timestamp: ts
+    });
+  };
+
+  // Andy (Solutions) — broker training and educational content lens
+  addMemo('andy', 2400, "Walked the South Hall front aisle. Three different burger build-up plays in the first ten booths. Center-of-plate value is going to be the loudest theme of the show.", [pic('andy1')]);
+  addMemo('andy', 1900, "Note for myself. Buyers Edge demo is the right anchor for the procurement-AI piece. Tony will care, Kevin will care, and Darrin will want it framed for category planning. Three audiences one piece of content.");
+  addMemo('andy', 700, "Idea: short video series on the floor. Brokers walking us through what they brought. Could shoot four or five tomorrow morning before the crowd.", [pic('andy2')]);
+
+  // Brian Lippert (Sales)
+  addMemo('brian_l', 2300, "La Preferida pantry depth is no joke. Pacific Northwest accounts have been begging for this for two years. Telling Wade to look hard.", [pic('brianl1')]);
+  addMemo('brian_l', 1100, "Center plate angle from Hormel rep. They have a value-tier bacon program I did not know existed. Need pricing tomorrow.");
+
+  // Brian Wright (Sales)
+  addMemo('brian_w', 2200, "Walked Smithfield twice. Their catering-pack pork is what Fernando keeps asking about. Going back tomorrow with specific accounts in mind.");
+  addMemo('brian_w', 1500, "Saw a takeout container at WNA that holds heat better than anything we carry. Matt would want to see this.", [pic('brianw1')]);
+  addMemo('brian_w', 400, "Quick one. Customer text from Mike at Salty Dog asking about dessert program. Bakery alley tomorrow first thing.");
+
+  // Christina Kost (Sales)
+  addMemo('christina', 2100, "Plant-based protein booths are quieter than last year. Two booths empty by 11am. Real shift.");
+  addMemo('christina', 1300, "Egg-forward menu items everywhere. Three booths showing different egg formats for value plays. Tony was right about this trend.", [pic('christina1')]);
+  addMemo('christina', 600, "Reminder to self: catering-pack ethnic SKUs are clustered in North Hall row 8. Hit that first thing Sunday.");
+
+  // Dan Seth (Sales)
+  addMemo('dan', 2350, "Show floor opening day. Energy is high. Lots of operators here, not just buyers. Good sign.");
+  addMemo('dan', 1700, "Note from Wade walk-around. He thinks bakery upgrade story is bigger than we have been treating it. Worth a follow-up call.");
+
+  // Darrin Soderberg (Cat Management)
+  addMemo('darrin', 2050, "Hispanic-authentic depth is real this year. Three suppliers I had not seen before. Worth a category review.", [pic('darrin1')]);
+  addMemo('darrin', 1450, "Sustainable packaging story is more mature than I expected. Eco-Products has compostables that hold heat. Margin question is the only real concern.");
+  addMemo('darrin', 500, "Talked with Mike at Wilson Hospitality. They are evaluating our distribution capabilities for their group. Tammy already flagged this. Following up.");
+
+  // David Radford (Sales)
+  addMemo('david', 2250, "Burger build-up parade in South Hall. Four booths in a row. If I had to pick one to show Tony it would be the King's Hawaiian slider buns.", [pic('david1')]);
+  addMemo('david', 1600, "Customer call mid-show. Sandy from Brewhouse asking specifically about value-tier pork. Center-plate value request hits home for me too now.");
+
+  // Dawn Schafer (Cat Management)
+  addMemo('dawn', 2150, "Bakery and dessert is going to be a big push for next quarter. The signal is everywhere on the floor today.", [pic('dawn1')]);
+  addMemo('dawn', 1200, "Catering-pack pricing on the new Smithfield line is competitive. Need to model it against current margin before I commit.");
+  addMemo('dawn', 350, "Walked the protein reimagined corridor with Christina. She is right that smaller-format proteins are the play. Plant-based is not where the energy is.");
+
+  // Jeff Paradise (Sales)
+  addMemo('jeff', 2000, "Street ops customers will care about the heat-holding takeout containers. That is a real margin and a real complaint.");
+  addMemo('jeff', 800, "Reminder. Connect Kawika with the Buyers Edge rep before we leave. He has accounts that are perfect for that demo.");
+
+  // Kawika McGrath (Sales)
+  addMemo('kawika', 1950, "Hawaii market angle on authentic-and-catering pulls toward Asian-pacific SKUs not Hispanic. Worth telling Fernando the lens varies by region.");
+  addMemo('kawika', 1100, "Buyers Edge procurement-AI demo. Andy already flagged. My take: this is what my higher-volume accounts have been asking about for a year.", [pic('kawika1')]);
+  addMemo('kawika', 300, "Note to self. Need to call Carla at Northwest Restaurant Group before the show ends. Tony said she was walking the floor.");
+
+  // Kristie Love (Sales)
+  addMemo('kristie', 1850, "Casino accounts will move on Rebellyous. Quality is good enough now. Two college operators also interested. Plant-based is back in pockets.", [pic('kristie1')]);
+  addMemo('kristie', 950, "Catering-format pack sizes in the casino vertical: bigger volume than restaurants. Fernando's request lines up with my book.");
+
+  // Michelle McClure (Cat Management)
+  addMemo('michelle', 2400, "Sustainability story for packaging is finally pencilling. I have been waiting two years for this.");
+  addMemo('michelle', 1400, "Bakery upgrade angle from cost-per-cover lens. Bun and roll suppliers are showing real differentiation. Worth a category project.", [pic('michelle1')]);
+  addMemo('michelle', 250, "Quick reminder. Need to send Wade the supplier short-list for Hispanic-authentic before we leave Chicago.");
+
+  // Tammy Pratt (Sales)
+  addMemo('tammy', 2300, "Hitchcock Farms produce program. Cat Mgmt asked me to look. Their fresh chain is shorter than ours. Genuinely impressive.", [pic('tammy1')]);
+  addMemo('tammy', 1550, "Mike Reardon from Wilson Hospitality stopped me at Popmenu. He is shopping. Darrin needs to know.");
+  addMemo('tammy', 450, "Center-of-plate value is the consistent question from operators. Every conversation comes back to it.");
+
+  // Tony Radelich (Sales)
+  addMemo('tony', 2250, "Burger value rebuild. Three suppliers. King's Hawaiian, Martin's, and a smaller player called Klosterman that surprised me. Klosterman is the dark horse.", [pic('tony1')]);
+  addMemo('tony', 1500, "Buyers Edge procurement-AI is the most relevant tech I have seen for my street accounts. Following up with Andy on the educational angle.");
+  addMemo('tony', 600, "Carla Diaz from Northwest Restaurant Group walking with their procurement lead. Heat-and-eat ethnic. Kevin will want this lead.");
+
+  // Wade Triplett (Cat Management)
+  addMemo('wade', 2100, "La Preferida pantry depth confirmed. Brian L is right. We need to act fast on the rollout. Latin authenticity is a category gap for us.", [pic('wade1')]);
+  addMemo('wade', 1300, "Bakery switch opportunity. The supplier landscape has moved. We have been on the same vendors too long.");
+
+  // Kevin Pribilsky (Sales + Cat Management)
+  addMemo('kevin', 1750, "Northwest Restaurant Group is in play. Tony flagged Carla on the floor. This is the account we have been working for two years.");
+  addMemo('kevin', 850, "Cross-functional read on the show. The catering-format trend is bigger than the authentic-ethnic trend in pure volume terms. Worth telling Fernando how to prioritize.", [pic('kevin1')]);
+  addMemo('kevin', 200, "Final-day note. Make sure Andy captures the Buyers Edge demo for educational content. That is the one piece I want from this trip.");
+
   await saveEntries();
   renderExplore();
   updateSentCount();
@@ -5143,12 +5561,30 @@ window.resetDemoScenario = resetDemoScenario;
 // ── NAVIGATION ──────────────────────────────────────────────────────────────
 
 function showScreen(name) {
+  // Gate non-Home screens behind identity selection. If no one is selected
+  // and the user taps Explore, Discovery, or Trip, redirect to Home and
+  // pulse the identity bar to direct attention there.
+  if (!currentIdentity && name !== 'home') {
+    pulseIdentityBar();
+    name = 'home';
+  }
+
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
-  ['explore','discover','trip'].forEach((s,i) => {
+  ['home','explore','discover','trip'].forEach((s,i) => {
     if (s === name) document.querySelectorAll('.tab')[i].classList.add('active');
   });
+
+  // Identity bar is only interactive on Home. Lock it on other screens
+  // so the arrow disappears and the bar reads as a static label.
+  const bar = document.getElementById('header-identity');
+  if (bar) bar.classList.toggle('locked', name !== 'home');
+  if (name !== 'home') {
+    // Close the dropdown if leaving home with it open
+    document.getElementById('identity-dropdown')?.classList.remove('open');
+    bar?.classList.remove('open');
+  }
 
   // Identity name is hidden on Home (no "viewing as" context there)
   const nameEl = document.getElementById('header-identity-name');
@@ -5183,15 +5619,57 @@ function closeWelcome() {
 }
 window.closeWelcome = closeWelcome;
 
+// Visual lock state and pulse helpers for unselected-identity gating.
+function pulseIdentityBar() {
+  const bar = document.getElementById('header-identity');
+  if (!bar) return;
+  bar.classList.remove('pulse');
+  // Force reflow so the animation restarts even on rapid repeat taps.
+  void bar.offsetWidth;
+  bar.classList.add('pulse');
+  setTimeout(() => bar.classList.remove('pulse'), 1700);
+}
+
+// Apply or remove the locked appearance on tabs (other than Home) and the
+// memo button based on whether an identity is currently selected.
+function updateLockedAffordances() {
+  const locked = !currentIdentity;
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach((t, i) => {
+    // i===0 is Home, always available
+    if (i === 0) return;
+    t.classList.toggle('locked', locked);
+  });
+  const memo = document.getElementById('memo-btn');
+  if (memo) memo.classList.toggle('locked', locked);
+}
+
 function toggleDay(header) {
   const body = header.nextElementSibling;
   body.classList.toggle('open');
 }
 
 function toggleRequest(card) {
-  card.classList.toggle('open');
+  // Pop the request open as a focused modal rather than expanding the
+  // list inline. Source of truth for content is still the card markup
+  // on Home; we lift the name and body into the modal at open time.
+  const name = card.querySelector('.request-name')?.textContent || '';
+  const body = card.querySelector('.request-body')?.innerHTML || '';
+  const modalTitle = document.getElementById('request-modal-title');
+  const modalBody = document.getElementById('request-modal-body');
+  const overlay = document.getElementById('request-modal-overlay');
+  if (!modalTitle || !modalBody || !overlay) return;
+  modalTitle.textContent = name;
+  modalBody.innerHTML = body;
+  overlay.classList.add('open');
 }
 window.toggleRequest = toggleRequest;
+
+function closeRequestModal() {
+  const overlay = document.getElementById('request-modal-overlay');
+  if (overlay) overlay.classList.remove('open');
+}
+window.closeRequestModal = closeRequestModal;
 
 // ── INIT ────────────────────────────────────────────────────────────────────
 
@@ -5214,6 +5692,7 @@ async function initApp() {
   restoreIdentity();
   renderDiscoverContext();
   updateReportButtonState();
+  updateLockedAffordances();
   showScreen('home');
 
   await loadFromKV();
