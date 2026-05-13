@@ -3925,11 +3925,58 @@
   }
   .bolo-head-sub {
     font-family: var(--font-body);
-    font-weight: 300;
-    font-size: 13px;
-    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
     color: var(--text-hint);
     margin-left: auto;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    line-height: 1;
+  }
+  .bolo-head-sub:active { color: var(--text-secondary); }
+
+  /* "See all" list modal: rows of every BOLO with title, subtitle, and
+     FOR byline. Tap a row to open the full BOLO detail modal. */
+  .bolo-list-modal-row {
+    display: block;
+    padding: 12px 14px;
+    border-top: 1px solid var(--border);
+    border-left: 2px solid var(--bolo);
+    margin-left: -14px;
+    margin-right: -14px;
+    cursor: pointer;
+    background: transparent;
+    border-right: none;
+    border-bottom: none;
+    width: calc(100% + 28px);
+    text-align: left;
+  }
+  .bolo-list-modal-row:first-child { border-top: none; }
+  .bolo-list-modal-row:active { background: var(--bolo-light); }
+  .bolo-list-modal-row-name {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--bolo);
+    margin: 0 0 2px;
+  }
+  .bolo-list-modal-row-summary {
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0 0 4px;
+    line-height: 1.4;
+  }
+  .bolo-list-modal-row-from {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-hint);
   }
   .bolo-viewport {
     overflow: hidden;
@@ -4026,6 +4073,9 @@
     padding: 20px;
     overflow-y: auto;
   }
+  /* Detail modal sits above the list modal so tapping a row from the list
+     reveals the detail on top. Closing the detail leaves the list visible. */
+  #bolo-modal { z-index: 5010; }
   .bolo-modal.open { display: flex; align-items: flex-start; justify-content: center; }
   .bolo-modal-inner {
     background: var(--surface);
@@ -4527,7 +4577,7 @@
     <div class="bolo-section" id="bolo-section">
       <div class="bolo-head">
         <span class="bolo-head-title">Bolo</span>
-        <span class="bolo-head-sub">Tap to expand</span>
+        <span class="bolo-head-sub" onclick="openBoloList()" role="button" aria-label="See all">&#9660;</span>
       </div>
       <div class="bolo-viewport">
         <div class="bolo-track" id="bolo-track">
@@ -4634,6 +4684,18 @@
     <div class="bolo-modal-summary" id="bolo-modal-summary"></div>
     <div id="bolo-modal-sections"></div>
     <button type="button" class="bolo-modal-action" id="bolo-modal-action" onclick="startBoloDiscovery()">Log a discovery for this</button>
+  </div>
+</div>
+
+<!-- BOLO list modal: opened by tapping "See all" next to the Bolo heading.
+     Shows every BOLO as a scrollable row (title + subtitle + FOR byline).
+     Tapping a row opens the full detail modal for that BOLO. -->
+<div id="bolo-list-modal" class="bolo-modal" onclick="if(event.target===this)closeBoloList()">
+  <div class="bolo-modal-inner" onclick="event.stopPropagation()">
+    <button type="button" class="bolo-modal-close" onclick="closeBoloList()" aria-label="Close">&times;</button>
+    <div class="bolo-modal-name">Bolo</div>
+    <div class="bolo-modal-summary">All current alerts</div>
+    <div id="bolo-list-modal-rows"></div>
   </div>
 </div>
 
@@ -7301,6 +7363,40 @@ function closeBolo() {
 }
 window.openBolo = openBolo;
 window.closeBolo = closeBolo;
+
+// "See all" entry point. Renders every BOLO as a scrollable row (title +
+// subtitle + FOR byline). Tapping a row closes the list and opens the
+// full detail modal for that BOLO.
+function openBoloList() {
+  const modal = document.getElementById('bolo-list-modal');
+  const rowsEl = document.getElementById('bolo-list-modal-rows');
+  if (!modal || !rowsEl) return;
+  const rowsHtml = BOLO_ITEMS.map((it, i) => {
+    const byline = it.from
+      ? `For ${it.from}`
+      : (it.who ? `For ${(it.who || '').replace(/\.$/, '')}` : '');
+    return `
+      <button type="button" class="bolo-list-modal-row" onclick="selectBoloFromList(${i})">
+        <div class="bolo-list-modal-row-name">${escapeHtml(it.name)}</div>
+        <div class="bolo-list-modal-row-summary">${escapeHtml(it.summary)}</div>
+        ${byline ? `<div class="bolo-list-modal-row-from">${escapeHtml(byline.toUpperCase())}</div>` : ''}
+      </button>`;
+  }).join('');
+  rowsEl.innerHTML = rowsHtml;
+  modal.classList.add('open');
+}
+function closeBoloList() {
+  document.getElementById('bolo-list-modal')?.classList.remove('open');
+}
+function selectBoloFromList(idx) {
+  // Open the detail on top of the list. When the user closes the detail,
+  // the list is still visible underneath; one more close gesture dismisses
+  // the list itself.
+  openBolo(idx);
+}
+window.openBoloList = openBoloList;
+window.closeBoloList = closeBoloList;
+window.selectBoloFromList = selectBoloFromList;
 
 // True if the current viewer already has an entry on this booth. Used by
 // the BOLO modal to flip the Add button to "In My Discoveries" so users
