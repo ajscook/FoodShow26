@@ -109,7 +109,7 @@
     border-bottom: 1px solid var(--border);
   }
   .header-logo {
-    height: 118px;
+    height: 140px;
     width: auto;
     max-width: 80%;
     object-fit: contain;
@@ -209,42 +209,136 @@
     inset: 0;
     z-index: 200;
     background: rgba(0,0,0,0.55);
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
-    padding: 0;
+    padding: 24px 16px;
   }
   .chrome-modal.open { display: flex; }
   .chrome-modal-inner {
     background: var(--surface);
-    border-top: 1px solid var(--border-strong);
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
     width: 100%;
-    max-height: 88vh;
+    max-width: 560px;
+    max-height: calc(100vh - 48px);
     overflow-y: auto;
-    padding: 22px 18px 28px;
+    padding: 18px 18px 22px;
     position: relative;
   }
   .chrome-modal-close {
     position: absolute;
-    top: 10px;
-    right: 14px;
-    width: 36px;
-    height: 36px;
+    top: 8px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
     background: transparent;
     border: none;
     color: var(--text-hint);
-    font-size: 28px;
+    font-size: 24px;
     line-height: 1;
     cursor: pointer;
   }
   .chrome-modal-title {
     font-family: var(--font-headline);
-    font-weight: 600;
-    font-size: 22px;
-    color: var(--text-primary);
-    margin: 0 0 16px 4px;
+    font-weight: 400;
+    font-size: 15px;
+    color: var(--text-secondary);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin: 0 0 14px 2px;
   }
-  .chrome-modal-body { padding-top: 4px; }
+  .chrome-modal-body { padding-top: 2px; }
+
+  /* =========================================================================
+     REPORT MODAL BODY
+     ========================================================================= */
+  #report-body .report-section { margin: 0 0 18px; }
+  #report-body .report-section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-headline);
+    font-weight: 400;
+    font-size: 15px;
+    color: var(--text-secondary);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  #report-body .report-section-label::before {
+    content: "";
+    width: 3px;
+    height: 16px;
+    background: var(--text-hint);
+    border-radius: 2px;
+  }
+  #report-body .report-section.section-notes .report-section-label::before { background: var(--bolo); }
+  #report-body .report-section.section-discoveries .report-section-label::before { background: var(--green-harbor); }
+  #report-body .report-empty {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-style: italic;
+    color: var(--text-hint);
+    padding: 4px 0 8px;
+  }
+  #report-body .report-item {
+    padding: 10px 0;
+    border-top: 1px solid var(--border);
+  }
+  #report-body .report-item:first-child { border-top: none; }
+  #report-body .report-item-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  #report-body .report-item-stamp {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+  #report-body .report-item-booth {
+    font-family: var(--font-headline);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+  }
+  #report-body .report-item-bolo {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    border: 1px solid var(--bolo);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--bolo);
+    text-transform: uppercase;
+  }
+  #report-body .report-item-note {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.45;
+    margin: 0 0 6px;
+  }
+  #report-body .report-thumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  #report-body .report-thumb {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    border: 1px solid var(--border);
+    cursor: pointer;
+  }
 
   /* Home screen */
   .home-block {
@@ -934,15 +1028,15 @@
   .voice-field-wrap { position: relative; }
   .voice-field-wrap > input,
   .voice-field-wrap > textarea {
-    padding-right: 38px;
+    padding-right: 56px;
   }
   .voice-field-icon {
     position: absolute;
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
-    width: 22px;
-    height: 22px;
+    width: 40px;
+    height: 40px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -958,7 +1052,7 @@
   }
   .voice-field-icon:hover { color: var(--blue); }
   .voice-field-icon.recording { color: var(--record-red); animation: recordPulse 1.2s infinite; }
-  .voice-field-icon svg { width: 16px; height: 16px; fill: currentColor; }
+  .voice-field-icon svg { width: 32px; height: 32px; fill: currentColor; }
   @keyframes recordPulse {
     0%,100% { opacity: 1; }
     50% { opacity: 0.5; }
@@ -3242,11 +3336,11 @@
   .day-date                              { font-size: 13px !important; }
 
   /* Tab bar tighten */
-  .tab-bar                               { position: fixed !important; bottom: 0 !important; left: 50% !important; right: auto !important; transform: translateX(-50%) !important; width: calc(100% - 32px) !important; max-width: 398px !important; margin: 0 !important; padding-left: 12px !important; padding-right: 12px !important; }
+  .tab-bar                               { position: fixed !important; bottom: 0 !important; left: 50% !important; right: auto !important; transform: translateX(-50%) !important; width: calc(100% - 32px) !important; max-width: 460px !important; margin: 0 !important; padding: 12px 12px 14px !important; }
   .tab-icon                              { display: none !important; }
-  .tab .tab-label                        { font-size: 13px !important; }
-  .memo-btn                              { width: 50px !important; height: 50px !important; margin: -18px 6px 0 !important; }
-  .memo-btn svg                          { width: 22px !important; height: 22px !important; }
+  .tab .tab-label                        { font-size: 18px !important; }
+  .memo-btn                              { width: 64px !important; height: 64px !important; margin: -22px 8px 0 !important; }
+  .memo-btn svg                          { width: 28px !important; height: 28px !important; }
 
   /* =========================================================================
      FIRST-TIME IDENTITY PICKER + RESET LINK
@@ -3587,9 +3681,9 @@
 
   /* Exhibitor chips */
   .exhibitor-chip {
-    font-size: 6px !important;
+    font-size: 3px !important;
     font-weight: 250 !important;
-    padding: 3px 8px !important;
+    padding: 2px 6px !important;
     border-radius: 4px !important;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -3743,8 +3837,8 @@
     display: flex !important;
     align-items: center;
     gap: 10px !important;
-    padding: 32px 14px !important;
-    min-height: 80px !important;
+    padding: 16px 14px !important;
+    min-height: 40px !important;
   }
   .explore-card-name-line {
     flex: 1;
@@ -4262,7 +4356,7 @@
   <!-- HOME -->
   <div id="screen-home" class="screen active">
     <div class="home-block">
-      <div class="home-greeting">Howdy, <span class="home-greeting-name">Andy.</span></div>
+      <div class="home-greeting"><span class="home-greeting-prefix">Howdy, </span><span class="home-greeting-name">Andy.</span></div>
 
       <!-- My Trip and My Report were moved out of the home body and are now
            opened via the three-icon chrome row above. -->
@@ -5573,23 +5667,76 @@ window.showFirstTimePicker = showFirstTimePicker;
 
 // Update the Home screen greeting ("Howdy, Andy.") to match the current
 // viewer. Falls back to a generic greeting if no identity is set.
+// Rotating greeting list. Each entry pairs the prefix text (including its
+// trailing punctuation and space) with the punctuation that should follow
+// the name. Default is a period; any prefix can override.
+const GREETING_PREFIXES = [
+  { prefix: "Howdy, ",            end: "." },
+  { prefix: "Ahoy, ",             end: "." },
+  { prefix: "Top o' the mornin', ", end: "." },
+  { prefix: "Yo, ",               end: "." },
+  { prefix: "Sup, ",              end: "." },
+  { prefix: "Aloha, ",            end: "." },
+  { prefix: "Boob-Boom, ",        end: "." },
+  { prefix: "Hola, ",             end: "." },
+  { prefix: "Wakanda forever, ",  end: "." },
+  { prefix: "Duuuuude! It's, ",   end: "!" },
+  { prefix: "Are you fired up, ", end: "?" },
+  { prefix: "Piss off, ",         end: "." },
+  { prefix: "Hair looks great, ", end: "!" },
+];
+// Shuffled queue so prefixes don't repeat back-to-back. When the queue
+// empties, it gets reshuffled.
+let __greetingQueue = [];
+let __greetingCurrent = null;
+function nextGreeting() {
+  if (__greetingQueue.length === 0) {
+    __greetingQueue = GREETING_PREFIXES
+      .map(g => g)
+      .sort(() => Math.random() - 0.5);
+    // Avoid the same prefix appearing first if it was the last shown.
+    if (__greetingCurrent && __greetingQueue[0]?.prefix === __greetingCurrent.prefix && __greetingQueue.length > 1) {
+      __greetingQueue.push(__greetingQueue.shift());
+    }
+  }
+  __greetingCurrent = __greetingQueue.shift();
+  return __greetingCurrent;
+}
+
 function updateHomeGreeting() {
   const nameEl = document.querySelector('.home-greeting-name');
+  const prefixEl = document.querySelector('.home-greeting-prefix');
   if (!nameEl) return;
+  // If no greeting has been picked yet this session, pull one now.
+  if (!__greetingCurrent) nextGreeting();
+  const g = __greetingCurrent;
+  if (prefixEl) prefixEl.textContent = g.prefix;
   if (!currentIdentity) {
-    nameEl.textContent = 'friend.';
+    nameEl.textContent = 'friend' + g.end;
     return;
   }
   const ident = resolveIdentity(currentIdentity.id);
   if (!ident) {
-    nameEl.textContent = 'friend.';
+    nameEl.textContent = 'friend' + g.end;
     return;
   }
   let displayName;
   if (currentIdentity.kind === 'person') displayName = ident.first;
   else if (currentIdentity.kind === 'harbor') displayName = 'team';
-  else displayName = ident.name; // department: "Category Management" or "Solutions"
-  nameEl.textContent = displayName + '.';
+  else displayName = ident.name;
+  nameEl.textContent = displayName + g.end;
+}
+
+// Cycle to a new greeting every 3 minutes while the user is on Home.
+// Skips the swap if the identity dropdown is open (avoids text shifting
+// mid-tap). Starts once on app init.
+function startGreetingRotation() {
+  setInterval(() => {
+    const dropdownOpen = document.getElementById('identity-dropdown')?.classList.contains('open');
+    if (dropdownOpen) return;
+    nextGreeting();
+    updateHomeGreeting();
+  }, 3 * 60 * 1000);
 }
 
 // Reset link for non-admins who picked the wrong name initially. Clears
@@ -7657,61 +7804,88 @@ function renderReport() {
   const body = document.getElementById('report-body');
   if (!body) return;
   if (!reportSubjectIsValid()) {
-    body.innerHTML = '';
+    body.innerHTML = '<div class="report-empty">Pick an identity to see your report.</div>';
     return;
   }
   const data = buildReportData();
 
-  let html = '';
-
-  // Subject line
-  html += `<div class="report-subject">Trip footprint for <strong>${escapeHtml(data.viewer.name)}</strong> &middot; Harbor NRA 2026</div>`;
-
-  // SECTION 1: Where I am
-  html += `<div class="report-section">`;
-  html += `<div class="report-section-label">Where I am</div>`;
-  html += `<div class="report-stat-row">`;
-  html += `<div class="report-stat"><div class="report-stat-num">${data.captured.length}</div><div class="report-stat-label">Booths captured</div></div>`;
-  html += `<div class="report-stat"><div class="report-stat-num">${data.inbound.length}</div><div class="report-stat-label">Sent to you</div></div>`;
-  html += `<div class="report-stat"><div class="report-stat-num">${data.hallsTouched}</div><div class="report-stat-label">Halls touched</div></div>`;
-  html += `</div>`;
-  html += `</div>`;
-
-  // SECTION 2: Where to go
-  html += `<div class="report-section">`;
-  html += `<div class="report-section-label">Where to go</div>`;
-  if (data.pending.length === 0) {
-    html += `<div class="report-empty">Nothing waiting on you right now.</div>`;
+  // Notes: voice memos the viewer captured.
+  let notesHtml = '';
+  if (data.memos.length === 0) {
+    notesHtml = '<div class="report-empty">No notes captured yet.</div>';
   } else {
-    data.pending.forEach(e => {
-      html += renderReportPendingItem(e);
-    });
-  }
-  html += `</div>`;
-
-  // SECTION 2.5: Voice memos (only shown if any exist)
-  if (data.memos.length > 0) {
-    html += `<div class="report-section">`;
-    html += `<div class="report-section-label">Voice memos</div>`;
-    data.memos.forEach(m => {
-      html += renderReportMemo(m);
-    });
-    html += `</div>`;
+    notesHtml = data.memos.map(renderReportNote).join('');
   }
 
-  // SECTION 3: Where I've been
-  html += `<div class="report-section">`;
-  html += `<div class="report-section-label">Where I've been</div>`;
-  if (data.boothList.length === 0) {
-    html += `<div class="report-empty">No booths captured or received yet.</div>`;
+  // Discoveries: booth entries the viewer captured (their own captures only).
+  // Bolo-tagged discoveries appear in this same list with a Bolo chip.
+  const myDiscoveries = data.captured.slice().sort((a,b) =>
+    (b.timestamp || b.createdAt || 0) - (a.timestamp || a.createdAt || 0));
+  let discoveriesHtml = '';
+  if (myDiscoveries.length === 0) {
+    discoveriesHtml = '<div class="report-empty">No discoveries logged yet.</div>';
   } else {
-    data.boothList.forEach(b => {
-      html += renderReportBooth(b, data.viewer);
-    });
+    discoveriesHtml = myDiscoveries.map(renderReportDiscovery).join('');
   }
-  html += `</div>`;
 
-  body.innerHTML = html;
+  body.innerHTML = `
+    <div class="report-section section-notes">
+      <div class="report-section-label">My Notes</div>
+      ${notesHtml}
+    </div>
+    <div class="report-section section-discoveries">
+      <div class="report-section-label">My Discoveries</div>
+      ${discoveriesHtml}
+    </div>
+  `;
+}
+
+function renderReportNote(memo) {
+  const photos = memo.photoUrls || [];
+  const ts = memo.timestamp ? new Date(memo.timestamp) : null;
+  const stamp = ts ? `${ts.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()} · ${ts.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}` : '';
+  const thumbs = photos.length === 0 ? '' : `
+    <div class="report-thumbs">
+      ${photos.map(u => `<img src="${u}" class="report-thumb" onclick="openLightbox('${u}')">`).join('')}
+    </div>
+  `;
+  return `
+    <div class="report-item">
+      <div class="report-item-head">
+        <span class="report-item-stamp">${escapeHtml(stamp)}</span>
+      </div>
+      ${memo.note ? `<div class="report-item-note">${escapeHtml(memo.note)}</div>` : ''}
+      ${thumbs}
+    </div>
+  `;
+}
+
+function renderReportDiscovery(entry) {
+  const photos = entry.photoUrls || [];
+  const ts = (entry.timestamp || entry.createdAt) ? new Date(entry.timestamp || entry.createdAt) : null;
+  const stamp = ts ? `${ts.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()} · ${ts.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}` : '';
+  const boloChip = (entry.boloId !== null && entry.boloId !== undefined && BOLO_ITEMS && BOLO_ITEMS[entry.boloId])
+    ? `<span class="report-item-bolo">BOLO &middot; ${escapeHtml(BOLO_ITEMS[entry.boloId].name)}</span>`
+    : '';
+  const thumbs = photos.length === 0 ? '' : `
+    <div class="report-thumbs">
+      ${photos.map(u => `<img src="${u}" class="report-thumb" onclick="openLightbox('${u}')">`).join('')}
+    </div>
+  `;
+  const booth = entry.booth ? `Booth ${escapeHtml(entry.booth)}` : '';
+  const hall = entry.hallCode ? `${escapeHtml(entry.hallCode)} · ` : '';
+  return `
+    <div class="report-item">
+      <div class="report-item-head">
+        <span class="report-item-stamp">${escapeHtml(stamp)}</span>
+        ${boloChip}
+      </div>
+      <div class="report-item-booth">${escapeHtml(entry.name || '')}</div>
+      <div class="report-item-stamp" style="margin-bottom:4px;">${hall}${booth}</div>
+      ${entry.note ? `<div class="report-item-note">${escapeHtml(entry.note)}</div>` : ''}
+      ${thumbs}
+    </div>
+  `;
 }
 
 function renderReportPendingItem(entry) {
@@ -8378,6 +8552,12 @@ function showScreen(name) {
     if (s === name) document.querySelectorAll('.tab')[i].classList.add('active');
   });
 
+  // The three-icon chrome row (My Trip, Me, My Report) lives only on For Me.
+  // On For Us it's removed entirely so the screen content starts right under
+  // the Harbor logo.
+  const chromeRow = document.querySelector('.header-chrome-row');
+  if (chromeRow) chromeRow.style.display = (name === 'home') ? '' : 'none';
+
   // The Me chrome icon stays interactive on every screen now. No locked
   // styling, no auto-close when changing tabs.
 
@@ -8486,6 +8666,8 @@ async function initApp() {
   // Populate the My Notes ticker so it has content on first paint, even
   // before the user touches anything.
   renderMyNotes();
+  // Cycle the home greeting prefix every 3 minutes.
+  startGreetingRotation();
   showScreen('home');
 
   await loadFromKV();
