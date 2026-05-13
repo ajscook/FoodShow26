@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Oswald:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,400&display=swap" rel="stylesheet">
 <style>
   :root {
     /* Single muted blue carrying every "interactive / system" signal. */
@@ -42,6 +42,11 @@
     /* Recording red — the one place red earns a place in the system. */
     --record-red: #E24B4A;
 
+    /* BOLO gold — used only for Be On the Lookout surfaces. Distinct from
+       orange (accent), green (Harbor), blue (system), and amber. */
+    --bolo: #E0B642;
+    --bolo-light: rgba(224,182,66,0.10);
+
     --white: #F4F1EC;
     --off-white: #131211;
     --surface: #1A1917;
@@ -56,8 +61,10 @@
     --radius-sm: 8px;
     --radius-md: 12px;
     --radius-lg: 16px;
-    --font: 'DM Sans', system-ui, sans-serif;
-    --font-mono: 'DM Mono', monospace;
+    --font:          'Plus Jakarta Sans', sans-serif;
+    --font-body:     'Plus Jakarta Sans', sans-serif;
+    --font-headline: 'Bricolage Grotesque', sans-serif;
+    --font-mono:     'Oswald', sans-serif;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -87,9 +94,11 @@
   ::-webkit-scrollbar { width: 0; height: 0; }
 
   /* HEADER
-     Logo bar scrolls naturally with the page. The identity bar (Viewing as)
-     stays stuck to the top once it reaches it, so users always have access
-     to identity switching no matter how far they have scrolled. */
+     Logo bar at the top, then a three-icon chrome row directly below it.
+     The row holds quick-access affordances: My Trip (left), Me (center,
+     identity), My Report (right). The Me circle preserves the original
+     `header-identity` id so existing pulse/dropdown/locked logic still
+     works without rewiring. */
 
   .header-logo-bar {
     background: var(--off-white);
@@ -106,64 +115,136 @@
     object-fit: contain;
   }
 
-  .header-identity-bar {
+  /* Three-icon chrome row that replaces the old "Viewing as" pill. */
+  .header-chrome-row {
     position: sticky;
     top: 0;
     z-index: 100;
     background: var(--off-white);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 36px;
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .chrome-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+    background: transparent;
+    border: none;
+    padding: 0;
+    min-width: 64px;
+  }
+  .chrome-item:active .chrome-circle { background: var(--surface); }
+  .chrome-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
     border: 1px solid var(--border-strong);
-    border-radius: var(--radius-md);
-    margin: 8px 16px;
-    padding: 0 16px;
-    height: 40px;
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    user-select: none;
+    color: var(--text-primary);
+    flex-shrink: 0;
   }
-  .header-identity-bar:active { background: var(--surface); }
-  .header-identity-bar.locked {
-    cursor: default;
+  .chrome-circle svg {
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    fill: none;
+  }
+  .chrome-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+  /* The Me circle shows the current viewer's initials in their color. */
+  .chrome-circle.chrome-circle-me {
     border-color: var(--border);
   }
-  .header-identity-bar.locked .header-identity-arrow {
-    display: none;
-  }
-  .header-identity-bar.locked:active { background: transparent; }
-  .header-identity-bar:focus,
-  .header-identity-bar:focus-within { outline: none; }
-  .header-identity-name:focus { outline: none; }
-  .header-identity-label {
+  .chrome-me-initials {
+    font-family: var(--font-headline);
+    font-weight: 700;
     font-size: 14px;
-    font-weight: 600;
-    color: var(--text-hint);
-    letter-spacing: 0;
-    text-transform: none;
-    margin-right: 8px;
-    flex-shrink: 0;
-  }
-  .header-identity-name {
-    font-size: 17px;
-    font-weight: 600;
+    letter-spacing: 0.02em;
     color: var(--text-primary);
-    text-transform: none;
-    letter-spacing: 0;
-    flex: 1;
   }
-  .header-identity-name.placeholder {
-    font-weight: 400;
+  /* Locked Me state: dropdown can't open. Match prior locked treatment. */
+  .chrome-item.locked { cursor: default; }
+  .chrome-item.locked .chrome-circle { border-color: var(--border); }
+  .chrome-item.open .chrome-circle { border-color: var(--text-primary); }
+
+  /* The identity dropdown is still anchored to the Me chrome item. */
+  .chrome-item .identity-dropdown {
+    top: calc(100% + 8px);
+  }
+
+  /* One-shot green pulse on the Me chrome circle to direct attention there
+     when the user taps a locked control. Replaces the prior identity-bar
+     pulse target. */
+  .chrome-item.pulse .chrome-circle {
+    animation: identityPulse 0.8s ease-out 2;
+  }
+  @keyframes identityPulse {
+    0%   { border-color: var(--border-strong); box-shadow: 0 0 0 0 rgba(75,173,74,0.0); }
+    50%  { border-color: #4BAD4A;              box-shadow: 0 0 0 4px rgba(75,173,74,0.35); }
+    100% { border-color: var(--border-strong); box-shadow: 0 0 0 0 rgba(75,173,74,0.0); }
+  }
+
+  /* Modal overlay used for My Trip and My Report. Same general layout as
+     the BOLO detail modal so the user sees a consistent pattern. */
+  .chrome-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(0,0,0,0.55);
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+  }
+  .chrome-modal.open { display: flex; }
+  .chrome-modal-inner {
+    background: var(--surface);
+    border-top: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    width: 100%;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 22px 18px 28px;
+    position: relative;
+  }
+  .chrome-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: none;
     color: var(--text-hint);
-    text-transform: none;
-    letter-spacing: 0;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
   }
-  .header-identity-arrow {
-    font-size: 14px;
-    color: var(--text-secondary);
-    transition: transform 0.15s;
-    flex-shrink: 0;
+  .chrome-modal-title {
+    font-family: var(--font-headline);
+    font-weight: 600;
+    font-size: 22px;
+    color: var(--text-primary);
+    margin: 0 0 16px 4px;
   }
-  .header-identity-bar.open .header-identity-arrow { transform: rotate(180deg); }
+  .chrome-modal-body { padding-top: 4px; }
 
   /* Home screen */
   .home-block {
@@ -527,7 +608,7 @@
     line-height: 1;
   }
   .tab.active .tab-label {
-    color: var(--text-primary);
+    color: var(--secondary) !important;
   }
 
   /* Memo button - circular, lives in tab bar but visually distinct */
@@ -1715,11 +1796,33 @@
     padding: 14px 16px 8px;
   }
   .explore-section-title {
-    font-size: 20px;
-    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-headline);
+    font-size: 15px;
+    font-weight: 400;
     color: var(--text-secondary);
-    letter-spacing: 0;
-    text-transform: none;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  /* Vertical color dash to the left of the section label, keyed by section.
+     The label text stays off-white; only the dash carries the color. */
+  .explore-section-title::before {
+    content: "";
+    width: 3px;
+    height: 22px;
+    border-radius: 2px;
+    background: transparent;
+  }
+  .explore-section-head[data-section="invitations"] .explore-section-title::before {
+    background: var(--green-harbor);
+  }
+  .explore-section-head[data-section="peerFlags"] .explore-section-title::before {
+    background: var(--tertiary);
+  }
+  .explore-section-head[data-section="engaged"] .explore-section-title::before {
+    background: var(--secondary);
   }
   .explore-section-count {
     font-size: 17px;
@@ -1730,6 +1833,149 @@
     min-width: 0;
     text-align: right;
     font-family: var(--font-mono);
+  }
+
+  /* MY LIST: add button row at top of Explore */
+  .mylist-add-row {
+    padding: 12px 16px 4px;
+  }
+  .mylist-add-btn {
+    width: 100%;
+    background: transparent;
+    color: var(--white);
+    border: 1px dashed rgba(244,241,236,0.35);
+    border-radius: var(--radius-md);
+    padding: 11px 14px;
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .mylist-add-btn:active {
+    border-color: var(--white);
+  }
+
+  /* MY LIST: remove action inside an expanded my-list card body */
+  .explore-card-mylist-actions {
+    padding: 12px 16px 16px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .explore-card-mylist-remove {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    font-family: var(--font);
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .explore-card-mylist-remove:active {
+    color: var(--text-primary);
+    border-color: var(--white);
+  }
+
+  /* MY LIST: picker overlay */
+  .mylist-picker-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 800;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 60px 16px 16px;
+  }
+  .mylist-picker-overlay.open { display: flex; }
+  .mylist-picker-modal {
+    width: 100%;
+    max-width: 420px;
+    max-height: calc(100vh - 80px);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+  .mylist-picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .mylist-picker-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .mylist-picker-close {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 4px;
+  }
+  .mylist-picker-input {
+    margin: 12px 16px 8px;
+    padding: 10px 12px;
+    background: var(--off-white);
+    color: var(--text-primary);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 16px;
+  }
+  .mylist-picker-input:focus {
+    outline: none;
+    border-color: var(--white);
+  }
+  .mylist-picker-results {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 0 8px;
+  }
+  .mylist-picker-result {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .mylist-picker-result:active { background: var(--surface-raised); }
+  .mylist-picker-result-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+  .mylist-picker-result-meta {
+    font-size: 13px;
+    color: var(--text-hint);
+    display: flex;
+    gap: 8px;
+  }
+  .mylist-picker-result.disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .mylist-picker-result.disabled .mylist-picker-result-meta::after {
+    content: 'Already on your list';
+    color: var(--text-hint);
+    font-style: italic;
+  }
+  .mylist-picker-empty,
+  .mylist-picker-hint {
+    padding: 24px 16px;
+    text-align: center;
+    color: var(--text-hint);
+    font-size: 14px;
   }
 
   /* EXPLORE: cards */
@@ -1752,6 +1998,13 @@
   }
   .explore-card.origin-peer {
     border-left: 4px solid var(--blue);
+  }
+  .explore-card.origin-mine {
+    border-left: 4px solid var(--white);
+  }
+  .explore-card.origin-mine .explore-card-count {
+    color: var(--white);
+    border-color: var(--white);
   }
   .explore-card.origin-mixed {
     border-left: 4px solid var(--green-harbor);
@@ -2363,6 +2616,1608 @@
   .export-result.show { display: block; }
   .export-result-success { color: var(--green); }
   .export-result-error { color: var(--record-red); }
+
+  /* =========================================================================
+     DESIGN PACKAGE: Epicurean Executive
+     Applied 2026-05-12. Targeted overrides on top of existing system.
+     Green = branding & dept signals. Orange = ACCENT (text, borders,
+     active indicators, mic button). Blue = system signals.
+     Typography follows the three-font system: Bricolage Grotesque on
+     headlines, Plus Jakarta Sans on body, Oswald on caps and numerics.
+     Playfair Display italic is reserved for .home-greeting-name only.
+     ========================================================================= */
+  :root {
+    --primary: var(--green-harbor);   /* #4BAD4A */
+    --secondary: #E87D3E;             /* Orange - Accent */
+    --tertiary: #7A9BC4;              /* Azure Blue - System */
+    --font-headline: 'Bricolage Grotesque', sans-serif;
+    --font-body:     'Plus Jakarta Sans', sans-serif;
+  }
+
+  /* Headline typography */
+  h1, h2,
+  .request-name,
+  .explore-card-name,
+  .report-topbar-title,
+  .day-title {
+    font-family: var(--font-headline);
+    font-weight: 700;
+  }
+
+  /* Plus Jakarta italic on supporting body text below headlines */
+  .request-summary,
+  .trip-note,
+  .day-date {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  /* Trip note: orange left border per spec */
+  .trip-note {
+    border-left-color: var(--secondary);
+  }
+
+  /* Neutralize any lingering cell tints */
+  .request-card,
+  .explore-card,
+  .day-card,
+  .sent-item,
+  .selected-exhibitor {
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    box-shadow: none !important;
+  }
+
+  /* Active tab indicator: orange accent per spec */
+  .tab.active::after {
+    background: var(--secondary) !important;
+  }
+
+  /* Hall pill S color stays blue accent */
+  .hall-pill.hall-S {
+    color: var(--tertiary);
+    border-color: var(--tertiary);
+  }
+
+  /* Origin signals (engaged shifts amber -> orange) */
+  .explore-card.origin-dept   { border-left: 4px solid var(--primary) !important; }
+  .explore-card.origin-peer   { border-left: 4px solid var(--tertiary) !important; }
+  .explore-card.origin-mine   { border-left: 4px solid var(--text-primary) !important; }
+  .explore-card.origin-mixed  { border-left: 4px solid var(--primary) !important; border-right: 4px solid var(--tertiary) !important; }
+  .explore-card.engaged       { border-left: 4px solid var(--secondary) !important; }
+  .explore-card.engaged .explore-card-count {
+    color: var(--secondary) !important;
+    border-color: var(--secondary) !important;
+  }
+
+  /* =========================================================================
+     FONT SYSTEM ENFORCEMENT
+     Three-font system: Bricolage Grotesque (headlines), Plus Jakarta Sans
+     (body), Oswald (caps + numerics). Playfair Display italic is the single
+     exception, reserved for .home-greeting-name only.
+     ========================================================================= */
+
+  /* Headlines: Bricolage Grotesque heavy */
+  .home-greeting,
+  .home-section-title,
+  .my-discoveries-head-title,
+  .home-report-btn,
+  .explore-card-name,
+  .explore-card-name-line,
+  .request-name,
+  .report-topbar-title,
+  .day-title,
+  h1, h2 {
+    font-family: var(--font-headline) !important;
+    font-weight: 700 !important;
+  }
+
+  /* Section headers (My Trip, My Notes, My Report, Missions) read lighter
+     than the hero/card headlines. */
+  .home-section-title {
+    font-size: 15px !important;
+    font-weight: 300 !important;
+  }
+
+  /* My Discoveries heading: muted, regular, caps to match the For Us section
+     labels. */
+  .my-discoveries-head-title {
+    font-weight: 400 !important;
+    color: var(--text-secondary) !important;
+    letter-spacing: 0.04em !important;
+    text-transform: uppercase !important;
+  }
+
+  /* Body: Plus Jakarta Sans (explicit overrides where rules elsewhere
+     may have set a different family) */
+  .explore-entry-note,
+  .response-existing-note,
+  .header-identity-name,
+  .request-summary,
+  .trip-note,
+  .day-date,
+  .exhibitor-about-text,
+  .explore-card-body-from-name,
+  .explore-entry-from-text {
+    font-family: var(--font-body) !important;
+  }
+
+  /* Caps + numerics: Oswald */
+  .tab-label,
+  .header-identity-label,
+  .home-section-arrow,
+  .explore-card-body-from-label,
+  .response-existing-label,
+  .explore-entry-tagged-label,
+  .explore-entry-contact strong,
+  .exhibitor-about-toggle,
+  .exhibitor-chip,
+  .request-section-label,
+  .explore-card-count,
+  .explore-card-booth-num,
+  .booth-pill,
+  .hall-pill,
+  .explore-entry-time,
+  .explore-card-hall-initial {
+    font-family: var(--font-mono) !important;
+  }
+
+  /* Single exception: Playfair Display italic 400 on the greeting name only */
+  .home-greeting-name {
+    font-family: 'Playfair Display', serif !important;
+    font-style: italic !important;
+    font-weight: 400 !important;
+    color: var(--secondary);
+  }
+
+  /* Size scale per font-system spec */
+  .home-greeting           { font-size: 30px; }
+  .home-section-title      { font-size: 15px; }
+  .my-discoveries-head-title { font-size: 15px; }
+  .home-report-btn         { font-size: 12px; font-weight: 800 !important; text-transform: uppercase; letter-spacing: 0.06em; }
+  .explore-card-name-line  { font-size: 16px; }
+  .explore-entry-note      { font-size: 14px; }
+  .request-section-text    { font-size: 14px; }
+  .request-summary         { font-size: 14px; }
+  .hall-banner             { font-size: 13px; }
+  .response-existing-note  { font-size: 13px; }
+  .response-form-textarea  { font-size: 13px; }
+  .exhibitor-about-text    { font-size: 12px; }
+  .trip-note               { font-size: 12px; }
+  .day-date                { font-size: 11px; }
+
+  /* Home greeting: "Howdy, Andy." treatment.
+     Howdy in Bricolage 700, Andy in Playfair Display italic 400. */
+  .home-greeting {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 1.1;
+    color: var(--text-primary);
+    margin: 8px 16px 24px;
+    letter-spacing: -0.01em;
+  }
+  .home-greeting-name {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--secondary);
+  }
+
+  /* Day card date badge: enlarge existing .day-icon to match spec (15, 16, 17...) */
+  .day-icon {
+    width: auto !important;
+    min-width: 44px;
+    height: 44px !important;
+    padding: 0 10px;
+    font-family: var(--font-body) !important;
+    font-size: 20px !important;
+    font-weight: 500 !important;
+  }
+
+  /* Identity bar pulse (inert until JS adds .pulse class) */
+  .header-identity-bar.pulse {
+    animation: identityPulse 0.8s ease-out 2;
+  }
+  @keyframes identityPulse {
+    50% { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(75,173,74,0.3); }
+  }
+
+  /* =========================================================================
+     DISCOVERY SCREEN REDESIGN
+     ========================================================================= */
+
+  /* Screen title bar at top of Discovery: large Playfair title + MY RECORD pill */
+  .discovery-titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px 12px;
+  }
+  .discovery-title {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 36px;
+    color: var(--text-primary);
+    line-height: 1.1;
+  }
+  .my-record-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .my-record-pill:hover { border-color: var(--text-secondary); }
+  .my-record-pill-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+
+  /* Search bar with magnifying glass icon prefix */
+  .search-bar {
+    position: relative;
+    margin: 0 16px 16px;
+  }
+  .search-bar-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    color: var(--text-hint);
+    pointer-events: none;
+  }
+  .search-bar .exhibitor-search-input {
+    margin-bottom: 0;
+    padding-left: 42px;
+    border-color: var(--border-strong);
+    background: var(--surface);
+    font-size: 17px;
+  }
+  .search-bar .exhibitor-search-input::placeholder {
+    color: var(--text-hint);
+  }
+  .search-bar .exhibitor-search-input:focus {
+    border-color: var(--text-secondary);
+  }
+
+  /* Capture card: orange-bordered container around the Discovery form */
+  .capture-card {
+    margin: 0 16px 20px;
+    padding: 16px 16px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--secondary);
+    border-radius: var(--radius-md);
+  }
+  .capture-card .form-section-label {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+    margin: 0 0 8px;
+  }
+  .capture-card .form-section-label + * { margin-top: 0; }
+  .capture-card .form-textarea {
+    background: transparent;
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+    min-height: 80px;
+    font-size: 17px;
+  }
+  .capture-card .form-textarea::placeholder {
+    font-family: var(--font-headline);
+    font-style: italic;
+    color: var(--text-hint);
+  }
+
+  /* Send to row inside capture card */
+  .capture-card .picker-wrap { margin-bottom: 14px; }
+  .capture-card .picker-trigger {
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 12px 14px;
+  }
+  .capture-card .picker-trigger.empty span:first-child {
+    font-family: var(--font-headline);
+    font-style: italic;
+    color: var(--text-hint);
+  }
+
+  /* Add details row: label on left, toggle switch on right */
+  .details-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0 14px;
+  }
+  .details-toggle-row-label {
+    font-family: var(--font-body);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .toggle-switch {
+    width: 48px;
+    height: 26px;
+    border-radius: 13px;
+    background: var(--surface-raised);
+    border: 1px solid var(--border-strong);
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .toggle-switch::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--text-secondary);
+    transition: transform 0.2s, background 0.2s;
+  }
+  .toggle-switch.open {
+    background: var(--secondary);
+    border-color: var(--secondary);
+  }
+  .toggle-switch.open::before {
+    transform: translateX(22px);
+    background: #FFFFFF;
+  }
+
+  /* Submit Discovery: orange full-width with play-triangle icon */
+  .capture-card .btn-primary {
+    background: var(--secondary) !important;
+    color: #FFFFFF !important;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .capture-card .btn-primary:hover { background: #D86A2A !important; }
+  .capture-card .btn-primary:disabled {
+    background: var(--surface-raised) !important;
+    color: var(--text-hint) !important;
+    cursor: not-allowed;
+  }
+  .capture-card .btn-primary-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  /* Clear button: full-width dark with border */
+  .capture-card .btn-secondary {
+    background: transparent;
+    color: var(--text-primary);
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: 17px;
+    font-weight: 600;
+  }
+
+  /* My Discoveries: heading with green left accent, always-visible cards */
+  .my-discoveries-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 16px 12px;
+    margin-top: 8px;
+  }
+  .my-discoveries-head::before {
+    content: "";
+    width: 3px;
+    height: 22px;
+    background: var(--primary);
+    border-radius: 2px;
+  }
+  .my-discoveries-head-title {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--text-primary);
+  }
+
+  /* Sent-item card redesign: title Playfair, italic note, booth+category pills */
+  .sent-list { padding: 0; }
+  .sent-item {
+    position: relative;
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 14px 16px !important;
+    margin-bottom: 10px !important;
+  }
+  .sent-item-time {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    font-family: var(--font-body) !important;
+    font-size: 13px;
+    color: var(--text-hint);
+  }
+  .sent-item-name {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 19px;
+    color: var(--text-primary);
+    padding-right: 60px;
+    margin-bottom: 4px;
+  }
+  .sent-item-note {
+    font-family: var(--font-headline);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin-bottom: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .sent-item-pills {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .pill-booth {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    background: var(--primary);
+    color: #FFFFFF;
+    border-radius: 4px;
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .pill-category {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* =========================================================================
+     TAB BAR REDESIGN: 5 items with center mic, icons over labels
+     ========================================================================= */
+  .tab-bar {
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: space-around !important;
+    padding: 8px 0 10px !important;
+    position: relative;
+  }
+  .tab {
+    flex: 1 1 0 !important;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 0 0 !important;
+    color: var(--text-hint);
+    position: relative;
+    cursor: pointer;
+  }
+  .tab-icon {
+    width: 22px;
+    height: 22px;
+    color: currentColor;
+  }
+  .tab .tab-label {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase;
+    color: currentColor;
+  }
+  .tab.active {
+    color: var(--secondary) !important;
+  }
+  .tab::after,
+  .tab.active::after {
+    display: none !important;
+  }
+
+  /* Center mic button (memo-btn): big green circle, raised */
+  .memo-btn {
+    position: static !important;
+    flex: 0 0 auto !important;
+    width: 56px !important;
+    height: 56px !important;
+    border-radius: 50% !important;
+    background: var(--primary) !important;
+    border: none !important;
+    margin: -22px 6px 0 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF !important;
+    cursor: pointer;
+  }
+  .memo-btn svg {
+    width: 26px;
+    height: 26px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .memo-btn.recording {
+    background: var(--record-red) !important;
+  }
+
+  /* =========================================================================
+     COMPRESSION PASS: aggressive size cuts across all screens (2026-05-12)
+     Brings phone proportions in line with the design spec. Reductions of
+     ~25-35% on display type and ~15-25% on body, labels, and chrome.
+     ========================================================================= */
+
+  /* Display titles */
+  .home-greeting           { font-size: 30px !important; margin: 4px 16px 18px !important; }
+  .discovery-title         { font-size: 26px !important; }
+  .my-discoveries-head-title { font-size: 15px !important; }
+  .my-discoveries-head::before { height: 18px !important; }
+  .request-name            { font-size: 17px !important; }
+  .explore-card-name       { font-size: 19px !important; }
+  .day-title               { font-size: 17px !important; }
+
+  /* Discovery capture card body */
+  .capture-card                          { padding: 14px 14px 12px !important; }
+  .capture-card .form-section-label      { font-size: 10px !important; margin-bottom: 6px !important; }
+  .capture-card .form-textarea           { font-size: 14px !important; min-height: 64px !important; padding: 8px 10px !important; }
+  .capture-card .picker-trigger          { padding: 10px 12px !important; font-size: 14px !important; }
+  .capture-card .picker-trigger.empty span:first-child { font-size: 14px !important; }
+  .details-toggle-row                    { padding: 4px 0 10px !important; }
+  .details-toggle-row-label              { font-size: 14px !important; }
+  .toggle-switch                         { width: 40px !important; height: 22px !important; border-radius: 11px !important; }
+  .toggle-switch::before                 { width: 16px !important; height: 16px !important; }
+  .toggle-switch.open::before            { transform: translateX(18px) !important; }
+  .capture-card .btn-primary             { font-size: 14px !important; padding: 11px 14px !important; }
+  .capture-card .btn-secondary           { font-size: 14px !important; padding: 9px 14px !important; }
+  .capture-card .btn-primary-icon        { width: 13px !important; height: 13px !important; }
+
+  /* Discovery search bar */
+  .search-bar .exhibitor-search-input    { font-size: 15px !important; padding-top: 30px !important; padding-bottom: 30px !important; border: 1.5px solid var(--tertiary) !important; }
+  .search-bar-icon                       { width: 16px !important; height: 16px !important; }
+
+  /* Sent-item cards */
+  .sent-item                             { padding: 12px 14px !important; border-left: 4px solid var(--primary) !important; }
+  .sent-item-name                        { font-size: 15px !important; padding-right: 56px !important; }
+  .sent-item-note                        { font-size: 13px !important; margin-bottom: 8px !important; }
+  .sent-item-time                        { font-size: 11px !important; top: 12px !important; right: 14px !important; }
+  .pill-booth, .pill-category            { font-size: 9px !important; padding: 2px 6px !important; }
+
+  /* MY RECORD pill */
+  .my-record-pill                        { font-size: 10px !important; padding: 6px 10px !important; }
+  .my-record-pill-icon                   { width: 13px !important; height: 13px !important; }
+
+  /* Trip note italic + day date */
+  .trip-note                             { font-size: 14px !important; }
+  .day-date                              { font-size: 13px !important; }
+
+  /* Tab bar tighten */
+  .tab-bar                               { position: fixed !important; bottom: 0 !important; left: 50% !important; right: auto !important; transform: translateX(-50%) !important; width: calc(100% - 32px) !important; max-width: 398px !important; margin: 0 !important; padding-left: 12px !important; padding-right: 12px !important; }
+  .tab-icon                              { display: none !important; }
+  .tab .tab-label                        { font-size: 13px !important; }
+  .memo-btn                              { width: 50px !important; height: 50px !important; margin: -18px 6px 0 !important; }
+  .memo-btn svg                          { width: 22px !important; height: 22px !important; }
+
+  /* =========================================================================
+     FIRST-TIME IDENTITY PICKER + RESET LINK
+     ========================================================================= */
+  .first-time-picker {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 2000;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px;
+    overflow-y: auto;
+  }
+  .first-time-picker.open { display: flex; }
+  .first-time-picker-box {
+    width: 100%;
+    max-width: 398px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 20px;
+  }
+  .first-time-picker-title {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 26px;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    line-height: 1.1;
+  }
+  .first-time-picker-sub {
+    font-family: var(--font-headline);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+  .first-time-picker-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .first-time-picker-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 11px 14px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    text-align: left;
+  }
+  .first-time-picker-item:hover { border-color: var(--text-secondary); }
+  .first-time-picker-item:active { background: var(--surface-raised); }
+  .first-time-picker-item-name {
+    font-size: 15px;
+    font-weight: 600;
+    flex: 1;
+  }
+  .first-time-picker-item-tag {
+    font-size: 11px;
+    color: var(--text-hint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* "Not me? Switch" reset link below the identity bar. Visible only for
+     non-admins (admins can switch directly via the dropdown). */
+  .identity-reset-link {
+    display: none;
+    text-align: right;
+    margin: -4px 16px 6px;
+    font-size: 12px;
+    color: var(--text-hint);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  .identity-reset-link.show { display: block; }
+  .identity-reset-link:hover { color: var(--text-secondary); }
+
+  /* =========================================================================
+     HOME COLLAPSIBLE SECTIONS (Trip, My Notes, etc.)
+     ========================================================================= */
+  .home-section {
+    margin: 0 16px 14px;
+  }
+  .home-section-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    color: var(--text-primary);
+    font-family: var(--font-headline);
+    font-weight: 700;
+    text-align: left;
+  }
+  .home-section-header:active { background: var(--surface-raised); }
+  .home-section.open .home-section-header {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-color: transparent;
+  }
+  .home-section-title {
+    font-size: 18px;
+    line-height: 1;
+  }
+  .home-section-arrow {
+    font-size: 12px;
+    color: var(--text-hint);
+    transition: transform 0.18s ease;
+  }
+  .home-section.open .home-section-arrow {
+    transform: rotate(180deg);
+  }
+  .home-section-body {
+    padding: 12px 16px 14px;
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    background: var(--surface);
+  }
+  /* Trip body content needs to flow naturally; reset some inherited styling */
+  .home-section-body .section-head:first-child { padding-top: 0; }
+  .home-section-body .links-grid { margin-top: 4px; }
+
+  /* =========================================================================
+     MY NOTES LIST (entries with kind:'memo' belonging to the current user)
+     ========================================================================= */
+  .my-notes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .my-notes-empty {
+    font-size: 14px;
+    color: var(--text-hint);
+    font-style: italic;
+    padding: 4px 0;
+  }
+  .my-note-item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-raised);
+    overflow: hidden;
+  }
+  .my-note-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .my-note-head:active { background: var(--surface); }
+  .my-note-title {
+    flex: 1;
+    font-size: 15px;
+    color: var(--text-primary);
+    line-height: 1.35;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .my-note-time {
+    flex-shrink: 0;
+    font-size: 11px;
+    color: var(--text-hint);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .my-note-arrow {
+    flex-shrink: 0;
+    font-size: 11px;
+    color: var(--text-hint);
+    transition: transform 0.18s ease;
+  }
+  .my-note-item.open .my-note-arrow { transform: rotate(180deg); }
+  .my-note-body {
+    display: none;
+    padding: 4px 12px 12px;
+    border-top: 1px solid var(--border);
+  }
+  .my-note-item.open .my-note-body { display: block; }
+  .my-note-text {
+    font-size: 15px;
+    color: var(--text-primary);
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    padding-top: 10px;
+  }
+  .my-note-photos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .my-note-photos img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+
+  /* =========================================================================
+     HOME REPORT BUTTON (Generate Progress Report)
+     ========================================================================= */
+  .home-report-btn {
+    /* Override btn-primary's bright accent: this is a Home utility action, not
+       a primary submit. Match the .home-section-header look so it nestles
+       between Notes and My Discoveries instead of screaming for attention. */
+    margin: 0 16px 14px;
+    width: calc(100% - 32px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 16px;
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-md) !important;
+    color: var(--text-primary) !important;
+    font-family: var(--font-headline) !important;
+    font-weight: 700 !important;
+    font-size: 16px !important;
+    text-align: center !important;
+    cursor: pointer;
+    box-shadow: none !important;
+  }
+  .home-report-btn:active {
+    background: var(--surface-raised) !important;
+  }
+
+  /* =========================================================================
+     EXPLORE CARD BODY META (category + From, moved from collapsed header)
+     ========================================================================= */
+  .explore-card-body-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .explore-card-body-from {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .explore-card-body-from-label {
+    font-size: 11px;
+    color: var(--text-hint);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .explore-card-body-from-name {
+    font-size: 14px;
+    color: var(--text-primary);
+  }
+
+  /* =========================================================================
+     EB H BADGE INLINE (moved from absolute corner into header flex flow)
+     ========================================================================= */
+  .explore-card-eb-badge {
+    /* Override the prior absolute positioning. Render as a flex item inside
+       the header so it sits visibly at rest, left of the chevron. */
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .explore-card-eb-badge img {
+    width: 20px !important;
+    height: 20px !important;
+    display: block;
+  }
+  /* Remove the old padding hack that reserved corner space for the absolute badge. */
+  .explore-card-eb-badge + .explore-card-header {
+    padding-right: 14px;
+  }
+
+  /* =========================================================================
+     CARD BODY — formatting only (sizes, padding, layout, casing, button
+     styling). Font-family is deliberately NOT declared on any rule below;
+     elements inherit the legacy font from their cascade. The single exception
+     is .explore-entry-time, whose legacy CSS specifies monospace — that is
+     restored explicitly so the formatting overrides do not break it.
+     ========================================================================= */
+
+  /* About this exhibitor: small subtle toggle */
+  .exhibitor-about-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px;
+    width: auto !important;
+    max-width: none !important;
+    margin: 8px 0 0 !important;
+    padding: 5px 10px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-hint) !important;
+    background: transparent !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 4px !important;
+  }
+  .exhibitor-about-toggle:hover,
+  .exhibitor-about-toggle:active {
+    color: var(--text-secondary) !important;
+    border-color: var(--border-strong) !important;
+    background: transparent !important;
+  }
+  .exhibitor-about-text {
+    font-size: 14px !important;
+    color: var(--text-secondary) !important;
+    line-height: 1.55 !important;
+  }
+
+  /* Exhibitor chips */
+  .exhibitor-chip {
+    font-size: 6px !important;
+    font-weight: 250 !important;
+    padding: 3px 8px !important;
+    border-radius: 4px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .exhibitor-details-block {
+    padding: 10px 14px !important;
+    border-top: none !important;
+  }
+
+  /* Entry inside an expanded card */
+  .explore-entry {
+    padding: 12px 14px !important;
+    border-top: 1px solid var(--border);
+  }
+  .explore-entry-from {
+    font-size: 13px !important;
+  }
+  .explore-entry-avatar {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+  }
+  .explore-entry-from-text {
+    font-size: 14px !important;
+    color: var(--text-primary) !important;
+  }
+  .explore-entry-time {
+    /* Legacy font-family was monospace — restore explicitly */
+    font-family: var(--font-mono) !important;
+    font-size: 11px !important;
+    color: var(--text-hint) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  /* Note text: formatting only — no font-family declaration, legacy cascade applies */
+  .explore-entry-note {
+    font-family: var(--font-headline) !important;
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+    color: var(--text-primary) !important;
+    margin: 8px 0 !important;
+  }
+  .explore-entry-contact {
+    font-size: 13px !important;
+    color: var(--text-secondary) !important;
+  }
+  .explore-entry-contact strong {
+    font-weight: 600;
+    color: var(--text-hint);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 11px;
+  }
+  .explore-entry-tagged {
+    font-size: 12px !important;
+    color: var(--text-secondary) !important;
+    margin-top: 8px !important;
+  }
+  .explore-entry-tagged-label {
+    color: var(--text-hint) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 11px;
+    margin-right: 4px;
+  }
+  .response-block {
+    margin-top: 12px;
+  }
+  .response-existing {
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+  .response-existing-label {
+    font-size: 11px !important;
+    color: var(--text-hint) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .response-existing-note {
+    font-size: 15px !important;
+    color: var(--text-primary) !important;
+    line-height: 1.5;
+  }
+  .response-form-textarea {
+    font-size: 15px !important;
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+  /* Submit / Update Response button */
+  .response-block .btn-primary {
+    width: 100%;
+    padding: 7px 12px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: var(--primary) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: var(--radius-sm) !important;
+    cursor: pointer;
+  }
+  .response-block .btn-primary:active {
+    filter: brightness(0.92);
+  }
+
+
+
+  /* =========================================================================
+     GENERATE PROGRESS REPORT — distinct treatment
+     Italic Playfair in the orange accent so it reads as a tap-action with
+     intentional weight, rather than another section header.
+     ========================================================================= */
+  .home-report-btn {
+    font-family: var(--font-headline) !important;
+    font-style: italic !important;
+    font-weight: 400 !important;
+    font-size: 18px !important;
+    color: var(--secondary) !important;
+    letter-spacing: 0.01em;
+  }
+
+  /* =========================================================================
+     MY DISCOVERIES (relocated from Discovery tab)
+     ========================================================================= */
+  .my-discoveries-section {
+    /* No horizontal padding here: cards inside provide their own 16px margin
+       via .explore-card. Adding section padding would double the inset and
+       make cards narrower than they are on Explore. */
+    margin: 0 0 16px;
+  }
+
+  /* =========================================================================
+     EXPLORE CARD HEADER — SINGLE-LINE LAYOUT
+     Left: count chip, exhibitor name (truncates with ellipsis if too long).
+     Right (stacked): vertical separator, hall initial, booth number,
+     optional H badge, chevron. Right group pins to the right edge.
+     ========================================================================= */
+  .explore-card-header {
+    display: flex !important;
+    align-items: center;
+    gap: 10px !important;
+    padding: 32px 14px !important;
+    min-height: 80px !important;
+  }
+  .explore-card-name-line {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+  }
+  .explore-card-right-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-left: 12px;
+    border-left: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .explore-card-hall-initial {
+    font-family: var(--font-headline);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    line-height: 1;
+  }
+  .explore-card-booth-num {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-hint);
+    line-height: 1;
+  }
+
+  /* EB partner signal: instead of a white H badge, the exhibitor name renders
+     in Harbor green. Applies to both the card header name and the
+     selected-exhibitor name in the capture flow. */
+  .explore-card-name-line.eb-partner,
+  .selected-exhibitor-name.eb-partner {
+    color: var(--primary) !important;
+  }
+
+  /* =========================================================================
+     PLAYBOOK SECTION ON EXPLORE
+     ========================================================================= */
+  .playbook-section {
+    margin: 8px 0 8px;
+  }
+
+  /* =========================================================================
+     BOLO (Be On the Lookout) — auto-scrolling ticker of mission cards
+     Replaces the old Missions collapsible on For Us. Visually distinct from
+     exhibitor cards: borderless tinted strips that drift across the screen.
+     ========================================================================= */
+  .bolo-section {
+    margin: 0 0 18px;
+    position: relative;
+  }
+  .bolo-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 16px 12px;
+    margin-top: 8px;
+  }
+  .bolo-head::before {
+    content: "";
+    width: 3px;
+    height: 22px;
+    background: var(--bolo);
+    border-radius: 2px;
+  }
+  .bolo-head-title {
+    font-family: var(--font-headline);
+    font-weight: 400;
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+  .bolo-head-sub {
+    font-family: var(--font-body);
+    font-weight: 300;
+    font-size: 13px;
+    font-style: italic;
+    color: var(--text-hint);
+    margin-left: auto;
+  }
+  .bolo-viewport {
+    overflow: hidden;
+    position: relative;
+    padding: 4px 0 12px;
+  }
+  .bolo-viewport::before,
+  .bolo-viewport::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 24px;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .bolo-viewport::before {
+    left: 0;
+    background: linear-gradient(to right, var(--surface), rgba(26,25,23,0));
+  }
+  .bolo-viewport::after {
+    right: 0;
+    background: linear-gradient(to left, var(--surface), rgba(26,25,23,0));
+  }
+  .bolo-track {
+    display: flex;
+    gap: 14px;
+    width: max-content;
+    animation: bolo-drift 30s linear infinite;
+    padding: 0 16px;
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+  .bolo-section:hover .bolo-track,
+  .bolo-track:active {
+    animation-play-state: paused;
+  }
+  @keyframes bolo-drift {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .bolo-card {
+    flex: 0 0 240px;
+    background: transparent;
+    border: none;
+    border-left: 2px solid var(--bolo);
+    border-radius: 0;
+    padding: 6px 12px 6px 12px;
+    cursor: pointer;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .bolo-card:active { opacity: 0.6; }
+  .bolo-card-name {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--bolo);
+    margin: 0;
+  }
+  .bolo-card-summary {
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.35;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .bolo-card-foot {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--text-hint);
+    margin-top: 2px;
+  }
+
+  /* BOLO modal: tap a card to see full WHY/WHAT/WHO */
+  .bolo-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 5000;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  .bolo-modal.open { display: flex; align-items: flex-start; justify-content: center; }
+  .bolo-modal-inner {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-left: 4px solid var(--bolo);
+    border-radius: var(--radius-md);
+    padding: 20px 18px 22px;
+    max-width: 480px;
+    width: 100%;
+    margin-top: 40px;
+    position: relative;
+  }
+  .bolo-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    color: var(--text-hint);
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px 10px;
+  }
+  .bolo-modal-name {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    padding-right: 30px;
+  }
+  .bolo-modal-summary {
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin-bottom: 18px;
+    line-height: 1.4;
+  }
+  .bolo-modal-section {
+    margin-bottom: 14px;
+  }
+  .bolo-modal-section-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--bolo);
+    margin-bottom: 4px;
+  }
+  .bolo-modal-section-text {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.5;
+  }
+  /* Modal action button: "Log a discovery for this" */
+  .bolo-modal-action {
+    display: block;
+    width: 100%;
+    margin-top: 18px;
+    padding: 14px 18px;
+    background: transparent;
+    border: 1.5px solid var(--bolo);
+    border-radius: var(--radius-md);
+    color: var(--bolo);
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    text-align: center;
+  }
+  .bolo-modal-action:active { background: var(--bolo-light); }
+
+  /* Capture-surface banner: "You're logging against BOLO: Packaging" */
+  .pending-bolo-banner {
+    display: none;
+    margin: 0 16px 12px;
+    padding: 10px 14px;
+    border: 1px solid var(--bolo);
+    border-left-width: 4px;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .pending-bolo-banner.open { display: flex; align-items: center; gap: 10px; }
+  .pending-bolo-banner-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--bolo);
+  }
+  .pending-bolo-banner-name {
+    flex: 1;
+    color: var(--text-primary);
+  }
+  .pending-bolo-banner-clear {
+    background: transparent;
+    border: none;
+    color: var(--text-hint);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 4px;
+  }
+
+  /* Inline BOLO chip on an entry to mark it as logged against a mission. */
+  .explore-entry-bolo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 4px 0 8px;
+    padding: 4px 8px;
+    border: 1px solid var(--bolo);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--bolo);
+    text-transform: uppercase;
+  }
+
+  /* =========================================================================
+     MY NOTES section (For Me)
+     Sits above My Discoveries. Collapsed: a BOLO-style auto-scrolling ticker
+     showing the 5 most recent notes. Expanded: a vertical list of all notes
+     (using the existing renderMyNotes output). The down-triangle on the head
+     toggles between states. Tapping the ticker also expands.
+     ========================================================================= */
+  .notes-section {
+    margin: 0 0 18px;
+  }
+  .notes-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 16px 12px;
+    margin-top: 8px;
+    cursor: pointer;
+  }
+  .notes-head::before {
+    content: "";
+    width: 3px;
+    height: 22px;
+    background: var(--bolo);
+    border-radius: 2px;
+  }
+  .notes-head-title {
+    font-family: var(--font-headline);
+    font-weight: 400;
+    font-size: 15px;
+    color: var(--text-secondary);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .notes-head-arrow {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--text-hint);
+    transition: transform 0.18s ease;
+  }
+  .notes-section.open .notes-head-arrow {
+    transform: rotate(180deg);
+  }
+  /* Hide the ticker when expanded so the vertical list is the only surface. */
+  .notes-section.open .notes-ticker {
+    display: none;
+  }
+  /* Ticker reuses BOLO mechanics; styling intentionally matches BOLO cards
+     except the accent color, which is the Harbor green to match the head dash. */
+  .notes-ticker {
+    cursor: pointer;
+  }
+  .notes-ticker-viewport {
+    overflow: hidden;
+    position: relative;
+    padding: 4px 0 12px;
+  }
+  .notes-ticker-viewport::before,
+  .notes-ticker-viewport::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 24px;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .notes-ticker-viewport::before {
+    left: 0;
+    background: linear-gradient(to right, var(--surface), rgba(26,25,23,0));
+  }
+  .notes-ticker-viewport::after {
+    right: 0;
+    background: linear-gradient(to left, var(--surface), rgba(26,25,23,0));
+  }
+  .notes-ticker-track {
+    display: flex;
+    gap: 14px;
+    width: max-content;
+    animation: notes-drift 30s linear infinite;
+    padding: 0 16px;
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+  .notes-section:hover .notes-ticker-track,
+  .notes-ticker-track:active {
+    animation-play-state: paused;
+  }
+  @keyframes notes-drift {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .notes-ticker-card {
+    flex: 0 0 240px;
+    background: transparent;
+    border: none;
+    border-left: 2px solid var(--bolo);
+    border-radius: 0;
+    padding: 14px 12px;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .notes-ticker-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--bolo);
+    margin: 0;
+  }
+  .notes-ticker-photo-icon {
+    width: 12px;
+    height: 12px;
+    color: var(--bolo);
+    flex-shrink: 0;
+  }
+  .notes-ticker-text {
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .notes-ticker-empty {
+    flex: 0 0 auto;
+    padding: 12px 16px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-style: italic;
+    color: var(--text-hint);
+  }
+  /* Expanded body: tighten padding since the body lives inside the section,
+     not inside a bordered home-section-body shell. */
+  .notes-section-body {
+    padding: 0 16px;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  /* When the My Notes section is expanded, every note card displays fully
+     expanded (body visible, title wraps) so users can read and scroll
+     through all of them in chronological order. */
+  .notes-section-body .my-note-item .my-note-body { display: block; }
+  .notes-section-body .my-note-item .my-note-arrow { display: none; }
+  .notes-section-body .my-note-title {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
 </style>
 </head>
 <body>
@@ -2373,144 +4228,89 @@
     <div id="header-fallback" style="display:none;color:white;font-size: 22px;font-weight:700;letter-spacing:0.06em;">HARBOR SOLUTIONS</div>
   </div>
 
-  <div class="header-identity-bar" id="header-identity" onclick="toggleIdentityDropdown()">
-    <span class="header-identity-label">Viewing as</span>
-    <span class="header-identity-name placeholder" id="header-identity-name">[Select]</span>
-    <span class="header-identity-arrow">&#9660;</span>
-    <div class="identity-dropdown" id="identity-dropdown"></div>
+  <!-- Three-icon chrome row: My Trip, Me (identity), My Report. The Me item
+       keeps the original `header-identity` id so existing pulse, dropdown
+       open/close, locked-state, and outside-click logic continue to work. -->
+  <div class="header-chrome-row">
+    <button type="button" class="chrome-item" id="chrome-trip" onclick="openTripModal()">
+      <span class="chrome-circle">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h18M3 17h12"/><circle cx="18" cy="17" r="2"/></svg>
+      </span>
+      <span class="chrome-label">My Trip</span>
+    </button>
+
+    <div class="chrome-item" id="header-identity" onclick="toggleIdentityDropdown()">
+      <span class="chrome-circle chrome-circle-me">
+        <span class="chrome-me-initials" id="chrome-me-initials">--</span>
+      </span>
+      <span class="chrome-label">Me</span>
+      <div class="identity-dropdown" id="identity-dropdown"></div>
+    </div>
+
+    <button type="button" class="chrome-item" id="chrome-report" onclick="openReportModal()">
+      <span class="chrome-circle">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12l4 4v12a2 2 0 0 1-2 2H4z"/><path d="M16 4v4h4"/><path d="M8 13h8M8 17h6"/></svg>
+      </span>
+      <span class="chrome-label">My Report</span>
+    </button>
   </div>
+  <!-- Identity name is intentionally hidden on the new chrome row but the
+       element is kept (offscreen) so existing JS that writes to it doesn't
+       break. -->
+  <span class="header-identity-name placeholder" id="header-identity-name" style="position:absolute;left:-9999px;">[Select]</span>
 
   <!-- HOME -->
   <div id="screen-home" class="screen active">
     <div class="home-block">
-      <div class="home-welcome">
-        <div class="home-welcome-body">
-          <p>Sales, you're closest to the customer and have an 'instinct read'; patterns across your region, what operators are switching, what's missing from the mix, and what competitors are landing. Category management, you're closest to the data and logistics; you know what's moving across the portfolio, what fits a category gap, and what the trend lines 'say.'</p>
-          <p>Here at the show, the two halves meet. Sales discovers a booth that a customer has been asking about, taps in a Category Manager to check it against the logistics and the portfolio gap. Together you'll discover if there's potential, how or if Harbor can source it, and whether it earns a place in the mix. The decisions that usually take weeks of back-and-forth get made in the aisle, with both reads on the table.</p>
-          <p class="home-welcome-beat">Two days, 2,100 exhibitors, and over 2-million square feet (40 football fields) of exhibition space.</p>
-          <p>This app is how we carry it. In the Explore tab you'll see some exhibitors we'd like your take on along with discoveries from the show floor from the team. When you tap into an exhibitor card, you'll have everything you'll need including a voice to text note taker and camera capture. The Discovery tab is where you can capture what you find, share your perspective on it, tag in a Category Manager or Andy, and build a record of your perspective (and the rest of the team) both for you and for Harbor Foodservice.</p>
-          <p class="home-welcome-close">What we gather here goes home with us, to our customers and to each other,</p>
-          <p class="home-welcome-signoff">Dawn &amp; Andy</p>
-        </div>
-      </div>
-      <div class="home-intro-wrap">
-        <div class="home-intro">Here's what we already know from the field.</div>
-      </div>
+      <div class="home-greeting">Howdy, <span class="home-greeting-name">Andy.</span></div>
 
-      <div class="request-stack">
+      <!-- My Trip and My Report were moved out of the home body and are now
+           opened via the three-icon chrome row above. -->
 
-      <div class="request-card" style="--weight: 1.0" onclick="toggleRequest(this)">
-        <div class="request-head-text">
-          <div class="request-name">Center-of-plate value rebuild</div>
-          <div class="request-summary">Hold price points without dropping perceived quality</div>
+      <!-- My Notes lives just above My Discoveries; see below. -->
+
+      <!-- My Notes: BOLO-style ticker (top 5 newest) when collapsed, vertical
+           stack of all notes when expanded. Tapping the section head OR the
+           ticker expands; tapping a note in the expanded list opens it for
+           view/edit via the existing toggleMyNoteItem behavior. -->
+      <div class="notes-section" id="notes-section">
+        <div class="notes-head" id="notes-head" onclick="toggleNotesSection()" role="button" aria-expanded="false" aria-controls="notes-section-body">
+          <span class="notes-head-title">My Notes</span>
+          <span class="notes-head-arrow">&#9660;</span>
         </div>
-        <div class="request-arrow">&#9654;</div>
-        <div class="request-body">
-          <div class="request-section">
-            <div class="request-section-label">Why</div>
-            <div class="request-section-text">Independent operators are watching their highest-volume menu items lose price-to-value alignment. When a burger or an egg dish stops feeling worth what it costs, the whole check average comes under pressure. Helping operators rebuild value here protects the items their business actually runs on.</div>
+        <!-- Collapsed state: BOLO-style ticker of the most recent 5 notes. -->
+        <div class="notes-ticker" id="notes-ticker" onclick="toggleNotesSection()">
+          <div class="notes-ticker-viewport">
+            <div class="notes-ticker-track" id="notes-ticker-track"></div>
           </div>
-          <div class="request-section">
-            <div class="request-section-label">What</div>
-            <div class="request-section-text">Find products that let an operator hold a price point without dropping perceived quality. Burger build-ups, egg formats, staple proteins.</div>
-          </div>
-          <div class="request-section">
-            <div class="request-section-label">Who</div>
-            <div class="request-section-text">Tony, David.</div>
-          </div>
+        </div>
+        <!-- Expanded state: vertical list of all notes. Hidden until expanded. -->
+        <div class="notes-section-body" id="notes-section-body" style="display:none;">
+          <div id="my-notes-list" class="my-notes-list"></div>
+          <div id="my-notes-empty" class="my-notes-empty" style="display:none;">No notes yet. Tap the mic to capture one.</div>
         </div>
       </div>
 
-      <div class="request-card" style="--weight: 0.75" onclick="toggleRequest(this)">
-        <div class="request-head-text">
-          <div class="request-name">Protein, reimagined</div>
-          <div class="request-summary">Proteins that read as a feature, not a substitute</div>
+      <!-- My Discoveries (relocated from the former Discovery tab). -->
+      <div class="my-discoveries-section">
+        <div class="my-discoveries-head">
+          <span class="my-discoveries-head-title">My Discoveries</span>
         </div>
-        <div class="request-arrow">&#9654;</div>
-        <div class="request-body">
-          <div class="request-section">
-            <div class="request-section-label">Why</div>
-            <div class="request-section-text">Customer demand is shifting toward protein as a feature rather than meat as a default. Operators who only offer the standard chicken-beef-pork lineup are losing diners who want something smaller, lighter, or non-meat without it feeling like a compromise. The operators who get ahead of this win menu space the rest will be chasing in a year.</div>
-          </div>
-          <div class="request-section">
-            <div class="request-section-label">What</div>
-            <div class="request-section-text">Find proteins that read as a feature, not a substitute. Plant, dairy, egg-forward, smaller-format.</div>
-          </div>
-          <div class="request-section">
-            <div class="request-section-label">Who</div>
-            <div class="request-section-text">Hagan, Christina.</div>
-          </div>
-        </div>
+        <div class="sent-list open" id="sent-list"></div>
       </div>
 
-      <div class="request-card" style="--weight: 0.5" onclick="toggleRequest(this)">
-        <div class="request-head-text">
-          <div class="request-name">Packaging and containers</div>
-          <div class="request-summary">Takeout that holds heat, doesn't leak, doesn't kill margin</div>
+      <!-- Export (visible only when viewing as Harbor / All Team). -->
+      <div class="export-section" id="export-section" style="display:none;">
+        <div class="section-head" style="padding:0 0 6px;">Export for analysis</div>
+        <div style="font-size: 14px;color:var(--text-hint);line-height:1.5;">
+          Pulls every entry and response from this trip into a JSON file for Claude ingestion.
         </div>
-        <div class="request-arrow">&#9654;</div>
-        <div class="request-body">
-          <div class="request-section">
-            <div class="request-section-label">Why</div>
-            <div class="request-section-text">Takeout and delivery volume is now structural for independent operators, not a pandemic holdover, and most of their kitchens were never designed for it. Containers that hold heat, do not leak, and do not blow up the food cost are the difference between a third-party order that earns a repeat and one that does not.</div>
-          </div>
-          <div class="request-section">
-            <div class="request-section-label">What</div>
-            <div class="request-section-text">Find takeout and delivery containers that solve heat, leak, and sustainability without killing margin.</div>
-          </div>
-          <div class="request-section">
-            <div class="request-section-label">Who</div>
-            <div class="request-section-text">Matt.</div>
-          </div>
+        <div class="export-buttons">
+          <button class="btn-secondary" onclick="exportToClipboard()">Copy JSON</button>
+          <button class="btn-secondary" onclick="exportToFile()">Download file</button>
         </div>
+        <div class="export-result" id="export-result"></div>
       </div>
-
-      <div class="request-card" style="--weight: 0.25" onclick="toggleRequest(this)">
-        <div class="request-head-text">
-          <div class="request-name">Bakery and dessert upgrades</div>
-          <div class="request-summary">Small upgrades, large perceived-quality gains</div>
-        </div>
-        <div class="request-arrow">&#9654;</div>
-        <div class="request-body">
-          <div class="request-section">
-            <div class="request-section-label">Why</div>
-            <div class="request-section-text">Independent operators do not have R&amp;D budgets, and bakery and dessert are where small upgrades produce the largest perceived-quality gains for the lowest cost per cover. A better bun, a better roll, a signature dessert; these are the items diners remember and post about, and they cost the operator pennies to upgrade.</div>
-          </div>
-          <div class="request-section">
-            <div class="request-section-label">What</div>
-            <div class="request-section-text">Find buns, rolls, breads, and desserts that lift perceived quality at low cost-per-cover.</div>
-          </div>
-          <div class="request-section">
-            <div class="request-section-label">Who</div>
-            <div class="request-section-text">Matt, and connects back to Tony's burger.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="request-card" style="--weight: 0.0" onclick="toggleRequest(this)">
-        <div class="request-head-text">
-          <div class="request-name">Authentic and catering-ready</div>
-          <div class="request-summary">Hispanic-authentic SKUs and catering-format pack sizes</div>
-        </div>
-        <div class="request-arrow">&#9654;</div>
-        <div class="request-body">
-          <div class="request-section">
-            <div class="request-section-label">Why</div>
-            <div class="request-section-text">Two real shifts are happening at once: independent operators serving authentic ethnic cuisine are growing in markets like Seattle, and operators across the board are leaning into catering as a margin channel that does not require more dining room seats. SKUs that serve either trend open accounts the standard catalog cannot.</div>
-          </div>
-          <div class="request-section">
-            <div class="request-section-label">What</div>
-            <div class="request-section-text">Find Hispanic-authentic SKUs and catering-format pack sizes that independent operators can run with.</div>
-          </div>
-          <div class="request-section">
-            <div class="request-section-label">Who</div>
-            <div class="request-section-text">Fernando.</div>
-          </div>
-        </div>
-      </div>
-
-      </div>
-
     </div>
   </div>
 
@@ -2519,43 +4319,111 @@
     <div id="explore-empty-identity" class="empty-state" style="display:none;">
       Select an identity at the top of the screen to see what's been shared with you.
     </div>
-    <div class="hall-banner" id="hall-banner"></div>
-    <div class="sort-picker-row" id="sort-picker-row" style="display:none;">
-      <div class="sort-picker-wrap">
-        <div class="sort-picker-trigger" id="sort-trigger" onclick="toggleSortPicker()">
-          <span id="sort-picker-label">By hall</span>
-          <span class="sort-picker-arrow">&#9660;</span>
-        </div>
-        <div class="sort-picker-list" id="sort-picker-list"></div>
-      </div>
-    </div>
-    <div id="explore-sections"></div>
-  </div>
-
-  <!-- DISCOVER -->
-  <div id="screen-discover" class="screen">
     <div id="discover-context-banner"></div>
     <div id="discover-existing-notice"></div>
 
-    <div class="report-button-wrap">
-      <button class="btn-report" id="report-open-btn" onclick="openReport()">
-        <span id="report-open-btn-label">My Record</span>
-        <span class="btn-report-arrow">&#9660;</span>
-      </button>
+    <!-- BOLO (Be On the Lookout). Auto-scrolling ticker of mission cards.
+         Cards are duplicated so the CSS keyframe can translate -50% and the
+         second set lands seamlessly on the first. Tap any card to open the
+         full WHY/WHAT/WHO in the modal. -->
+    <div class="bolo-section" id="bolo-section">
+      <div class="bolo-head">
+        <span class="bolo-head-title">Bolo</span>
+        <span class="bolo-head-sub">Tap to expand</span>
+      </div>
+      <div class="bolo-viewport">
+        <div class="bolo-track" id="bolo-track">
+
+          <div class="bolo-card" data-bolo="0">
+            <div class="bolo-card-name">Center-of-plate value</div>
+            <div class="bolo-card-summary">Burgers, eggs, staple proteins that hold a price point without losing quality.</div>
+            <div class="bolo-card-foot">FOR TONY, DAVID</div>
+          </div>
+
+          <div class="bolo-card" data-bolo="1">
+            <div class="bolo-card-name">Protein, reimagined</div>
+            <div class="bolo-card-summary">Plant, dairy, egg-forward proteins that read as a feature, not a substitute.</div>
+            <div class="bolo-card-foot">FOR HAGAN, CHRISTINA</div>
+          </div>
+
+          <div class="bolo-card" data-bolo="2">
+            <div class="bolo-card-name">Packaging</div>
+            <div class="bolo-card-summary">Takeout containers that hold heat, don't leak, don't kill margin.</div>
+            <div class="bolo-card-foot">FOR MATT</div>
+          </div>
+
+          <div class="bolo-card" data-bolo="3">
+            <div class="bolo-card-name">Bakery &amp; dessert</div>
+            <div class="bolo-card-summary">Buns, rolls, breads, desserts that lift perceived quality at low cost-per-cover.</div>
+            <div class="bolo-card-foot">FOR MATT, TONY</div>
+          </div>
+
+          <div class="bolo-card" data-bolo="4">
+            <div class="bolo-card-name">Authentic &amp; catering</div>
+            <div class="bolo-card-summary">Hispanic-authentic SKUs and catering-format pack sizes.</div>
+            <div class="bolo-card-foot">FOR FERNANDO</div>
+          </div>
+
+          <!-- Duplicate set for seamless loop. aria-hidden so screen readers
+               don't double-announce. -->
+          <div class="bolo-card" data-bolo="0" aria-hidden="true">
+            <div class="bolo-card-name">Center-of-plate value</div>
+            <div class="bolo-card-summary">Burgers, eggs, staple proteins that hold a price point without losing quality.</div>
+            <div class="bolo-card-foot">FOR TONY, DAVID</div>
+          </div>
+
+          <div class="bolo-card" data-bolo="1" aria-hidden="true">
+            <div class="bolo-card-name">Protein, reimagined</div>
+            <div class="bolo-card-summary">Plant, dairy, egg-forward proteins that read as a feature, not a substitute.</div>
+            <div class="bolo-card-foot">FOR HAGAN, CHRISTINA</div>
+          </div>
+
+          <div class="bolo-card" data-bolo="2" aria-hidden="true">
+            <div class="bolo-card-name">Packaging</div>
+            <div class="bolo-card-summary">Takeout containers that hold heat, don't leak, don't kill margin.</div>
+            <div class="bolo-card-foot">FOR MATT</div>
+          </div>
+
+          <div class="bolo-card" data-bolo="3" aria-hidden="true">
+            <div class="bolo-card-name">Bakery &amp; dessert</div>
+            <div class="bolo-card-summary">Buns, rolls, breads, desserts that lift perceived quality at low cost-per-cover.</div>
+            <div class="bolo-card-foot">FOR MATT, TONY</div>
+          </div>
+
+          <div class="bolo-card" data-bolo="4" aria-hidden="true">
+            <div class="bolo-card-name">Authentic &amp; catering</div>
+            <div class="bolo-card-summary">Hispanic-authentic SKUs and catering-format pack sizes.</div>
+            <div class="bolo-card-foot">FOR FERNANDO</div>
+          </div>
+
+        </div>
+      </div>
     </div>
 
-    <div class="discover-wrap">
-      <input class="form-input exhibitor-search-input" id="exhibitor-search" type="text" placeholder="Search by exhibitor or booth number" oninput="searchExhibitors(this.value)" autocomplete="off">
+
+    <!-- Pending BOLO banner. Visible only after the user taps
+         "Log a discovery for this" inside a BOLO modal. -->
+    <div class="pending-bolo-banner" id="pending-bolo-banner">
+      <span class="pending-bolo-banner-label">BOLO</span>
+      <span class="pending-bolo-banner-name" id="pending-bolo-banner-name"></span>
+      <button type="button" class="pending-bolo-banner-clear" onclick="clearPendingBolo()" aria-label="Clear BOLO tag">&times;</button>
+    </div>
+
+    <div class="search-bar">
+      <svg class="search-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="form-input exhibitor-search-input" id="exhibitor-search" type="text" placeholder="Search exhibitors or booth numbers..." oninput="searchExhibitors(this.value)" autocomplete="off">
+    </div>
+    <div class="discover-wrap" style="padding-top:0;">
       <div id="exhibitor-results"></div>
       <div id="selected-exhibitor-block" style="display:none;"></div>
     </div>
 
     <div id="discover-form-block" style="display:none;">
-      <div class="section-head">What stood out?</div>
-      <div class="discover-wrap">
-        <textarea class="form-textarea" id="disc-note" rows="4" placeholder="Impressions, products, follow-up needed..."></textarea>
+      <div class="capture-card">
+        <label class="form-section-label">Notes</label>
+        <textarea class="form-textarea" id="disc-note" rows="4" placeholder="What stood out?"></textarea>
 
-        <label class="form-label">Send to</label>
+        <label class="form-section-label">Send to</label>
         <div class="picker-wrap">
           <div class="picker-trigger empty" id="recipient-trigger" onclick="toggleRecipientPicker()">
             <span id="recipient-label">No one selected</span>
@@ -2564,10 +4432,10 @@
           <div class="picker-list" id="recipient-list"></div>
         </div>
 
-        <button type="button" class="details-toggle" id="details-toggle" onclick="toggleDiscoverDetails()">
-          <span>Add details</span>
-          <span class="details-toggle-arrow">&#9660;</span>
-        </button>
+        <div class="details-toggle-row">
+          <span class="details-toggle-row-label">Add details</span>
+          <button type="button" class="toggle-switch" id="details-toggle" onclick="toggleDiscoverDetails()" aria-label="Toggle details"></button>
+        </div>
         <div id="discover-details-block" class="details-block">
           <label class="form-label">Who you spoke with</label>
           <input class="form-input" id="disc-contact" type="text" placeholder="Contact name" autocomplete="off">
@@ -2582,149 +4450,27 @@
           </div>
         </div>
 
-        <button class="btn-primary" id="disc-submit-btn" onclick="submitEntry()">Submit</button>
+        <button class="btn-primary" id="disc-submit-btn" onclick="submitEntry()">
+          <svg class="btn-primary-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Submit Discovery
+        </button>
         <button class="btn-secondary" onclick="resetDiscoverForm()">Clear</button>
       </div>
     </div>
 
-    <!-- Things I've sent (sender's outbound view) -->
-    <div class="sent-section">
-      <button class="sent-toggle" id="sent-toggle" onclick="toggleSentSection()">
-        <span class="sent-toggle-label">MY DISCOVERIES</span>
-        <span class="sent-toggle-right">
-          <span class="sent-toggle-count" id="sent-toggle-count">0</span>
-          <span class="sent-toggle-arrow">&#9660;</span>
-        </span>
-      </button>
-      <div class="sent-list" id="sent-list"></div>
-    </div>
-
-    <!-- Export (visible only when viewing as Harbor / All Team) -->
-    <div class="export-section" id="export-section" style="display:none;">
-      <div class="section-head" style="padding:0 0 6px;">Export for analysis</div>
-      <div style="font-size: 14px;color:var(--text-hint);line-height:1.5;">
-        Pulls every entry and response from this trip into a JSON file for Claude ingestion.
-      </div>
-      <div class="export-buttons">
-        <button class="btn-secondary" onclick="exportToClipboard()">Copy JSON</button>
-        <button class="btn-secondary" onclick="exportToFile()">Download file</button>
-      </div>
-      <div class="export-result" id="export-result"></div>
-    </div>
-  </div>
-
-  <!-- TRIP -->
-  <div id="screen-trip" class="screen">
-    <div class="section-head" style="margin:0;padding:14px 16px 8px;">Useful Links</div>
-    <div class="links-grid">
-      <a class="link-chip" href="https://www.hilton.com/en/hotels/chiphhh-palmer-house/" target="_blank">Palmer House</a>
-      <a class="link-chip" href="https://www.nationalrestaurantshow.com/home/" target="_blank">NRA Show</a>
-      <a class="link-chip" href="https://www.transitchicago.com/" target="_blank">CTA Transit</a>
-      <a class="link-chip" href="https://www.mlb.com/cubs/ballpark" target="_blank">Wrigley Field</a>
-      <a class="link-chip" href="https://wendellaboats.com/" target="_blank">Arch. Tour</a>
-      <a class="link-chip" href="https://maps.apple.com/?address=3702+N+Broadway,+Chicago,+IL+60613" target="_blank">Panino's</a>
-    </div>
-    <div class="trip-note">Casual attire throughout. Show execution details on prep call.</div>
-
-    <div class="day-card">
-      <div class="day-header" onclick="toggleDay(this)">
-        <div class="day-title-block">
-          <div class="day-title">Travel + Arrival</div>
-          <div class="day-date">Friday, May 15</div>
-        </div>
-        <div class="day-icon">15</div>
-      </div>
-      <div class="day-body">
-        <div class="event"><div class="event-time">8:10a</div><div class="event-desc">Depart <a class="event-link" href="https://www.portseattle.org/sea-tac" target="_blank">SeaTac</a></div></div>
-        <div class="event"><div class="event-time">2:32p</div><div class="event-desc">Arrive <a class="event-link" href="https://www.flychicago.com/ohare/home/pages/default.aspx" target="_blank">O'Hare</a> &mdash; <a class="event-link" href="https://www.transitchicago.com/" target="_blank">CTA Blue Line</a> to Monroe/Dearborn</div></div>
-        <div class="event"><div class="event-time">Hotel</div><div class="event-desc"><a class="event-link" href="https://www.hilton.com/en/hotels/chiphhh-palmer-house/" target="_blank">Palmer House Hilton</a> &mdash; use mobile key to skip check-in line</div></div>
-        <div class="event"><div class="event-time">5&ndash;6p</div><div class="event-desc">Downtime</div></div>
-        <div class="event"><div class="event-time">6:00p</div><div class="event-desc">Meet in lobby &rarr; casual team dinner</div></div>
-        <div class="event"><div class="event-time">Eve</div><div class="event-desc">Optional live music or free time</div></div>
-      </div>
-    </div>
-
-    <div class="day-card">
-      <div class="day-header" onclick="toggleDay(this)">
-        <div class="day-title-block">
-          <div class="day-title">NRA Show + Smithfield Dinner</div>
-          <div class="day-date">Saturday, May 16</div>
-        </div>
-        <div class="day-icon">16</div>
-      </div>
-      <div class="day-body">
-        <div class="event"><div class="event-time">9:30a</div><div class="event-desc">Meet in lobby &rarr; shuttle to <a class="event-link" href="https://www.mccormickplace.com/" target="_blank">McCormick Place</a></div></div>
-        <div class="event"><div class="event-time">10a&ndash;2:30p</div><div class="event-desc"><a class="event-link" href="https://www.nationalrestaurantshow.com/home/" target="_blank">NRA Show</a> floor <span class="event-badge badge-show">Day 1</span></div></div>
-        <div class="event"><div class="event-time">Afternoon</div><div class="event-desc">Return to <a class="event-link" href="https://www.hilton.com/en/hotels/chiphhh-palmer-house/" target="_blank">Palmer House</a> + downtime</div></div>
-        <div class="event"><div class="event-time">Evening</div><div class="event-desc">Smithfield dinner &mdash; <a class="event-link" href="https://paninospizzeria.com/" target="_blank">Panino's</a> (full buyout) <span class="event-badge badge-event">Vendor</span></div></div>
-      </div>
-    </div>
-
-    <div class="day-card">
-      <div class="day-header" onclick="toggleDay(this)">
-        <div class="day-title-block">
-          <div class="day-title">Show + Vendor Events</div>
-          <div class="day-date">Sunday, May 17</div>
-        </div>
-        <div class="day-icon">17</div>
-      </div>
-      <div class="day-body">
-        <div class="event"><div class="event-time">9:30a</div><div class="event-desc">Meet in lobby &rarr; shuttle to <a class="event-link" href="https://www.mccormickplace.com/" target="_blank">McCormick Place</a></div></div>
-        <div class="event"><div class="event-time">Morning</div><div class="event-desc"><a class="event-link" href="https://www.nationalrestaurantshow.com/home/" target="_blank">NRA Show</a> floor <span class="event-badge badge-show">Day 2</span></div></div>
-        <div class="event"><div class="event-time">12:00p</div><div class="event-desc">Sunny Sky Products meeting &mdash; booth 2454 (South hall)</div></div>
-        <div class="event"><div class="event-time">Afternoon</div><div class="event-desc">Reset at <a class="event-link" href="https://www.hilton.com/en/hotels/chiphhh-palmer-house/" target="_blank">Palmer House</a></div></div>
-        <div class="event"><div class="event-time">Evening</div><div class="event-desc">Tillamook &middot; Buyers Edge &middot; Ajinomoto &middot; Texas Pete <span class="event-badge badge-event">Vendors</span></div></div>
-        <div class="event"><div class="event-time">Transport</div><div class="event-desc"><a class="event-link" href="https://www.uber.com/" target="_blank">Grouped Ubers</a></div></div>
-      </div>
-    </div>
-
-    <div class="day-card">
-      <div class="day-header" onclick="toggleDay(this)">
-        <div class="day-title-block">
-          <div class="day-title">Chicago + Cubs Game</div>
-          <div class="day-date">Monday, May 18</div>
-        </div>
-        <div class="day-icon">18</div>
-      </div>
-      <div class="day-body">
-        <div class="event"><div class="event-time">9&ndash;9:30a</div><div class="event-desc">Optional <a class="event-link" href="https://www.nationalrestaurantshow.com/home/" target="_blank">show</a> visit</div></div>
-        <div class="event"><div class="event-time">12:30p</div><div class="event-desc"><a class="event-link" href="https://wendellaboats.com/" target="_blank">Architecture tour</a> &mdash; 400 N Michigan Ave (90 min)</div></div>
-        <div class="event"><div class="event-time">Afternoon</div><div class="event-desc">Free time &mdash; <a class="event-link" href="https://www.themagnificentmile.com/" target="_blank">Magnificent Mile</a></div></div>
-        <div class="event"><div class="event-time">6:30p</div><div class="event-desc">Cubs at <a class="event-link" href="https://www.mlb.com/cubs/ballpark" target="_blank">Wrigley Field</a> &mdash; <a class="event-link" href="https://www.transitchicago.com/" target="_blank">train</a> back after</div></div>
-      </div>
-    </div>
-
-    <div class="day-card">
-      <div class="day-header" onclick="toggleDay(this)">
-        <div class="day-title-block">
-          <div class="day-title">Travel Home</div>
-          <div class="day-date">Tuesday, May 19</div>
-        </div>
-        <div class="day-icon">19</div>
-      </div>
-      <div class="day-body">
-        <div class="event"><div class="event-time">7:00a</div><div class="event-desc">Depart <a class="event-link" href="https://www.hilton.com/en/hotels/chiphhh-palmer-house/" target="_blank">Palmer House</a> &rarr; <a class="event-link" href="https://www.transitchicago.com/" target="_blank">Blue Line</a> to O'Hare</div></div>
-        <div class="event"><div class="event-time">10:00a</div><div class="event-desc">Flight departure from <a class="event-link" href="https://www.flychicago.com/ohare/home/pages/default.aspx" target="_blank">O'Hare</a></div></div>
-      </div>
-    </div>
+    <div id="explore-sections"></div>
   </div>
 
   <div class="tab-bar">
     <div class="tab active" onclick="showScreen('home')">
-      <div class="tab-label">Home</div>
-    </div>
-    <div class="tab" onclick="showScreen('explore')">
-      <div class="tab-label">Explore</div>
-    </div>
-    <div class="tab" onclick="showScreen('discover')">
-      <div class="tab-label">Discovery</div>
-    </div>
-    <div class="tab" onclick="showScreen('trip')">
-      <div class="tab-label">Trip</div>
+      <div class="tab-label">For Me</div>
     </div>
     <button type="button" class="memo-btn" id="memo-btn" onclick="openMemo()" aria-label="Voice memo">
       <svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
     </button>
+    <div class="tab" onclick="showScreen('explore')">
+      <div class="tab-label">For Us</div>
+    </div>
   </div>
 
 </div>
@@ -2735,14 +4481,139 @@
   <img id="photo-lightbox-img" src="" alt="">
 </div>
 
-<!-- My report overlay -->
-<div id="report-overlay" class="report-overlay">
-  <div class="report-inner">
-    <div class="report-topbar">
-      <div class="report-topbar-title">My report</div>
-      <button type="button" class="report-close-btn" onclick="closeReport()" aria-label="Close report">&times;</button>
+<!-- First-time identity picker. Shown on first load when no identity is stored. -->
+<div id="first-time-picker" class="first-time-picker">
+  <div class="first-time-picker-box">
+    <div class="first-time-picker-title">Who are you?</div>
+    <div class="first-time-picker-sub">Pick yourself. We'll remember.</div>
+    <div class="first-time-picker-list" id="first-time-picker-list"></div>
+  </div>
+</div>
+
+<!-- BOLO detail modal: shows the full WHY/WHAT/WHO when a carousel card is tapped. -->
+<div id="bolo-modal" class="bolo-modal" onclick="if(event.target===this)closeBolo()">
+  <div class="bolo-modal-inner" onclick="event.stopPropagation()">
+    <button type="button" class="bolo-modal-close" onclick="closeBolo()" aria-label="Close">&times;</button>
+    <div class="bolo-modal-name" id="bolo-modal-name"></div>
+    <div class="bolo-modal-summary" id="bolo-modal-summary"></div>
+    <div id="bolo-modal-sections"></div>
+    <button type="button" class="bolo-modal-action" id="bolo-modal-action" onclick="startBoloDiscovery()">Log a discovery for this</button>
+  </div>
+</div>
+
+<!-- My Trip modal. Opened by the My Trip chrome icon. The body holds the
+     trip-day cards exactly as they used to render inline. toggleDay() still
+     works since it operates on event.target. -->
+<div id="trip-modal" class="chrome-modal" onclick="if(event.target===this)closeTripModal()">
+  <div class="chrome-modal-inner" onclick="event.stopPropagation()">
+    <button type="button" class="chrome-modal-close" onclick="closeTripModal()" aria-label="Close">&times;</button>
+    <div class="chrome-modal-title">My Trip</div>
+    <div class="chrome-modal-body">
+      <div class="section-head" style="margin:0;padding:0 0 8px;">Useful Links</div>
+      <div class="links-grid">
+        <a class="link-chip" href="https://www.hilton.com/en/hotels/chiphhh-palmer-house/" target="_blank">Palmer House</a>
+        <a class="link-chip" href="https://www.nationalrestaurantshow.com/home/" target="_blank">NRA Show</a>
+        <a class="link-chip" href="https://www.transitchicago.com/" target="_blank">CTA Transit</a>
+        <a class="link-chip" href="https://www.mlb.com/cubs/ballpark" target="_blank">Wrigley Field</a>
+        <a class="link-chip" href="https://wendellaboats.com/" target="_blank">Arch. Tour</a>
+        <a class="link-chip" href="https://maps.apple.com/?address=3702+N+Broadway,+Chicago,+IL+60613" target="_blank">Panino's</a>
+      </div>
+      <div class="trip-note">Casual attire throughout. Show execution details on prep call.</div>
+
+      <div class="day-card">
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-title-block">
+            <div class="day-title">Travel + Arrival</div>
+            <div class="day-date">Friday, May 15</div>
+          </div>
+          <div class="day-icon">15</div>
+        </div>
+        <div class="day-body">
+          <div class="event"><div class="event-time">8:10a</div><div class="event-desc">Depart <a class="event-link" href="https://www.portseattle.org/sea-tac" target="_blank">SeaTac</a></div></div>
+          <div class="event"><div class="event-time">2:32p</div><div class="event-desc">Arrive <a class="event-link" href="https://www.flychicago.com/ohare/home/pages/default.aspx" target="_blank">O'Hare</a> &mdash; <a class="event-link" href="https://www.transitchicago.com/" target="_blank">CTA Blue Line</a> to Monroe/Dearborn</div></div>
+          <div class="event"><div class="event-time">Hotel</div><div class="event-desc"><a class="event-link" href="https://www.hilton.com/en/hotels/chiphhh-palmer-house/" target="_blank">Palmer House Hilton</a> &mdash; use mobile key to skip check-in line</div></div>
+          <div class="event"><div class="event-time">5&ndash;6p</div><div class="event-desc">Downtime</div></div>
+          <div class="event"><div class="event-time">6:00p</div><div class="event-desc">Meet in lobby &rarr; casual team dinner</div></div>
+          <div class="event"><div class="event-time">Eve</div><div class="event-desc">Optional live music or free time</div></div>
+        </div>
+      </div>
+
+      <div class="day-card">
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-title-block">
+            <div class="day-title">NRA Show + Smithfield Dinner</div>
+            <div class="day-date">Saturday, May 16</div>
+          </div>
+          <div class="day-icon">16</div>
+        </div>
+        <div class="day-body">
+          <div class="event"><div class="event-time">9:30a</div><div class="event-desc">Meet in lobby &rarr; shuttle to <a class="event-link" href="https://www.mccormickplace.com/" target="_blank">McCormick Place</a></div></div>
+          <div class="event"><div class="event-time">10a&ndash;2:30p</div><div class="event-desc"><a class="event-link" href="https://www.nationalrestaurantshow.com/home/" target="_blank">NRA Show</a> floor <span class="event-badge badge-show">Day 1</span></div></div>
+          <div class="event"><div class="event-time">Afternoon</div><div class="event-desc">Return to <a class="event-link" href="https://www.hilton.com/en/hotels/chiphhh-palmer-house/" target="_blank">Palmer House</a> + downtime</div></div>
+          <div class="event"><div class="event-time">Evening</div><div class="event-desc">Smithfield dinner &mdash; <a class="event-link" href="https://paninospizzeria.com/" target="_blank">Panino's</a> (full buyout) <span class="event-badge badge-event">Vendor</span></div></div>
+        </div>
+      </div>
+
+      <div class="day-card">
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-title-block">
+            <div class="day-title">Show + Vendor Events</div>
+            <div class="day-date">Sunday, May 17</div>
+          </div>
+          <div class="day-icon">17</div>
+        </div>
+        <div class="day-body">
+          <div class="event"><div class="event-time">9:30a</div><div class="event-desc">Meet in lobby &rarr; shuttle to <a class="event-link" href="https://www.mccormickplace.com/" target="_blank">McCormick Place</a></div></div>
+          <div class="event"><div class="event-time">Morning</div><div class="event-desc"><a class="event-link" href="https://www.nationalrestaurantshow.com/home/" target="_blank">NRA Show</a> floor <span class="event-badge badge-show">Day 2</span></div></div>
+          <div class="event"><div class="event-time">12:00p</div><div class="event-desc">Sunny Sky Products meeting &mdash; booth 2454 (South hall)</div></div>
+          <div class="event"><div class="event-time">Afternoon</div><div class="event-desc">Reset at <a class="event-link" href="https://www.hilton.com/en/hotels/chiphhh-palmer-house/" target="_blank">Palmer House</a></div></div>
+          <div class="event"><div class="event-time">Evening</div><div class="event-desc">Tillamook &middot; Buyers Edge &middot; Ajinomoto &middot; Texas Pete <span class="event-badge badge-event">Vendors</span></div></div>
+          <div class="event"><div class="event-time">Transport</div><div class="event-desc"><a class="event-link" href="https://www.uber.com/" target="_blank">Grouped Ubers</a></div></div>
+        </div>
+      </div>
+
+      <div class="day-card">
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-title-block">
+            <div class="day-title">Chicago + Cubs Game</div>
+            <div class="day-date">Monday, May 18</div>
+          </div>
+          <div class="day-icon">18</div>
+        </div>
+        <div class="day-body">
+          <div class="event"><div class="event-time">9&ndash;9:30a</div><div class="event-desc">Optional <a class="event-link" href="https://www.nationalrestaurantshow.com/home/" target="_blank">show</a> visit</div></div>
+          <div class="event"><div class="event-time">12:30p</div><div class="event-desc"><a class="event-link" href="https://wendellaboats.com/" target="_blank">Architecture tour</a> &mdash; 400 N Michigan Ave (90 min)</div></div>
+          <div class="event"><div class="event-time">Afternoon</div><div class="event-desc">Free time &mdash; <a class="event-link" href="https://www.themagnificentmile.com/" target="_blank">Magnificent Mile</a></div></div>
+          <div class="event"><div class="event-time">6:30p</div><div class="event-desc">Cubs at <a class="event-link" href="https://www.mlb.com/cubs/ballpark" target="_blank">Wrigley Field</a> &mdash; <a class="event-link" href="https://www.transitchicago.com/" target="_blank">train</a> back after</div></div>
+        </div>
+      </div>
+
+      <div class="day-card">
+        <div class="day-header" onclick="toggleDay(this)">
+          <div class="day-title-block">
+            <div class="day-title">Travel Home</div>
+            <div class="day-date">Tuesday, May 19</div>
+          </div>
+          <div class="day-icon">19</div>
+        </div>
+        <div class="day-body">
+          <div class="event"><div class="event-time">7:00a</div><div class="event-desc">Depart <a class="event-link" href="https://www.hilton.com/en/hotels/chiphhh-palmer-house/" target="_blank">Palmer House</a> &rarr; <a class="event-link" href="https://www.transitchicago.com/" target="_blank">Blue Line</a> to O'Hare</div></div>
+          <div class="event"><div class="event-time">10:00a</div><div class="event-desc">Flight departure from <a class="event-link" href="https://www.flychicago.com/ohare/home/pages/default.aspx" target="_blank">O'Hare</a></div></div>
+        </div>
+      </div>
     </div>
-    <div id="report-body" class="report-body"></div>
+  </div>
+</div>
+
+<!-- My Report modal. Opened by the My Report chrome icon. Body holds the
+     report content rendered by renderReport(). -->
+<div id="report-modal" class="chrome-modal" onclick="if(event.target===this)closeReportModal()">
+  <div class="chrome-modal-inner" onclick="event.stopPropagation()">
+    <button type="button" class="chrome-modal-close" onclick="closeReportModal()" aria-label="Close">&times;</button>
+    <div class="chrome-modal-title">My Report</div>
+    <div class="chrome-modal-body">
+      <div id="report-body" class="report-body"></div>
+    </div>
   </div>
 </div>
 
@@ -2783,6 +4654,18 @@
   </div>
 </div>
 
+<!-- MY LIST PICKER: search exhibitors and add to your private hit list -->
+<div id="mylist-picker-overlay" class="mylist-picker-overlay" onclick="if(event.target===this)closeMyListPicker()">
+  <div class="mylist-picker-modal">
+    <div class="mylist-picker-header">
+      <span class="mylist-picker-title">Add to your list</span>
+      <button type="button" class="mylist-picker-close" onclick="closeMyListPicker()" aria-label="Close">&times;</button>
+    </div>
+    <input type="text" id="mylist-picker-input" class="mylist-picker-input" placeholder="Search exhibitors by name" autocomplete="off">
+    <div id="mylist-picker-results" class="mylist-picker-results"></div>
+  </div>
+</div>
+
 <script>
 // ── IDENTITY MODEL ──────────────────────────────────────────────────────────
 
@@ -2813,6 +4696,11 @@ const DEPARTMENTS = [
 ];
 
 const HARBOR = {id:'harbor', name:'Harbor (all team)', kind:'harbor'};
+
+// Admins can switch identity via the dropdown (including to departments and Harbor).
+// Non-admins are locked to their own identity after picking it on first load.
+const ADMINS = ['andy', 'dawn', 'wade', 'darrin'];
+function isAdmin(id) { return ADMINS.includes(id); }
 
 let currentIdentity = null; // {id, kind: 'person'|'department'|'harbor'}
 
@@ -2927,7 +4815,144 @@ async function saveTeamAddition(person) {
   await kvSet(TEAM_ADDITIONS_KEY, list);
 }
 
+// ── MY LIST: PRE-SHOW PERSONAL HIT LIST ─────────────────────────────────────
+// Each user maintains a private list of exhibitors they want to walk. Surfaces
+// only on Explore for that person under "On your list", with a white origin
+// stripe. Not visible to teammates. Not exported. Not in recap.
+const MY_LIST_KEY = 'harbor:my_list:v1';
+
+// In-memory cache: { userId: [{booth, addedAt}, ...] }
+let myListByUser = {};
+
+async function loadMyList() {
+  const saved = await kvGet(MY_LIST_KEY);
+  myListByUser = (saved && typeof saved === 'object' && !Array.isArray(saved)) ? saved : {};
+}
+
+async function persistMyList() {
+  await kvSet(MY_LIST_KEY, myListByUser);
+}
+
+function getMyListForUser(userId) {
+  return Array.isArray(myListByUser[userId]) ? myListByUser[userId] : [];
+}
+
+async function addToMyList(userId, booth) {
+  if (!userId || !booth) return;
+  const boothStr = String(booth);
+  const list = getMyListForUser(userId);
+  if (list.some(item => String(item.booth) === boothStr)) return;
+  list.push({ booth: boothStr, addedAt: Date.now() });
+  myListByUser[userId] = list;
+  await persistMyList();
+}
+
+async function removeFromMyList(userId, booth) {
+  if (!userId || !booth) return;
+  const boothStr = String(booth);
+  const list = getMyListForUser(userId);
+  const filtered = list.filter(item => String(item.booth) !== boothStr);
+  myListByUser[userId] = filtered;
+  await persistMyList();
+}
+
+function isOnMyList(userId, booth) {
+  if (!userId || !booth) return false;
+  const boothStr = String(booth);
+  return getMyListForUser(userId).some(item => String(item.booth) === boothStr);
+}
+
+// ── MY LIST: PICKER UI ──────────────────────────────────────────────────────
+
+let myListPickerDebounce = null;
+
+function openMyListPicker() {
+  if (!currentIdentity || currentIdentity.kind !== 'person') return;
+  const overlay = document.getElementById('mylist-picker-overlay');
+  const input = document.getElementById('mylist-picker-input');
+  const results = document.getElementById('mylist-picker-results');
+  if (!overlay || !input || !results) return;
+  input.value = '';
+  results.innerHTML = `<div class="mylist-picker-hint">Start typing an exhibitor name.</div>`;
+  overlay.classList.add('open');
+  setTimeout(() => input.focus(), 50);
+  input.oninput = onMyListPickerInput;
+}
+
+function closeMyListPicker() {
+  const overlay = document.getElementById('mylist-picker-overlay');
+  if (!overlay) return;
+  overlay.classList.remove('open');
+  if (myListPickerDebounce) {
+    clearTimeout(myListPickerDebounce);
+    myListPickerDebounce = null;
+  }
+}
+
+function onMyListPickerInput(e) {
+  if (myListPickerDebounce) clearTimeout(myListPickerDebounce);
+  const q = e.target.value;
+  myListPickerDebounce = setTimeout(() => renderMyListPickerResults(q), 120);
+}
+
+function renderMyListPickerResults(q) {
+  const results = document.getElementById('mylist-picker-results');
+  if (!results) return;
+  const query = (q || '').trim().toLowerCase();
+  if (query.length < 2) {
+    results.innerHTML = `<div class="mylist-picker-hint">Type at least two characters to search.</div>`;
+    return;
+  }
+  // SEARCH_DATA shape: [boothNum, name, hallCode]
+  const matches = [];
+  for (const row of SEARCH_DATA) {
+    if (matches.length >= 40) break; // cap results
+    const name = (row[1] || '').toLowerCase();
+    if (name.includes(query)) {
+      matches.push({ booth: String(row[0]), name: row[1], hallCode: row[2] });
+    }
+  }
+  if (matches.length === 0) {
+    results.innerHTML = `<div class="mylist-picker-empty">No exhibitors match "${escapeHtml(q)}".</div>`;
+    return;
+  }
+  const viewerId = currentIdentity.id;
+  results.innerHTML = matches.map(m => {
+    const info = BOOTHS[m.booth] || {};
+    const hall = info.h || '';
+    const already = isOnMyList(viewerId, m.booth);
+    return `
+      <div class="mylist-picker-result${already ? ' disabled' : ''}"
+           ${already ? '' : `onclick="handleMyListPickerSelect('${m.booth}')"`}
+           data-booth="${m.booth}">
+        <div class="mylist-picker-result-name">${escapeHtml(m.name)}</div>
+        <div class="mylist-picker-result-meta">
+          <span>${escapeHtml(hall || '?')}</span>
+          <span>#${m.booth}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function handleMyListPickerSelect(booth) {
+  if (!currentIdentity || currentIdentity.kind !== 'person') return;
+  await addToMyList(currentIdentity.id, booth);
+  closeMyListPicker();
+  renderExplore();
+}
+
+async function handleRemoveFromMyList(booth, ev) {
+  if (ev) ev.stopPropagation();
+  if (!currentIdentity || currentIdentity.kind !== 'person') return;
+  await removeFromMyList(currentIdentity.id, booth);
+  // Card disappears from the section. If section is now empty, the section is hidden.
+  expandedCards.delete(String(booth));
+  renderExplore();
+}
+
 async function loadFromKV() {
+  if (window.__demoMode) return;
   const saved = await kvGet(ENTRIES_KEY);
   if (saved && Array.isArray(saved)) entries = saved;
   renderExplore();
@@ -2936,13 +4961,14 @@ async function loadFromKV() {
 
 // Poll for updates every 30 seconds
 setInterval(async () => {
+  if (window.__demoMode) return;
   const saved = await kvGet(ENTRIES_KEY);
   if (saved && Array.isArray(saved) && JSON.stringify(saved) !== JSON.stringify(entries)) {
     entries = saved;
     renderExplore();
     updateSentCount();
     if (document.getElementById('sent-list')?.classList.contains('open')) renderSentList();
-    if (document.getElementById('report-overlay')?.classList.contains('open')) renderReport();
+    if (document.getElementById('home-section-report')?.classList.contains('open')) renderReport();
   }
 
   // Also check for newly added teammates from other devices
@@ -3468,14 +5494,19 @@ function selectIdentity(id, kind, userInitiated) {
     }
   }
 
+  // Update the Home greeting ("Howdy, Andy.") to match the current viewer.
+  updateHomeGreeting();
+  // Update the Me chrome circle (initials + color).
+  renderMeAvatar();
+
   // Mark selected in dropdown
   document.querySelectorAll('.identity-dropdown-item').forEach(el => {
     el.classList.toggle('selected', el.dataset.identityId === id);
   });
 
-  // Identity is intentionally not persisted across sessions. Every load
-  // starts in [Select] state so the user picks deliberately rather than
-  // inheriting a stale identity from a previous use.
+  // Persist the identity choice so the user doesn't have to pick again
+  // on next load. The first-time picker handles the no-stored-identity case.
+  try { localStorage.setItem(IDENTITY_STORAGE_KEY, JSON.stringify({id, kind})); } catch(e) {}
 
   closeIdentityDropdown();
 
@@ -3488,25 +5519,91 @@ function selectIdentity(id, kind, userInitiated) {
   updateLockedAffordances();
   // If sent list is open, refresh it
   if (document.getElementById('sent-list')?.classList.contains('open')) renderSentList();
+  // Refresh My Notes (ticker + expanded list both pull from current identity).
+  renderMyNotes();
 
   // Jump to Explore if the user just picked a name while on Home
   if (shouldJumpToExplore) showScreen('explore');
 }
 
 function restoreIdentity() {
-  // Identity is no longer persisted. Clear any value left over from a
-  // previous build so users who visited before this change do not get
-  // a one-time restore on their next load.
-  try { localStorage.removeItem(IDENTITY_STORAGE_KEY); } catch(e) {}
+  try {
+    const stored = localStorage.getItem(IDENTITY_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (parsed && parsed.id && parsed.kind) {
+        const ident = resolveIdentity(parsed.id);
+        if (ident) {
+          selectIdentity(parsed.id, parsed.kind, false);
+          return;
+        }
+      }
+    }
+  } catch(e) {}
+  // No stored identity (or unrecognized) — show the first-time picker.
+  showFirstTimePicker();
 }
 
+// First-time picker: a modal listing all teammates. The user must pick one
+// before they can use the app. After picking, the choice is persisted in
+// localStorage so the picker doesn't reappear on next load.
+function showFirstTimePicker() {
+  const modal = document.getElementById('first-time-picker');
+  const list = document.getElementById('first-time-picker-list');
+  if (!modal || !list) return;
+  list.innerHTML = '';
+  const sortedPeople = [...PEOPLE].sort((a,b) => a.first.localeCompare(b.first));
+  sortedPeople.forEach(p => {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'first-time-picker-item';
+    item.innerHTML = `
+      <span class="first-time-picker-item-name">${escapeHtml(p.name)}</span>
+      <span class="first-time-picker-item-tag">${escapeHtml(formatTagsForDisplay(p.tags))}</span>
+    `;
+    item.onclick = () => {
+      modal.classList.remove('open');
+      selectIdentity(p.id, 'person', false);
+    };
+    list.appendChild(item);
+  });
+  modal.classList.add('open');
+}
+window.showFirstTimePicker = showFirstTimePicker;
+
+// Update the Home screen greeting ("Howdy, Andy.") to match the current
+// viewer. Falls back to a generic greeting if no identity is set.
+function updateHomeGreeting() {
+  const nameEl = document.querySelector('.home-greeting-name');
+  if (!nameEl) return;
+  if (!currentIdentity) {
+    nameEl.textContent = 'friend.';
+    return;
+  }
+  const ident = resolveIdentity(currentIdentity.id);
+  if (!ident) {
+    nameEl.textContent = 'friend.';
+    return;
+  }
+  let displayName;
+  if (currentIdentity.kind === 'person') displayName = ident.first;
+  else if (currentIdentity.kind === 'harbor') displayName = 'team';
+  else displayName = ident.name; // department: "Category Management" or "Solutions"
+  nameEl.textContent = displayName + '.';
+}
+
+// Reset link for non-admins who picked the wrong name initially. Clears
+// stored identity and reopens the picker.
+function resetIdentity() {
+  try { localStorage.removeItem(IDENTITY_STORAGE_KEY); } catch(e) {}
+  currentIdentity = null;
+  showFirstTimePicker();
+}
+window.resetIdentity = resetIdentity;
+
 function toggleIdentityDropdown() {
-  // Identity is only changeable from the Home screen. On other screens the
-  // identity bar still displays who is viewing, but tapping it is inert.
-  // This prevents accidental identity switches on the show floor (e.g. from
-  // a phone in a pocket) and keeps the change deliberate.
-  const homeActive = document.getElementById('screen-home')?.classList.contains('active');
-  if (!homeActive) return;
+  // Open to any viewer. Anyone can switch identity from the Me chrome icon.
+  if (!currentIdentity) return;
   const bar = document.getElementById('header-identity');
   const dd  = document.getElementById('identity-dropdown');
   const open = dd.classList.toggle('open');
@@ -3573,10 +5670,10 @@ function selectExhibitor(booth, name, hall, hallCode) {
   block.style.display = 'block';
   const selInfo = BOOTHS[booth];
   const selFirstCat = selInfo && selInfo.cat && selInfo.cat.length ? selInfo.cat[0] : '';
+  const isEbPartnerSelected = ["1488","1671","1863","2454","2712","3472","5607","6245","7207","7659","7850","7980","8067","11518","12006","12807","13102","13239","13306","13345","13823"].includes(String(booth));
   block.innerHTML = `
     <div class="selected-exhibitor">
-      ${["1488","1671","1863","2454","2712","3472","5607","6245","7207","7659","7850","7980","8067","11518","12006","12807","13102","13239","13306","13345","13823"].includes(String(booth)) ? `<div class="explore-card-eb-badge" title="EB partner"><img src="assets/H.png" alt="EB partner"></div>` : ''}
-      <div class="selected-exhibitor-name">${name}</div>
+      <div class="selected-exhibitor-name${isEbPartnerSelected ? ' eb-partner' : ''}">${name}</div>
       <div class="selected-exhibitor-meta">
         <span class="hall-pill hall-${hallCode}">${hall}</span>
         <span class="booth-pill">#${booth}</span>
@@ -3939,6 +6036,7 @@ async function submitEntry() {
       taggedSelf: selectedRecipientSelf,
       photoUrls,
       dot: dotAnswer || null,
+      boloId: (pendingBoloId !== null) ? pendingBoloId : null,
       createdAt: Date.now(),
       updatedAt: Date.now(),
       responses: []
@@ -3948,6 +6046,9 @@ async function submitEntry() {
 
   await saveEntries();
   captureHaptic();
+  // Clear any pending BOLO tag so the next discovery starts clean.
+  pendingBoloId = null;
+  if (typeof renderPendingBoloBanner === 'function') renderPendingBoloBanner();
   resetDiscoverForm();
   renderExplore();
   updateSentCount();
@@ -4071,11 +6172,33 @@ function buildExploreCards(viewerId, viewerKind) {
     byBooth[e.booth].entries.push(e);
   });
 
+  // My-list booths: only surface for person viewers, only for that person's own list.
+  // Departments and Harbor never see anyone's my-list. A booth that already has
+  // entries (dept invitation, peer flag) keeps its existing origin; my-list does
+  // not override or merge. My-list shows up only for booths with no other entries.
+  const myListBooths = (viewerKind === 'person') ? getMyListForUser(viewerId) : [];
+  myListBooths.forEach(item => {
+    const booth = String(item.booth);
+    if (byBooth[booth]) return; // already surfaced via dept/peer entries
+    const info = BOOTHS[booth];
+    if (!info) return; // booth not in exhibitor data; skip silently
+    byBooth[booth] = {
+      booth,
+      name: info.n || '',
+      hall: info.h || '',
+      hallCode: info.h ? info.h.charAt(0) : '',
+      entries: [],
+      isMyList: true,
+      myListAddedAt: item.addedAt || 0
+    };
+  });
+
   return Object.values(byBooth).map(card => {
     const hasDept = card.entries.some(e => e.creatorKind === 'department');
     const hasPeer = card.entries.some(e => e.creatorKind === 'person');
     let origin;
-    if (hasDept && hasPeer) origin = 'mixed';
+    if (card.isMyList) origin = 'mine';
+    else if (hasDept && hasPeer) origin = 'mixed';
     else if (hasDept) origin = 'dept';
     else origin = 'peer';
 
@@ -4087,12 +6210,18 @@ function buildExploreCards(viewerId, viewerKind) {
     }
 
     // Most recent activity for sort
-    const latestTs = Math.max(
-      ...card.entries.map(e => {
-        const responseTs = (e.responses || []).reduce((m, r) => Math.max(m, r.createdAt || 0), 0);
-        return Math.max(e.updatedAt || e.createdAt || 0, responseTs);
-      })
-    );
+    let latestTs;
+    if (card.entries.length === 0) {
+      // My-list-only card: use addedAt as the activity timestamp
+      latestTs = card.myListAddedAt || 0;
+    } else {
+      latestTs = Math.max(
+        ...card.entries.map(e => {
+          const responseTs = (e.responses || []).reduce((m, r) => Math.max(m, r.createdAt || 0), 0);
+          return Math.max(e.updatedAt || e.createdAt || 0, responseTs);
+        })
+      );
+    }
 
     return {
       ...card,
@@ -4105,7 +6234,8 @@ function buildExploreCards(viewerId, viewerKind) {
 }
 
 // Section assignment for a card (per viewer)
-// Person viewer: invitations (any green not engaged), peerFlags (all blue not engaged), engaged (responded)
+// Person viewer: mine (my-list, not engaged), invitations (any green not engaged),
+// peerFlags (all blue not engaged), engaged (responded)
 // Department viewer: department inbox - just one section, all cards (engaged not shown)
 // Harbor viewer: all cards in their origin colors, no engaged section
 function assignSection(card, viewerKind) {
@@ -4113,6 +6243,7 @@ function assignSection(card, viewerKind) {
   if (viewerKind === 'department') return 'inbox';
   // person viewer
   if (card.engaged) return 'engaged';
+  if (card.origin === 'mine') return 'mine';
   if (card.origin === 'dept' || card.origin === 'mixed') return 'invitations';
   return 'peerFlags';
 }
@@ -4212,32 +6343,26 @@ function renderExplore() {
   const emptyIdentity = document.getElementById('explore-empty-identity');
   const banner = document.getElementById('hall-banner');
   const sortRow = document.getElementById('sort-picker-row');
+  const addRow = document.getElementById('mylist-add-row');
 
   if (!currentIdentity) {
     emptyIdentity.style.display = 'block';
     sectionsContainer.innerHTML = '';
-    banner.style.display = 'none';
+    if (banner) banner.style.display = 'none';
     if (sortRow) sortRow.style.display = 'none';
+    if (addRow) addRow.style.display = 'none';
     return;
   }
   emptyIdentity.style.display = 'none';
 
+  // Add-to-list button: only visible to person viewers (not departments, not Harbor)
+  if (addRow) {
+    addRow.style.display = (currentIdentity.kind === 'person') ? 'block' : 'none';
+  }
+
   const cards = buildExploreCards(currentIdentity.id, currentIdentity.kind);
 
-  // Hall banner: if viewer (person) has 2+ cards in the same hall, suggest starting there
-  if (currentIdentity.kind === 'person' && cards.length > 0) {
-    const hallCounts = {};
-    cards.forEach(c => { hallCounts[c.hall] = (hallCounts[c.hall] || 0) + 1; });
-    const top = Object.entries(hallCounts).sort((a,b) => b[1] - a[1])[0];
-    if (top && top[1] >= 2) {
-      banner.style.display = 'block';
-      banner.textContent = `${top[1]} of your ${cards.length} cards are in ${top[0]} Hall.`;
-    } else {
-      banner.style.display = 'none';
-    }
-  } else {
-    banner.style.display = 'none';
-  }
+  // (Hall banner feature removed.)
 
   // Sort picker: only show when there are cards to sort
   if (sortRow) {
@@ -4268,8 +6393,9 @@ function renderExplore() {
   // Render sections in order based on viewer kind
   let sectionOrder, sectionLabels;
   if (currentIdentity.kind === 'person') {
-    sectionOrder = ['invitations', 'peerFlags', 'engaged'];
+    sectionOrder = ['mine', 'invitations', 'peerFlags', 'engaged'];
     sectionLabels = {
+      mine:        'On your list',
       invitations: 'From Departments',
       peerFlags:   'From Teammates',
       engaged:     'Engaged'
@@ -4287,6 +6413,7 @@ function renderExplore() {
   sectionOrder.forEach(key => {
     const list = bySection[key] || [];
     if (list.length === 0 && currentIdentity.kind !== 'person') return; // skip empty sections except for person viewer's main sections
+    if (list.length === 0 && key === 'mine') return; // skip empty my-list section; the Add button handles that surface
     html += renderExploreSection(sectionLabels[key], list, key);
   });
 
@@ -4310,7 +6437,7 @@ function renderExploreSection(title, cards, sectionKey) {
     body = sorted.map(c => renderExploreCard(c)).join('');
   }
   return `
-    <div class="explore-section-head">
+    <div class="explore-section-head" data-section="${sectionKey}">
       <span class="explore-section-title">${title}</span>
       <span class="explore-section-count">${cards.length}</span>
     </div>
@@ -4326,53 +6453,78 @@ function renderExploreCard(card) {
   const justEngagedClass = (card.engaged && justEngagedBooths.has(String(card.booth))) ? ' just-engaged' : '';
   const isEbPartner = ["1488","1671","1863","2454","2712","3472","5607","6245","7207","7659","7850","7980","8067","11518","12006","12807","13102","13239","13306","13345","13823"].includes(String(card.booth));
 
-  // Resting-state attribution: first sender (oldest entry) + N count of others
-  const sortedByOldest = [...card.entries].sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-  const firstEntry = sortedByOldest[0];
-  const firstCreator = resolveCreator(firstEntry);
-  // For people, use first name + last initial. For departments, use a short label
-  // so the From column doesn't crowd out the exhibitor name.
-  let firstName;
-  if (firstCreator.kind === 'person') {
-    const parts = (firstCreator.name || '').split(' ');
-    const lastInitial = parts.length > 1 ? parts[parts.length - 1].charAt(0) : '';
-    firstName = lastInitial ? `${firstCreator.first} ${lastInitial}.` : firstCreator.first;
-  } else if (firstCreator.name === 'Category Management') {
-    firstName = 'Cat Mgmt';
-  } else {
-    firstName = firstCreator.name;
+  // My-list cards have no entries and no "From" attribution. They are private
+  // intentions the viewer added themselves before the show.
+  const isMyListCard = card.origin === 'mine' && card.entries.length === 0;
+
+  let fromLine = '';
+  if (!isMyListCard) {
+    // Resting-state attribution: first sender (oldest entry) + N count of others
+    const sortedByOldest = [...card.entries].sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+    const firstEntry = sortedByOldest[0];
+    const firstCreator = resolveCreator(firstEntry);
+    // For people, use first name + last initial. For departments, use a short label
+    // so the From column doesn't crowd out the exhibitor name.
+    let firstName;
+    if (firstCreator.kind === 'person') {
+      const parts = (firstCreator.name || '').split(' ');
+      const lastInitial = parts.length > 1 ? parts[parts.length - 1].charAt(0) : '';
+      firstName = lastInitial ? `${firstCreator.first} ${lastInitial}.` : firstCreator.first;
+    } else if (firstCreator.name === 'Category Management') {
+      firstName = 'Cat Mgmt';
+    } else {
+      firstName = firstCreator.name;
+    }
+    const additionalCount = card.entries.length - 1;
+    fromLine = additionalCount > 0
+      ? `${escapeHtml(firstName)} <span class="explore-card-from-plus">+${additionalCount}</span>`
+      : escapeHtml(firstName);
   }
-  const additionalCount = card.entries.length - 1;
-  const fromLine = additionalCount > 0
-    ? `${escapeHtml(firstName)} <span class="explore-card-from-plus">+${additionalCount}</span>`
-    : escapeHtml(firstName);
 
   // First category from the exhibitor record, if available
   const info = BOOTHS[card.booth];
   const firstCat = info && info.cat && info.cat.length ? info.cat[0] : '';
 
+  // Header right column differs for my-list cards: no "From" data, no count chip
+  const countChip = isMyListCard
+    ? ''
+    : `<div class="explore-card-count">${card.count}</div>`;
+
+  // When expanded, the body shows category + "From" attribution at the top
+  // (these used to live in the collapsed header but were moved here to keep
+  // the collapsed card compact: name, hall, booth, count only).
+  const expandedMeta = (firstCat || fromLine)
+    ? `<div class="explore-card-body-meta">
+         ${firstCat ? `<span class="category-pill">${escapeHtml(firstCat)}</span>` : ''}
+         ${fromLine ? `<div class="explore-card-body-from"><span class="explore-card-body-from-label">From</span> <span class="explore-card-body-from-name">${fromLine}</span></div>` : ''}
+       </div>`
+    : '';
+
+  // Body for my-list cards: exhibitor details + remove action. For dept/peer
+  // cards: exhibitor details + entries.
+  const bodyContent = isMyListCard
+    ? `${expandedMeta}
+       ${renderExhibitorDetailsBlock(card.booth)}
+       <div class="explore-card-mylist-actions">
+         <button type="button" class="explore-card-mylist-remove" onclick="handleRemoveFromMyList('${card.booth}', event)">Remove from your list</button>
+       </div>`
+    : `${expandedMeta}
+       ${renderExhibitorDetailsBlock(card.booth)}
+       ${card.entries.map(e => renderExploreEntry(e, card)).join('')}`;
+
   return `
     <div class="explore-card ${originClass}${engagedClass}${expandedClass}${justEngagedClass}" data-booth="${card.booth}">
-      ${isEbPartner ? `<div class="explore-card-eb-badge" title="EB partner"><img src="assets/H.png" alt="EB partner"></div>` : ''}
       <div class="explore-card-header" onclick="toggleExploreCard('${card.booth}')">
-        <div class="explore-card-count">${card.count}</div>
-        <div class="explore-card-info">
-          <div class="explore-card-name">${escapeHtml(card.name)}</div>
-          <div class="explore-card-meta">
-            <span class="hall-pill hall-${card.hallCode || '?'}">${card.hall || '?'}</span>
-            <span class="booth-pill">#${card.booth}</span>
-            ${firstCat ? `<span class="category-pill">${escapeHtml(firstCat)}</span>` : ''}
-          </div>
+        ${countChip}
+        <div class="explore-card-name-line${isEbPartner ? ' eb-partner' : ''}">${escapeHtml(card.name)}</div>
+        <div class="explore-card-right-meta">
+          <span class="explore-card-hall-initial">${escapeHtml(card.hallCode || '?')}</span>
+          <span class="explore-card-booth-num">#${escapeHtml(String(card.booth))}</span>
+          <div class="explore-card-chevron">&#9660;</div>
         </div>
-        <div class="explore-card-from-right">
-          <div class="explore-card-from-label">From</div>
-          <div class="explore-card-from-name">${fromLine}</div>
-        </div>
-        <div class="explore-card-chevron">&#9660;</div>
       </div>
       <div class="explore-card-body">
-        ${renderExhibitorDetailsBlock(card.booth)}
-        ${card.entries.map(e => renderExploreEntry(e, card)).join('')}
+        ${bodyContent}
       </div>
     </div>
   `;
@@ -4429,6 +6581,7 @@ function renderExploreEntry(entry, card) {
         <div class="explore-entry-from-text">${escapeHtml(creator.name)}</div>
         <div class="explore-entry-time">${timeAgo(entry.updatedAt || entry.createdAt)}</div>
       </div>
+      ${(entry.boloId !== null && entry.boloId !== undefined && BOLO_ITEMS[entry.boloId]) ? `<div class="explore-entry-bolo">BOLO &middot; ${escapeHtml(BOLO_ITEMS[entry.boloId].name)}</div>` : ''}
       ${entry.contact ? `<div class="explore-entry-contact"><strong>Spoke with:</strong> ${escapeHtml(entry.contact)}</div>` : ''}
       <div class="explore-entry-note">${escapeHtml(entry.note)}</div>
       ${entry.dot ? renderDotBlock(entry.dot) : ''}
@@ -4492,6 +6645,9 @@ function toggleExploreCard(booth) {
   if (expandedCards.has(booth)) expandedCards.delete(booth);
   else expandedCards.add(booth);
   renderExplore();
+  // My Discoveries on Home uses the same renderer, so refresh it too when an
+  // expansion toggles. Only re-render if the list element is in the DOM.
+  if (document.getElementById('sent-list')) renderSentList();
 }
 window.toggleExploreCard = toggleExploreCard;
 
@@ -4572,6 +6728,394 @@ function toggleSentSection() {
 }
 window.toggleSentSection = toggleSentSection;
 
+// Toggle a collapsible Home section (Trip, My Notes) by name. When opened,
+// re-renders that section's content so it reflects the latest state.
+function toggleHomeSection(name) {
+  const body = document.getElementById('home-section-body-' + name);
+  if (!body) return;
+  const section = body.closest('.home-section');
+  const isOpen = body.style.display !== 'none';
+  if (isOpen) {
+    body.style.display = 'none';
+    section.classList.remove('open');
+    const header = section.querySelector('.home-section-header');
+    if (header) header.setAttribute('aria-expanded', 'false');
+  } else {
+    body.style.display = '';
+    section.classList.add('open');
+    const header = section.querySelector('.home-section-header');
+    if (header) header.setAttribute('aria-expanded', 'true');
+    // Re-render content that depends on entries/identity
+    if (name === 'report') renderReport();
+  }
+}
+window.toggleHomeSection = toggleHomeSection;
+
+// =============================================================================
+// BOLO (Be On the Lookout) — carousel + detail modal
+// Replaces the former Missions collapsible on For Us. Tapping a carousel card
+// opens the full WHY/WHAT/WHO in a modal.
+// =============================================================================
+const BOLO_ITEMS = [
+  {
+    name: 'Center-of-plate value rebuild',
+    summary: 'Hold price points without dropping perceived quality',
+    why: "Independent operators are watching their highest-volume menu items lose price-to-value alignment. When a burger or an egg dish stops feeling worth what it costs, the whole check average comes under pressure. Helping operators rebuild value here protects the items their business actually runs on.",
+    what: "Find products that let an operator hold a price point without dropping perceived quality. Burger build-ups, egg formats, staple proteins.",
+    who: "Tony, David."
+  },
+  {
+    name: 'Protein, reimagined',
+    summary: 'Proteins that read as a feature, not a substitute',
+    why: "Customer demand is shifting toward protein as a feature rather than meat as a default. Operators who only offer the standard chicken-beef-pork lineup are losing diners who want something smaller, lighter, or non-meat without it feeling like a compromise. The operators who get ahead of this win menu space the rest will be chasing in a year.",
+    what: "Find proteins that read as a feature, not a substitute. Plant, dairy, egg-forward, smaller-format.",
+    who: "Hagan, Christina."
+  },
+  {
+    name: 'Packaging and containers',
+    summary: "Takeout that holds heat, doesn't leak, doesn't kill margin",
+    why: "Takeout and delivery volume is now structural for independent operators, not a pandemic holdover, and most of their kitchens were never designed for it. Containers that hold heat, do not leak, and do not blow up the food cost are the difference between a third-party order that earns a repeat and one that does not.",
+    what: "Find takeout and delivery containers that solve heat, leak, and sustainability without killing margin.",
+    who: "Matt."
+  },
+  {
+    name: 'Bakery and dessert upgrades',
+    summary: 'Small upgrades, large perceived-quality gains',
+    why: "Independent operators do not have R&D budgets, and bakery and dessert are where small upgrades produce the largest perceived-quality gains for the lowest cost per cover. A better bun, a better roll, a signature dessert; these are the items diners remember and post about, and they cost the operator pennies to upgrade.",
+    what: "Find buns, rolls, breads, and desserts that lift perceived quality at low cost-per-cover.",
+    who: "Matt, and connects back to Tony's burger."
+  },
+  {
+    name: 'Authentic and catering-ready',
+    summary: 'Hispanic-authentic SKUs and catering-format pack sizes',
+    why: "Two real shifts are happening at once: independent operators serving authentic ethnic cuisine are growing in markets like Seattle, and operators across the board are leaning into catering as a margin channel that does not require more dining room seats. SKUs that serve either trend open accounts the standard catalog cannot.",
+    what: "Find Hispanic-authentic SKUs and catering-format pack sizes that independent operators can run with.",
+    who: "Fernando."
+  }
+];
+
+// Active state. `boloActiveIdx` tracks which BOLO is currently shown in the
+// modal so the action button knows which mission to attach. `pendingBoloId`
+// is set after the user taps "Log a discovery for this" and is read by
+// submitEntry to stamp the new entry.
+let boloActiveIdx = null;
+let pendingBoloId = null;
+
+function openBolo(idx) {
+  const item = BOLO_ITEMS[idx];
+  if (!item) return;
+  boloActiveIdx = idx;
+  const modal = document.getElementById('bolo-modal');
+  const nameEl = document.getElementById('bolo-modal-name');
+  const sumEl = document.getElementById('bolo-modal-summary');
+  const sectionsEl = document.getElementById('bolo-modal-sections');
+  const actionBtn = document.getElementById('bolo-modal-action');
+  if (!modal || !nameEl || !sumEl || !sectionsEl) return;
+  nameEl.textContent = item.name;
+  sumEl.textContent = item.summary;
+  sectionsEl.innerHTML = `
+    <div class="bolo-modal-section">
+      <div class="bolo-modal-section-label">WHY</div>
+      <div class="bolo-modal-section-text">${escapeHtml(item.why)}</div>
+    </div>
+    <div class="bolo-modal-section">
+      <div class="bolo-modal-section-label">WHAT</div>
+      <div class="bolo-modal-section-text">${escapeHtml(item.what)}</div>
+    </div>
+    <div class="bolo-modal-section">
+      <div class="bolo-modal-section-label">WHO</div>
+      <div class="bolo-modal-section-text">${escapeHtml(item.who)}</div>
+    </div>
+  `;
+  // Action button visible only for person viewers. Departments and Harbor
+  // viewers cannot capture discoveries.
+  if (actionBtn) {
+    const isPerson = currentIdentity && currentIdentity.kind === 'person';
+    actionBtn.style.display = isPerson ? '' : 'none';
+  }
+  modal.classList.add('open');
+}
+function closeBolo() {
+  document.getElementById('bolo-modal')?.classList.remove('open');
+}
+window.openBolo = openBolo;
+window.closeBolo = closeBolo;
+
+// =============================================================================
+// Chrome row modals: My Trip and My Report.
+// Tapping the chrome icons opens these. The trip modal carries the static
+// itinerary (toggleDay() still works inside it). The report modal calls
+// renderReport() so the report reflects current entries each time it opens.
+// =============================================================================
+function openTripModal() {
+  const modal = document.getElementById('trip-modal');
+  if (!modal) return;
+  modal.classList.add('open');
+}
+function closeTripModal() {
+  document.getElementById('trip-modal')?.classList.remove('open');
+}
+window.openTripModal = openTripModal;
+window.closeTripModal = closeTripModal;
+
+function openReportModal() {
+  const modal = document.getElementById('report-modal');
+  if (!modal) return;
+  // Refresh report contents whenever the modal is opened so the data is
+  // current. renderReport() writes into #report-body which lives inside
+  // the modal.
+  if (typeof renderReport === 'function') renderReport();
+  modal.classList.add('open');
+}
+function closeReportModal() {
+  document.getElementById('report-modal')?.classList.remove('open');
+}
+window.openReportModal = openReportModal;
+window.closeReportModal = closeReportModal;
+
+// Update the Me chrome circle to show the current viewer's initials in
+// the system blue color. The Me icon is always blue (initials + outline)
+// regardless of the identity's own color, so the chrome reads as a
+// consistent affordance.
+function renderMeAvatar() {
+  const el = document.getElementById('chrome-me-initials');
+  const circle = el ? el.parentElement : null;
+  if (!el || !circle) return;
+  const BLUE = '#7A9BC4'; // matches --tertiary / --blue
+  if (!currentIdentity) {
+    el.textContent = '--';
+    el.style.color = 'var(--text-hint)';
+    circle.style.borderColor = 'var(--border)';
+    return;
+  }
+  const ident = resolveIdentity(currentIdentity.id);
+  if (!ident) {
+    el.textContent = '--';
+    el.style.color = 'var(--text-hint)';
+    circle.style.borderColor = 'var(--border)';
+    return;
+  }
+  // Initials: for people, first letter of first + last name. For departments,
+  // use a 2-letter abbreviation. For Harbor (all-team), use "H".
+  let initialsStr;
+  if (ident.kind === 'department') {
+    initialsStr = ident.name === 'Category Management' ? 'CM'
+                : ident.name === 'Solutions' ? 'SO'
+                : initials(ident.name);
+  } else if (ident.kind === 'harbor') {
+    initialsStr = 'H';
+  } else {
+    initialsStr = initials(ident.name);
+  }
+  el.textContent = initialsStr;
+  el.style.color = BLUE;
+  circle.style.borderColor = BLUE;
+}
+window.renderMeAvatar = renderMeAvatar;
+
+// User tapped "Log a discovery for this" inside a BOLO modal. Close the
+// modal, set the pending BOLO id (read later by submitEntry), surface the
+// pending-bolo banner above the capture form, and scroll the user there.
+function startBoloDiscovery() {
+  if (boloActiveIdx === null) return;
+  pendingBoloId = boloActiveIdx;
+  closeBolo();
+  renderPendingBoloBanner();
+  // Make sure we're on For Us where capture lives, then scroll the
+  // capture surface into view.
+  showScreen('explore');
+  setTimeout(() => {
+    const target = document.getElementById('exhibitor-search');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.focus({ preventScroll: true });
+    }
+  }, 80);
+}
+window.startBoloDiscovery = startBoloDiscovery;
+
+function clearPendingBolo() {
+  pendingBoloId = null;
+  renderPendingBoloBanner();
+}
+window.clearPendingBolo = clearPendingBolo;
+
+function renderPendingBoloBanner() {
+  const banner = document.getElementById('pending-bolo-banner');
+  const nameEl = document.getElementById('pending-bolo-banner-name');
+  if (!banner || !nameEl) return;
+  if (pendingBoloId === null || !BOLO_ITEMS[pendingBoloId]) {
+    banner.classList.remove('open');
+    return;
+  }
+  nameEl.textContent = BOLO_ITEMS[pendingBoloId].name;
+  banner.classList.add('open');
+}
+
+// Wire carousel cards once on load.
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.bolo-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const idx = parseInt(card.getAttribute('data-bolo'), 10);
+      if (!isNaN(idx)) openBolo(idx);
+    });
+  });
+});
+
+// Toggle a collapsible Explore section (Missions). Same pattern as
+// toggleHomeSection but scoped to Explore's section IDs.
+function toggleExploreSection(name) {
+  const body = document.getElementById('explore-section-body-' + name);
+  if (!body) return;
+  const section = body.closest('.home-section');
+  const isOpen = body.style.display !== 'none';
+  if (isOpen) {
+    body.style.display = 'none';
+    section.classList.remove('open');
+    const header = section.querySelector('.home-section-header');
+    if (header) header.setAttribute('aria-expanded', 'false');
+  } else {
+    body.style.display = '';
+    section.classList.add('open');
+    const header = section.querySelector('.home-section-header');
+    if (header) header.setAttribute('aria-expanded', 'true');
+  }
+}
+window.toggleExploreSection = toggleExploreSection;
+
+// Render the current user's mic-captured notes (entries with kind === 'memo').
+// Each note appears as a collapsed item with a one-line title; tapping expands
+// to show the full text and any attached photos.
+function renderMyNotes() {
+  const list = document.getElementById('my-notes-list');
+  const empty = document.getElementById('my-notes-empty');
+  const tickerTrack = document.getElementById('notes-ticker-track');
+  if (!list || !empty) return;
+
+  if (!currentIdentity) {
+    list.innerHTML = '';
+    empty.style.display = '';
+    empty.textContent = 'Select an identity at the top to see your notes.';
+    if (tickerTrack) tickerTrack.innerHTML = '<div class="notes-ticker-empty">Select an identity to see your notes.</div>';
+    return;
+  }
+  // Memos are always personal. Even when viewing as a department or Harbor,
+  // we show the memos created by that identity (departments don't actually
+  // create memos today, but the filter is consistent with renderSentList).
+  const mine = entries.filter(e => e.kind === 'memo' && e.creator === currentIdentity.id);
+  mine.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+  // Vertical list (expanded state): all notes.
+  if (mine.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = '';
+    empty.textContent = 'No notes yet. Tap the mic to capture one.';
+  } else {
+    empty.style.display = 'none';
+    list.innerHTML = mine.map(renderMyNoteItem).join('');
+  }
+
+  // Ticker (collapsed state): the 5 most recent, doubled for seamless loop.
+  if (tickerTrack) {
+    if (mine.length === 0) {
+      tickerTrack.innerHTML = '<div class="notes-ticker-empty">No notes yet. Tap the mic to capture one.</div>';
+    } else {
+      const top5 = mine.slice(0, 5);
+      const cardHtml = top5.map(renderNoteTickerCard).join('');
+      // Duplicate the set so the -50% translation loops seamlessly.
+      tickerTrack.innerHTML = cardHtml + cardHtml;
+    }
+  }
+}
+window.renderMyNotes = renderMyNotes;
+
+// Compact ticker card. Headline is the actual date + time the note was
+// captured. If the note carries photos, a small camera icon sits next to
+// the timestamp. Tap behavior is handled at the ticker level (any tap
+// expands the section).
+function renderNoteTickerCard(entry) {
+  const text = (entry.note || '').trim();
+  const ts = entry.timestamp || entry.createdAt || Date.now();
+  const d = new Date(ts);
+  // e.g. "MAY 13 · 7:42 AM"
+  const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
+  const timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  const stamp = `${dateStr} · ${timeStr}`;
+  const hasPhotos = Array.isArray(entry.photoUrls) && entry.photoUrls.length > 0;
+  const photoIcon = hasPhotos
+    ? `<svg class="notes-ticker-photo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`
+    : '';
+  const preview = escapeHtml(text || '(photo note)');
+  return `
+    <div class="notes-ticker-card" aria-hidden="true">
+      <div class="notes-ticker-name">${escapeHtml(stamp)}${photoIcon}</div>
+      <div class="notes-ticker-text">${preview}</div>
+    </div>
+  `;
+}
+
+// Toggle the My Notes section between collapsed (ticker) and expanded
+// (vertical list). Re-renders to keep both surfaces current.
+function toggleNotesSection() {
+  const section = document.getElementById('notes-section');
+  const body = document.getElementById('notes-section-body');
+  const head = document.getElementById('notes-head');
+  if (!section || !body) return;
+  const isOpen = section.classList.toggle('open');
+  body.style.display = isOpen ? '' : 'none';
+  if (head) head.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  // Re-render so whichever surface is now visible reflects the latest state.
+  renderMyNotes();
+}
+window.toggleNotesSection = toggleNotesSection;
+
+// Render a single note item (collapsed by default; expandable).
+function renderMyNoteItem(entry) {
+  const text = (entry.note || '').trim();
+  // Title = first line of the note (truncated by CSS via white-space:nowrap).
+  // If the note is empty (photo-only memo), use a fallback title.
+  const firstLine = text.split('\n')[0] || '(photo note)';
+  const title = escapeHtml(firstLine);
+  const timeStr = formatRelativeTime(entry.timestamp || entry.createdAt || Date.now());
+  const photos = (entry.photoUrls || []).map(url =>
+    `<img src="${escapeHtml(url)}" alt="" onclick="openLightbox('${escapeHtml(url)}')">`
+  ).join('');
+  return `
+    <div class="my-note-item" onclick="toggleMyNoteItem(this)">
+      <div class="my-note-head">
+        <span class="my-note-title">${title}</span>
+        <span class="my-note-time">${escapeHtml(timeStr)}</span>
+        <span class="my-note-arrow">&#9660;</span>
+      </div>
+      <div class="my-note-body">
+        ${text ? `<div class="my-note-text">${escapeHtml(text)}</div>` : ''}
+        ${photos ? `<div class="my-note-photos">${photos}</div>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function toggleMyNoteItem(el) {
+  el.classList.toggle('open');
+}
+window.toggleMyNoteItem = toggleMyNoteItem;
+
+// Helper: format a unix-ms timestamp as a short relative string for note headers.
+function formatRelativeTime(ts) {
+  if (!ts) return '';
+  const now = Date.now();
+  const diff = Math.max(0, now - ts);
+  const min = Math.floor(diff / 60000);
+  if (min < 1) return 'just now';
+  if (min < 60) return min + 'm ago';
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return hr + 'h ago';
+  const day = Math.floor(hr / 24);
+  if (day < 7) return day + 'd ago';
+  const d = new Date(ts);
+  return (d.getMonth() + 1) + '/' + d.getDate();
+}
+
 function renderSentList() {
   const list = document.getElementById('sent-list');
   if (!currentIdentity) {
@@ -4583,18 +7127,51 @@ function renderSentList() {
     return;
   }
 
-  // Find every entry where the current identity is the creator (excluding memos - those are personal, not sent)
-  const mine = entries.filter(e => e.creator === currentIdentity.id && e.kind !== 'memo');
+  // My Discoveries cards must look and behave like Explore exhibitor cards.
+  // Build cards in the same shape as buildExploreCards, then render with the
+  // same renderExploreCard function. The count badge reflects the total entries
+  // on this booth across all teammates (cross-team awareness signal), while
+  // the expanded card shows only my own entries on that booth.
+  const myEntries = entries.filter(e => e.creator === currentIdentity.id && e.kind !== 'memo');
+  const byBooth = {};
+  myEntries.forEach(e => {
+    if (!byBooth[e.booth]) {
+      byBooth[e.booth] = {
+        booth: e.booth,
+        name: e.name,
+        hall: e.hall,
+        hallCode: e.hallCode,
+        entries: []
+      };
+    }
+    byBooth[e.booth].entries.push(e);
+  });
 
-  // Sort newest first (by updatedAt)
-  mine.sort((a, b) => (b.updatedAt || b.createdAt) - (a.updatedAt || a.createdAt));
+  const cards = Object.values(byBooth).map(card => {
+    // Total entries on this booth (everyone), for the count badge
+    const totalOnBooth = entries.filter(e => e.booth === card.booth && e.kind !== 'memo').length;
+    // Most recent activity from my own entries (for sort)
+    const latestTs = Math.max(
+      ...card.entries.map(e => e.updatedAt || e.createdAt || 0)
+    );
+    return {
+      ...card,
+      origin: 'mine',
+      engaged: false,
+      count: totalOnBooth,
+      latestTs
+    };
+  });
 
-  if (mine.length === 0) {
+  // Sort newest first
+  cards.sort((a, b) => (b.latestTs || 0) - (a.latestTs || 0));
+
+  if (cards.length === 0) {
     list.innerHTML = `<div class="empty-state">You haven't sent anything yet.</div>`;
     return;
   }
 
-  list.innerHTML = mine.map(renderSentItem).join('');
+  list.innerHTML = cards.map(c => renderExploreCard(c)).join('');
 }
 
 function renderSentItem(entry) {
@@ -4626,20 +7203,24 @@ function renderSentItem(entry) {
 
   const recipientsLine = recipientNames.length
     ? `<div class="sent-item-recipients"><strong>Sent to:</strong><span class="sent-item-recipients-names">${recipientNames.map(escapeHtml).join(', ')}</span></div>`
-    : `<div class="sent-item-recipients"><strong>Sent to:</strong><span class="sent-item-recipients-names">no one tagged</span></div>`;
+    : '';
+
+  // Look up category from the cached exhibitor data by booth.
+  const exhibitorInfo = (typeof BOOTHS !== 'undefined' && entry.booth) ? BOOTHS[entry.booth] : null;
+  const category = exhibitorInfo && Array.isArray(exhibitorInfo.cat) && exhibitorInfo.cat.length
+    ? exhibitorInfo.cat[0]
+    : '';
 
   return `
     <div class="sent-item">
-      <div class="sent-item-header">
-        <div class="sent-item-name">${escapeHtml(entry.name)}</div>
-        <div class="sent-item-time">${timeAgo(entry.updatedAt || entry.createdAt)}</div>
-      </div>
-      <div class="sent-item-meta">
-        <span class="hall-pill hall-${entry.hallCode || '?'}">${entry.hall || '?'}</span>
-        <span class="booth-pill">#${entry.booth}</span>
-      </div>
-      ${entry.contact ? `<div style="font-size: 14px;color:var(--text-hint);margin-bottom:4px;"><strong style="color:var(--text-secondary);">Spoke with:</strong> ${escapeHtml(entry.contact)}</div>` : ''}
+      <div class="sent-item-time">${timeAgo(entry.updatedAt || entry.createdAt)}</div>
+      <div class="sent-item-name">${escapeHtml(entry.name)}</div>
       <div class="sent-item-note">${escapeHtml(entry.note)}</div>
+      <div class="sent-item-pills">
+        <span class="pill-booth">Booth #${escapeHtml(String(entry.booth))}</span>
+        ${category ? `<span class="pill-category">${escapeHtml(category)}</span>` : ''}
+      </div>
+      ${entry.contact ? `<div style="font-size: 14px;color:var(--text-hint);margin-top:10px;"><strong style="color:var(--text-secondary);">Spoke with:</strong> ${escapeHtml(entry.contact)}</div>` : ''}
       ${responsesHtml}
       ${recipientsLine}
     </div>
@@ -4926,7 +7507,11 @@ async function saveMemo() {
   await saveEntries();
   captureHaptic();
 
-  if (document.getElementById('report-overlay')?.classList.contains('open')) renderReport();
+  if (document.getElementById('home-section-report')?.classList.contains('open')) renderReport();
+
+  // Refresh My Notes (ticker + expanded list) so the newly-saved memo
+  // appears immediately on whichever surface is showing.
+  renderMyNotes();
 
   closeMemoUI();
 }
@@ -5277,6 +7862,8 @@ function renderReportBlock(entry, viewer, kind) {
 // people have been on the floor since the show opened and have been logging
 // discoveries to each other for the past few hours.
 async function loadDemoScenario() {
+  window.__demoMode = true;
+  try { localStorage.removeItem('__demoReset'); } catch(e) {}
   const now = Date.now();
   const m = (mins) => now - (mins * 60000);
   const h = (hours) => now - (hours * 3600000);
@@ -5763,11 +8350,12 @@ window.loadDemoScenario = loadDemoScenario;
 // untouched - reloading the page restores it.
 function resetDemoScenario() {
   window.__demoMode = true; // keep polling paused so real entries don't repopulate
+  try { localStorage.setItem('__demoReset', '1'); } catch(e) {}
   entries = [];
   renderExplore();
   updateSentCount();
   if (document.getElementById('sent-list')?.classList.contains('open')) renderSentList();
-  if (document.getElementById('report-overlay')?.classList.contains('open')) renderReport();
+  if (document.getElementById('home-section-report')?.classList.contains('open')) renderReport();
 }
 window.resetDemoScenario = resetDemoScenario;
 // === END DEMO BUILD ONLY ===
@@ -5775,9 +8363,9 @@ window.resetDemoScenario = resetDemoScenario;
 // ── NAVIGATION ──────────────────────────────────────────────────────────────
 
 function showScreen(name) {
-  // Gate non-Home screens behind identity selection. If no one is selected
-  // and the user taps Explore, Discovery, or Trip, redirect to Home and
-  // pulse the identity bar to direct attention there.
+  // Gate Explore behind identity selection. If no one is selected and the
+  // user taps Explore, redirect to Home and pulse the identity bar to direct
+  // attention there.
   if (!currentIdentity && name !== 'home') {
     pulseIdentityBar();
     name = 'home';
@@ -5786,19 +8374,12 @@ function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
-  ['home','explore','discover','trip'].forEach((s,i) => {
+  ['home','explore'].forEach((s,i) => {
     if (s === name) document.querySelectorAll('.tab')[i].classList.add('active');
   });
 
-  // Identity bar is only interactive on Home. Lock it on other screens
-  // so the arrow disappears and the bar reads as a static label.
-  const bar = document.getElementById('header-identity');
-  if (bar) bar.classList.toggle('locked', name !== 'home');
-  if (name !== 'home') {
-    // Close the dropdown if leaving home with it open
-    document.getElementById('identity-dropdown')?.classList.remove('open');
-    bar?.classList.remove('open');
-  }
+  // The Me chrome icon stays interactive on every screen now. No locked
+  // styling, no auto-close when changing tabs.
 
   // Identity name is hidden on Home (no "viewing as" context there)
   const nameEl = document.getElementById('header-identity-name');
@@ -5844,6 +8425,9 @@ function updateLockedAffordances() {
   });
   const memo = document.getElementById('memo-btn');
   if (memo) memo.classList.toggle('locked', locked);
+
+  // Identity switching is open to all viewers; no locked state, no
+  // "Not me?" reset link.
 }
 
 function toggleDay(header) {
@@ -5878,6 +8462,7 @@ window.closeRequestModal = closeRequestModal;
 async function initApp() {
   await loadExhibitorData();
   await loadTeamAdditions();
+  await loadMyList();
   buildIdentityDropdown();
   buildRecipientPicker();
   buildSortPicker();
@@ -5896,6 +8481,11 @@ async function initApp() {
   renderDiscoverContext();
   updateReportButtonState();
   updateLockedAffordances();
+  // Update the Me chrome circle initials/color (may show "--" if no identity).
+  if (typeof renderMeAvatar === 'function') renderMeAvatar();
+  // Populate the My Notes ticker so it has content on first paint, even
+  // before the user touches anything.
+  renderMyNotes();
   showScreen('home');
 
   await loadFromKV();
