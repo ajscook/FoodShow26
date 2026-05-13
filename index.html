@@ -767,36 +767,36 @@
   .memo-overlay.open { display: flex; }
   .memo-modal {
     background: var(--off-white);
-    border: 1.5px solid var(--blue);
+    border: 1px solid var(--bolo);
     border-radius: var(--radius-md);
-    max-width: 420px;
+    max-width: 360px;
     width: 100%;
-    padding: 24px 22px 20px;
+    padding: 16px 14px 14px;
     position: relative;
     display: grid;
     grid-template-rows: auto 1fr auto auto;
-    row-gap: 14px;
-    height: 92vh;
-    max-height: 92vh;
+    row-gap: 10px;
+    max-height: 80vh;
   }
   .memo-modal-title {
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--text-primary);
+    font-family: var(--font-headline);
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.04em;
     text-align: center;
   }
   .memo-textarea {
     width: 100%;
-    height: 100%;
+    min-height: 180px;
     background: transparent;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 10px;
     color: var(--text-primary);
     font-family: var(--font);
-    font-size: 20px;
+    font-size: 15px;
     line-height: 1.45;
     resize: none;
     box-sizing: border-box;
@@ -806,11 +806,11 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    min-height: 88px;
+    min-height: 56px;
   }
   .memo-photo-thumb {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
     border-radius: 6px;
     object-fit: cover;
     cursor: pointer;
@@ -823,13 +823,13 @@
     position: absolute;
     top: -6px;
     right: -6px;
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     border: 1px solid var(--border-strong);
     background: var(--off-white);
     color: var(--text-secondary);
-    font-size: 17px;
+    font-size: 14px;
     line-height: 1;
     padding: 0;
     cursor: pointer;
@@ -851,14 +851,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     font-family: var(--font);
   }
   .memo-action-circle {
-    width: 56px;
-    height: 56px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    border: 1.5px solid var(--blue);
+    border: 1px solid var(--bolo);
     background: transparent;
     display: flex;
     align-items: center;
@@ -868,27 +868,27 @@
   .memo-action:active .memo-action-circle { transform: scale(0.96); }
   .memo-action:disabled .memo-action-circle { transform: none; }
   .memo-action-circle svg {
-    width: 24px;
-    height: 24px;
-    stroke: var(--green);
+    width: 18px;
+    height: 18px;
+    stroke: var(--bolo);
     fill: none;
-    stroke-width: 1.8;
+    stroke-width: 1.6;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
   .memo-action-label {
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 10px;
+    font-weight: 600;
     color: var(--text-hint);
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
   .memo-action.recording .memo-action-circle {
-    border-color: var(--green);
+    border-color: var(--record-red);
   }
   .memo-action.recording .memo-action-circle svg {
-    stroke: var(--green);
-    fill: var(--green);
+    stroke: var(--record-red);
+    fill: var(--record-red);
   }
   .memo-action:disabled {
     cursor: not-allowed;
@@ -1028,15 +1028,15 @@
   .voice-field-wrap { position: relative; }
   .voice-field-wrap > input,
   .voice-field-wrap > textarea {
-    padding-right: 56px;
+    padding-right: 38px;
   }
   .voice-field-icon {
     position: absolute;
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
+    width: 22px;
+    height: 22px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -1052,7 +1052,7 @@
   }
   .voice-field-icon:hover { color: var(--blue); }
   .voice-field-icon.recording { color: var(--record-red); animation: recordPulse 1.2s infinite; }
-  .voice-field-icon svg { width: 32px; height: 32px; fill: currentColor; }
+  .voice-field-icon svg { width: 16px; height: 16px; fill: currentColor; }
   @keyframes recordPulse {
     0%,100% { opacity: 1; }
     50% { opacity: 0.5; }
@@ -3135,6 +3135,9 @@
     background: var(--primary);
     border-radius: 2px;
   }
+  .my-tagged-section .my-discoveries-head::before {
+    background: var(--tertiary);
+  }
   .my-discoveries-head-title {
     font-family: var(--font-headline);
     font-weight: 700;
@@ -4001,7 +4004,7 @@
     line-height: 1.35;
     margin: 0;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
@@ -4080,6 +4083,95 @@
     font-size: 14px;
     color: var(--text-primary);
     line-height: 1.5;
+  }
+  /* Bookmark state: booth saved without a captured note. Renders at 50%
+     opacity on My Discoveries to signal "waiting to be observed". Adding
+     a note clears this flag and the card returns to full presence. */
+  .explore-card.bookmark { opacity: 0.5; }
+  .explore-card.bookmark:active { opacity: 0.75; }
+
+  /* From byline directly under the bolo subtitle. */
+  .bolo-modal-from {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+  .bolo-modal-from span {
+    color: var(--bolo);
+  }
+  /* Per-exhibitor block inside the bolo modal. */
+  .bolo-exhibitor {
+    border-top: 1px solid var(--border);
+    padding: 14px 0 4px;
+  }
+  .bolo-exhibitor-name {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text-primary);
+    margin: 0 0 2px;
+  }
+  .bolo-exhibitor-booth {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--text-hint);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .bolo-exhibitor-desc {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.45;
+    margin: 0 0 8px;
+  }
+  .bolo-exhibitor-questions {
+    list-style: none;
+    margin: 0 0 10px;
+    padding: 0;
+  }
+  .bolo-exhibitor-questions li {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.45;
+    padding: 2px 0 2px 14px;
+    position: relative;
+  }
+  .bolo-exhibitor-questions li::before {
+    content: "\2014";
+    position: absolute;
+    left: 0;
+    top: 2px;
+    color: var(--text-hint);
+  }
+  .bolo-exhibitor-add {
+    background: transparent;
+    border: 1px solid var(--bolo);
+    color: var(--bolo);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    cursor: pointer;
+    margin: 4px 0 4px;
+  }
+  .bolo-exhibitor-add:active { background: var(--bolo-light); }
+  .bolo-exhibitor-add.added {
+    background: var(--bolo-light);
+    color: var(--text-secondary);
+    border-color: var(--border-strong);
+    cursor: default;
   }
   /* Modal action button: "Log a discovery for this" */
   .bolo-modal-action {
@@ -4385,6 +4477,18 @@
         </div>
       </div>
 
+      <!-- My Tagged Booths: booths where the viewer was tagged (by a
+           department, a teammate, or where they've already engaged). Uses
+           the same card renderer as For Us so the experience is identical
+           when tapped. -->
+      <div class="my-tagged-section">
+        <div class="my-discoveries-head">
+          <span class="my-discoveries-head-title">My Tagged Booths</span>
+        </div>
+        <div id="my-tagged-cards"></div>
+        <div id="my-tagged-empty" class="report-empty" style="display:none;">No one has tagged you on a booth yet.</div>
+      </div>
+
       <!-- My Discoveries (relocated from the former Discovery tab). -->
       <div class="my-discoveries-section">
         <div class="my-discoveries-head">
@@ -4427,69 +4531,7 @@
       </div>
       <div class="bolo-viewport">
         <div class="bolo-track" id="bolo-track">
-
-          <div class="bolo-card" data-bolo="0">
-            <div class="bolo-card-name">Center-of-plate value</div>
-            <div class="bolo-card-summary">Burgers, eggs, staple proteins that hold a price point without losing quality.</div>
-            <div class="bolo-card-foot">FOR TONY, DAVID</div>
-          </div>
-
-          <div class="bolo-card" data-bolo="1">
-            <div class="bolo-card-name">Protein, reimagined</div>
-            <div class="bolo-card-summary">Plant, dairy, egg-forward proteins that read as a feature, not a substitute.</div>
-            <div class="bolo-card-foot">FOR HAGAN, CHRISTINA</div>
-          </div>
-
-          <div class="bolo-card" data-bolo="2">
-            <div class="bolo-card-name">Packaging</div>
-            <div class="bolo-card-summary">Takeout containers that hold heat, don't leak, don't kill margin.</div>
-            <div class="bolo-card-foot">FOR MATT</div>
-          </div>
-
-          <div class="bolo-card" data-bolo="3">
-            <div class="bolo-card-name">Bakery &amp; dessert</div>
-            <div class="bolo-card-summary">Buns, rolls, breads, desserts that lift perceived quality at low cost-per-cover.</div>
-            <div class="bolo-card-foot">FOR MATT, TONY</div>
-          </div>
-
-          <div class="bolo-card" data-bolo="4">
-            <div class="bolo-card-name">Authentic &amp; catering</div>
-            <div class="bolo-card-summary">Hispanic-authentic SKUs and catering-format pack sizes.</div>
-            <div class="bolo-card-foot">FOR FERNANDO</div>
-          </div>
-
-          <!-- Duplicate set for seamless loop. aria-hidden so screen readers
-               don't double-announce. -->
-          <div class="bolo-card" data-bolo="0" aria-hidden="true">
-            <div class="bolo-card-name">Center-of-plate value</div>
-            <div class="bolo-card-summary">Burgers, eggs, staple proteins that hold a price point without losing quality.</div>
-            <div class="bolo-card-foot">FOR TONY, DAVID</div>
-          </div>
-
-          <div class="bolo-card" data-bolo="1" aria-hidden="true">
-            <div class="bolo-card-name">Protein, reimagined</div>
-            <div class="bolo-card-summary">Plant, dairy, egg-forward proteins that read as a feature, not a substitute.</div>
-            <div class="bolo-card-foot">FOR HAGAN, CHRISTINA</div>
-          </div>
-
-          <div class="bolo-card" data-bolo="2" aria-hidden="true">
-            <div class="bolo-card-name">Packaging</div>
-            <div class="bolo-card-summary">Takeout containers that hold heat, don't leak, don't kill margin.</div>
-            <div class="bolo-card-foot">FOR MATT</div>
-          </div>
-
-          <div class="bolo-card" data-bolo="3" aria-hidden="true">
-            <div class="bolo-card-name">Bakery &amp; dessert</div>
-            <div class="bolo-card-summary">Buns, rolls, breads, desserts that lift perceived quality at low cost-per-cover.</div>
-            <div class="bolo-card-foot">FOR MATT, TONY</div>
-          </div>
-
-          <div class="bolo-card" data-bolo="4" aria-hidden="true">
-            <div class="bolo-card-name">Authentic &amp; catering</div>
-            <div class="bolo-card-summary">Hispanic-authentic SKUs and catering-format pack sizes.</div>
-            <div class="bolo-card-foot">FOR FERNANDO</div>
-          </div>
-
+          <!-- Cards rendered by renderBoloCarousel() from BOLO_ITEMS. -->
         </div>
       </div>
     </div>
@@ -4724,7 +4766,7 @@
 <!-- Voice memo popup -->
 <div id="memo-overlay" class="memo-overlay">
   <div class="memo-modal">
-    <div class="memo-modal-title">Voice memo</div>
+    <div class="memo-modal-title">My Note</div>
     <textarea id="memo-textarea" class="memo-textarea" placeholder="Your transcript will appear here as you speak. You can also edit it."></textarea>
     <div class="memo-photos-row" id="memo-photos-row"></div>
     <div class="memo-actions">
@@ -5061,7 +5103,9 @@ setInterval(async () => {
     entries = saved;
     renderExplore();
     updateSentCount();
-    if (document.getElementById('sent-list')?.classList.contains('open')) renderSentList();
+    renderSentList();
+    renderMyTagged();
+    renderMyNotes();
     if (document.getElementById('home-section-report')?.classList.contains('open')) renderReport();
   }
 
@@ -5643,10 +5687,9 @@ function selectIdentity(id, kind, userInitiated) {
   }
   // === END DEMO BUILD ONLY ===
 
-  // If the user picked from the dropdown while on Home, take them to Explore
-  // so they can see what was just selected as.
+  // Picking an identity stays on the current screen. Home is For Me, so
+  // any user who picks from there stays on For Me.
   const homeActive = document.getElementById('screen-home')?.classList.contains('active');
-  const shouldJumpToExplore = userInitiated && homeActive;
 
   currentIdentity = { id, kind };
   const ident = resolveIdentity(id);
@@ -5685,13 +5728,11 @@ function selectIdentity(id, kind, userInitiated) {
   updateSentCount();
   updateReportButtonState();
   updateLockedAffordances();
-  // If sent list is open, refresh it
-  if (document.getElementById('sent-list')?.classList.contains('open')) renderSentList();
+  // Refresh My Discoveries (always visible on For Me) and My Tagged Booths.
+  renderSentList();
+  renderMyTagged();
   // Refresh My Notes (ticker + expanded list both pull from current identity).
   renderMyNotes();
-
-  // Jump to Explore if the user just picked a name while on Home
-  if (shouldJumpToExplore) showScreen('explore');
 }
 
 function restoreIdentity() {
@@ -6201,7 +6242,6 @@ async function submitEntry() {
     return;
   }
   const note = document.getElementById('disc-note').value.trim();
-  if (!note) { alert('Add a note before submitting.'); return; }
 
   // Send To is required
   const totalRecipients = (selectedRecipientSelf ? 1 : 0) + selectedRecipientPeople.length + selectedRecipientGroups.length;
@@ -6209,6 +6249,11 @@ async function submitEntry() {
     alert('Select at least one recipient (or "Send Note to Self") before submitting.');
     return;
   }
+
+  // A note is optional when sending only to self (a "bookmark" entry for
+  // later capture). Sending to anyone else still requires a note.
+  const onlySelf = selectedRecipientSelf && selectedRecipientPeople.length === 0 && selectedRecipientGroups.length === 0;
+  if (!note && !onlySelf) { alert('Add a note before submitting.'); return; }
 
   // DOT answer required if the food question was shown
   const info = BOOTHS[selectedExhibitor.booth];
@@ -6614,9 +6659,10 @@ function renderExplore() {
   // Render sections in order based on viewer kind
   let sectionOrder, sectionLabels;
   if (currentIdentity.kind === 'person') {
-    sectionOrder = ['mine', 'invitations', 'peerFlags', 'engaged'];
+    // "On your list" was removed from For Us; bookmarks now live in
+    // My Discoveries on For Me where they render muted until captured.
+    sectionOrder = ['invitations', 'peerFlags', 'engaged'];
     sectionLabels = {
-      mine:        'On your list',
       invitations: 'From Departments',
       peerFlags:   'From Teammates',
       engaged:     'Engaged'
@@ -6639,6 +6685,20 @@ function renderExplore() {
   });
 
   sectionsContainer.innerHTML = html;
+
+  // For every response form just rendered, mount a photo capture block.
+  // Seeds photoStates with any prior photos from the user's existing
+  // response so editing doesn't lose them.
+  sectionsContainer.querySelectorAll('.response-photo-mount').forEach(anchor => {
+    const formId = anchor.dataset.formId;
+    if (!formId) return;
+    let seed = [];
+    if (anchor.dataset.seedPhotos) {
+      try { seed = JSON.parse(anchor.dataset.seedPhotos) || []; } catch (e) {}
+    }
+    photoStates[formId] = seed.map(u => ({ url: u, name: 'photo.jpg' }));
+    buildPhotoCapture(formId, anchor);
+  });
 
   // Clear the just-engaged set after the render commits. The glow class
   // is applied via renderExploreCard while building the html, and the
@@ -6734,7 +6794,7 @@ function renderExploreCard(card) {
        ${card.entries.map(e => renderExploreEntry(e, card)).join('')}`;
 
   return `
-    <div class="explore-card ${originClass}${engagedClass}${expandedClass}${justEngagedClass}" data-booth="${card.booth}">
+    <div class="explore-card ${originClass}${engagedClass}${expandedClass}${justEngagedClass}${card.isBookmark ? ' bookmark' : ''}" data-booth="${card.booth}">
       <div class="explore-card-header" onclick="toggleExploreCard('${card.booth}')">
         ${countChip}
         <div class="explore-card-name-line${isEbPartner ? ' eb-partner' : ''}">${escapeHtml(card.name)}</div>
@@ -6781,16 +6841,31 @@ function renderExploreEntry(entry, card) {
   // Show response block only for person viewers
   let responseBlock = '';
   if (viewerKind === 'person' && viewerId) {
+    const myResponsePhotos = (myResponse && Array.isArray(myResponse.photoUrls)) ? myResponse.photoUrls : [];
+    const existingResponsePhotosHtml = myResponsePhotos.length === 0 ? '' : `
+      <div class="entry-photo-grid">
+        ${myResponsePhotos.map(u => `<img src="${u}" class="entry-photo-thumb" onclick="event.stopPropagation();openLightbox('${u}')">`).join('')}
+      </div>`;
     const existingResponseHtml = myResponse ? `
       <div class="response-existing">
         <div class="response-existing-label">Your response &middot; ${timeAgo(myResponse.createdAt)}</div>
         <div class="response-existing-note">${escapeHtml(myResponse.note)}</div>
+        ${existingResponsePhotosHtml}
       </div>` : '';
+
+    // Photo capture for this response. The anchor div carries data attributes
+    // that the post-render mount step uses to call buildPhotoCapture, seeded
+    // with any prior photos from this user's existing response.
+    const responseFormId = 'response-' + entry.id;
+    const seedAttr = myResponsePhotos.length > 0
+      ? ` data-seed-photos="${escapeHtml(JSON.stringify(myResponsePhotos))}"`
+      : '';
 
     responseBlock = `
       <div class="response-block">
         ${existingResponseHtml}
         <textarea class="response-form-textarea" id="response-text-${entry.id}" rows="3" placeholder="${myResponse ? 'Update your response...' : 'Your response, perspective, or follow-up...'}">${myResponse ? escapeHtml(myResponse.note) : ''}</textarea>
+        <div class="response-photo-mount" data-form-id="${responseFormId}"${seedAttr}></div>
         <button class="btn-primary" onclick="event.stopPropagation();submitResponse('${entry.id}')">${myResponse ? 'Update Response' : 'Submit Response'}</button>
       </div>`;
   }
@@ -6866,9 +6941,11 @@ function toggleExploreCard(booth) {
   if (expandedCards.has(booth)) expandedCards.delete(booth);
   else expandedCards.add(booth);
   renderExplore();
-  // My Discoveries on Home uses the same renderer, so refresh it too when an
-  // expansion toggles. Only re-render if the list element is in the DOM.
+  // My Discoveries and My Tagged on Home use the same renderer, so refresh
+  // them too when an expansion toggles. Null-guarded so non-Home contexts
+  // are no-ops.
   if (document.getElementById('sent-list')) renderSentList();
+  if (document.getElementById('my-tagged-cards')) renderMyTagged();
 }
 window.toggleExploreCard = toggleExploreCard;
 
@@ -6916,14 +6993,20 @@ async function submitResponse(entryId) {
   if (!entry) return;
   if (!Array.isArray(entry.responses)) entry.responses = [];
 
+  // Pull the photos the user attached via the response form.
+  const responseFormId = 'response-' + entryId;
+  const photos = (photoStates[responseFormId] || []).map(p => p.url).filter(Boolean);
+
   const existing = entry.responses.find(r => r.responder === currentIdentity.id);
   if (existing) {
     existing.note = note;
+    existing.photoUrls = photos;
     existing.updatedAt = Date.now();
   } else {
     entry.responses.push({
       responder: currentIdentity.id,
       note,
+      photoUrls: photos,
       createdAt: Date.now(),
       updatedAt: Date.now()
     });
@@ -6979,6 +7062,75 @@ window.toggleHomeSection = toggleHomeSection;
 // =============================================================================
 const BOLO_ITEMS = [
   {
+    name: 'Labor Saving Products',
+    summary: 'Prep reduction, consistency, & throughput without sacrificing quality',
+    from: 'Brian W',
+    why: "Kitchen labor remains unstable and expensive. Operators want products that reduce scratch prep, simplify training, shorten ticket times, and improve consistency across shifts and locations.",
+    trend: "This trend appears less about fully replacing labor and more about redesigning kitchen systems around simplified execution, lower training dependency, and throughput consistency. The strongest exhibitors are those explicitly positioning products around prep reduction, consistency, scalability, or operational simplification.",
+    exhibitors: [
+      {
+        name: 'Ajinomoto Foods North America',
+        booth: '13306',
+        description: 'Broad portfolio of labor-saving frozen appetizers, handhelds, entrees, and globally inspired products built specifically for operational ease and consistency.',
+        questions: [
+          'Which products are seeing the fastest adoption specifically because of labor constraints?',
+          'Where are operators seeing the biggest prep-time reductions?',
+          'What menu categories are easiest to implement without retraining staff?'
+        ]
+      },
+      {
+        name: '915 Food Company',
+        booth: '7923',
+        description: 'Ready-to-serve Mediterranean products positioned around \u201Czero prep\u201D execution and consistency. Strong fit for operators trying to add flavor variety without additional kitchen labor.',
+        questions: [
+          'How are operators using these products beyond grab-and-go?',
+          'What shelf-life and waste reduction improvements are customers reporting?',
+          'Which SKUs work best for cross-utilization across multiple menu parts?'
+        ]
+      },
+      {
+        name: 'AMOY Asian Foods North America',
+        booth: '12142',
+        description: 'Focused on authentic Asian products while specifically highlighting labor-saving efficiencies for restaurant operators.',
+        questions: [
+          'Which items reduce highest-skill prep work the most?',
+          'How are chains balancing authenticity with simplified execution?',
+          'What formats perform best for speed-scratch kitchens?'
+        ]
+      },
+      {
+        name: 'Aegis Foods',
+        booth: '888',
+        description: 'Pasteurized ready-to-use egg formats aimed at reducing prep complexity, food safety risk, and back-of-house labor.',
+        questions: [
+          'Are operators replacing traditional egg prep stations?',
+          'What labor savings are realistic in high-volume breakfast programs?',
+          'Which formats work best for commissary or healthcare applications?'
+        ]
+      },
+      {
+        name: 'Alchemy Spice Company',
+        booth: '11944',
+        description: 'May help operators simplify scratch prep through consistent seasoning systems and flavor standardization across lower-skilled labor pools.',
+        questions: [
+          'Are operators reducing ingredient inventories through blended systems?',
+          'What consistency improvements are customers seeing across locations?',
+          'How are chains using blends to accelerate training?'
+        ]
+      },
+      {
+        name: 'ACP / XpressChef',
+        booth: '4801',
+        description: 'Equipment only makes the list because high-speed ovens continue to align tightly with reduced-skill kitchen models and compressed ticket times.',
+        questions: [
+          'Which menu categories show the best labor ROI?',
+          'What staffing model changes are customers making after implementation?',
+          'How difficult is rollout across mixed kitchen footprints?'
+        ]
+      }
+    ]
+  },
+  {
     name: 'Center-of-plate value rebuild',
     summary: 'Hold price points without dropping perceived quality',
     why: "Independent operators are watching their highest-volume menu items lose price-to-value alignment. When a burger or an egg dish stops feeling worth what it costs, the whole check average comes under pressure. Helping operators rebuild value here protects the items their business actually runs on.",
@@ -7022,6 +7174,47 @@ const BOLO_ITEMS = [
 let boloActiveIdx = null;
 let pendingBoloId = null;
 
+// Render the carousel ticker from BOLO_ITEMS. The track contains the cards
+// twice so the -50% CSS translation produces a seamless loop. The "foot"
+// line ("FOR Brian W") falls back to deriving the byline from `who` for
+// legacy entries that don't have a `from` field.
+function renderBoloCarousel() {
+  const track = document.getElementById('bolo-track');
+  if (!track) return;
+  const cards = BOLO_ITEMS.map((it, i) => {
+    const byline = it.from
+      ? `FROM ${it.from}`
+      : (it.who ? 'FOR ' + (it.who || '').replace(/\.$/, '') : '');
+    return `
+      <div class="bolo-card" data-bolo="${i}">
+        <div class="bolo-card-name">${escapeHtml(it.name)}</div>
+        <div class="bolo-card-summary">${escapeHtml(it.summary)}</div>
+        ${byline ? `<div class="bolo-card-foot">${escapeHtml(byline.toUpperCase())}</div>` : ''}
+      </div>`;
+  }).join('');
+  // Duplicate the set for the seamless loop. Second copy aria-hidden.
+  const dup = BOLO_ITEMS.map((it, i) => {
+    const byline = it.from
+      ? `FROM ${it.from}`
+      : (it.who ? 'FOR ' + (it.who || '').replace(/\.$/, '') : '');
+    return `
+      <div class="bolo-card" data-bolo="${i}" aria-hidden="true">
+        <div class="bolo-card-name">${escapeHtml(it.name)}</div>
+        <div class="bolo-card-summary">${escapeHtml(it.summary)}</div>
+        ${byline ? `<div class="bolo-card-foot">${escapeHtml(byline.toUpperCase())}</div>` : ''}
+      </div>`;
+  }).join('');
+  track.innerHTML = cards + dup;
+  // Re-bind taps since innerHTML wiped any listeners on prior nodes.
+  track.querySelectorAll('.bolo-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const idx = parseInt(card.getAttribute('data-bolo'), 10);
+      if (!isNaN(idx)) openBolo(idx);
+    });
+  });
+}
+window.renderBoloCarousel = renderBoloCarousel;
+
 function openBolo(idx) {
   const item = BOLO_ITEMS[idx];
   if (!item) return;
@@ -7034,25 +7227,72 @@ function openBolo(idx) {
   if (!modal || !nameEl || !sumEl || !sectionsEl) return;
   nameEl.textContent = item.name;
   sumEl.textContent = item.summary;
-  sectionsEl.innerHTML = `
-    <div class="bolo-modal-section">
-      <div class="bolo-modal-section-label">WHY</div>
-      <div class="bolo-modal-section-text">${escapeHtml(item.why)}</div>
-    </div>
-    <div class="bolo-modal-section">
-      <div class="bolo-modal-section-label">WHAT</div>
-      <div class="bolo-modal-section-text">${escapeHtml(item.what)}</div>
-    </div>
-    <div class="bolo-modal-section">
-      <div class="bolo-modal-section-label">WHO</div>
-      <div class="bolo-modal-section-text">${escapeHtml(item.who)}</div>
-    </div>
-  `;
-  // Action button visible only for person viewers. Departments and Harbor
-  // viewers cannot capture discoveries.
+
+  // Rich schema: name + subtitle + FROM byline + WHY + TREND INSTINCT +
+  // list of exhibitors, each with a description, italic suggested questions,
+  // and an Add button that bookmarks the booth to the viewer's discoveries.
+  // Legacy schema (older BOLOs without `exhibitors`) renders the same WHY /
+  // WHAT / WHO it always did.
+  const isRich = Array.isArray(item.exhibitors) && item.exhibitors.length > 0;
+  let html = '';
+  if (item.from) {
+    html += `<div class="bolo-modal-from">FROM <span>${escapeHtml(item.from)}</span></div>`;
+  }
+  if (item.why) {
+    html += `
+      <div class="bolo-modal-section">
+        <div class="bolo-modal-section-label">WHY</div>
+        <div class="bolo-modal-section-text">${escapeHtml(item.why)}</div>
+      </div>`;
+  }
+  if (isRich) {
+    if (item.trend) {
+      html += `
+        <div class="bolo-modal-section">
+          <div class="bolo-modal-section-label">TREND INSTINCT</div>
+          <div class="bolo-modal-section-text">${escapeHtml(item.trend)}</div>
+        </div>`;
+    }
+    html += `<div class="bolo-modal-section">
+      <div class="bolo-modal-section-label">WHERE</div>`;
+    item.exhibitors.forEach((ex, exIdx) => {
+      const questionsHtml = (ex.questions || []).map(q => `<li>${escapeHtml(q)}</li>`).join('');
+      const alreadyBookmarked = exhibitorIsBookmarked(ex.booth);
+      const btnLabel = alreadyBookmarked ? 'In My Discoveries' : 'Add to My Discoveries';
+      const btnClass = alreadyBookmarked ? 'bolo-exhibitor-add added' : 'bolo-exhibitor-add';
+      html += `
+        <div class="bolo-exhibitor" data-bolo-ex="${exIdx}">
+          <div class="bolo-exhibitor-name">${escapeHtml(ex.name)}</div>
+          <div class="bolo-exhibitor-booth">Booth ${escapeHtml(String(ex.booth))}</div>
+          ${ex.description ? `<div class="bolo-exhibitor-desc">${escapeHtml(ex.description)}</div>` : ''}
+          ${questionsHtml ? `<ul class="bolo-exhibitor-questions">${questionsHtml}</ul>` : ''}
+          <button type="button" class="${btnClass}" onclick="bookmarkFromBolo(${idx}, ${exIdx}, this)" ${alreadyBookmarked ? 'disabled' : ''}>${btnLabel}</button>
+        </div>`;
+    });
+    html += `</div>`;
+  } else {
+    if (item.what) {
+      html += `
+        <div class="bolo-modal-section">
+          <div class="bolo-modal-section-label">WHAT</div>
+          <div class="bolo-modal-section-text">${escapeHtml(item.what)}</div>
+        </div>`;
+    }
+    if (item.who) {
+      html += `
+        <div class="bolo-modal-section">
+          <div class="bolo-modal-section-label">WHO</div>
+          <div class="bolo-modal-section-text">${escapeHtml(item.who)}</div>
+        </div>`;
+    }
+  }
+  sectionsEl.innerHTML = html;
+
+  // The "Log a discovery for this" action is only meaningful for legacy
+  // BOLOs (free-form discovery). Rich BOLOs have per-exhibitor Add buttons.
   if (actionBtn) {
     const isPerson = currentIdentity && currentIdentity.kind === 'person';
-    actionBtn.style.display = isPerson ? '' : 'none';
+    actionBtn.style.display = (isPerson && !isRich) ? '' : 'none';
   }
   modal.classList.add('open');
 }
@@ -7061,6 +7301,80 @@ function closeBolo() {
 }
 window.openBolo = openBolo;
 window.closeBolo = closeBolo;
+
+// True if the current viewer already has an entry on this booth. Used by
+// the BOLO modal to flip the Add button to "In My Discoveries" so users
+// don't accidentally double-add.
+function exhibitorIsBookmarked(booth) {
+  if (!currentIdentity || currentIdentity.kind !== 'person') return false;
+  const b = String(booth);
+  return entries.some(e =>
+    e.kind !== 'memo' &&
+    e.creator === currentIdentity.id &&
+    String(e.booth) === b
+  );
+}
+window.exhibitorIsBookmarked = exhibitorIsBookmarked;
+
+// Bookmark an exhibitor from a rich BOLO modal. Creates a self-recipient
+// discovery entry with an empty note, tagged with the BOLO id so the
+// origin is preserved. The entry shows up muted on My Discoveries until
+// the user opens it and captures real observations.
+async function bookmarkFromBolo(boloIdx, exIdx, btnEl) {
+  if (!currentIdentity || currentIdentity.kind !== 'person') {
+    alert('Switch to your name to add this to your discoveries.');
+    return;
+  }
+  const item = BOLO_ITEMS[boloIdx];
+  if (!item || !item.exhibitors) return;
+  const ex = item.exhibitors[exIdx];
+  if (!ex) return;
+  if (exhibitorIsBookmarked(ex.booth)) return;
+
+  // Resolve hall info from the exhibitor data if we can find it; otherwise
+  // leave blank. BOOTHS is keyed by booth number; the lookup is best-effort.
+  let hall = '';
+  let hallCode = '';
+  const lookup = (typeof BOOTHS !== 'undefined') ? BOOTHS[String(ex.booth)] : null;
+  if (lookup) {
+    hall = lookup.h || '';
+    hallCode = hall ? hall.charAt(0) : '';
+  }
+
+  const newEntry = {
+    id: 'e' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+    creator: currentIdentity.id,
+    creatorKind: 'person',
+    booth: String(ex.booth),
+    name: ex.name,
+    hall,
+    hallCode,
+    note: '',
+    contact: '',
+    taggedPeople: [],
+    taggedGroups: [],
+    taggedSelf: true,
+    photoUrls: [],
+    dot: null,
+    boloId: boloIdx,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    responses: []
+  };
+  entries.unshift(newEntry);
+  await saveEntries();
+  // Flip the button label so it's clear the action took.
+  if (btnEl) {
+    btnEl.textContent = 'In My Discoveries';
+    btnEl.classList.add('added');
+    btnEl.disabled = true;
+  }
+  // Refresh the personal dashboard surfaces.
+  if (typeof renderSentList === 'function') renderSentList();
+  if (typeof renderMyTagged === 'function') renderMyTagged();
+  updateSentCount();
+}
+window.bookmarkFromBolo = bookmarkFromBolo;
 
 // =============================================================================
 // Chrome row modals: My Trip and My Report.
@@ -7173,15 +7487,8 @@ function renderPendingBoloBanner() {
   banner.classList.add('open');
 }
 
-// Wire carousel cards once on load.
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.bolo-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const idx = parseInt(card.getAttribute('data-bolo'), 10);
-      if (!isNaN(idx)) openBolo(idx);
-    });
-  });
-});
+// Carousel taps are wired inside renderBoloCarousel() since the markup is
+// generated at runtime.
 
 // Toggle a collapsible Explore section (Missions). Same pattern as
 // toggleHomeSection but scoped to Explore's section IDs.
@@ -7337,6 +7644,50 @@ function formatRelativeTime(ts) {
   return (d.getMonth() + 1) + '/' + d.getDate();
 }
 
+// "My Tagged Booths" on For Me. Shows booths where someone else has tagged
+// the viewer (department invitation, teammate flag, or already-engaged).
+// Uses the same card renderer as For Us so the experience is identical
+// when the user taps in. Reuses the .explore-card-* styling.
+function renderMyTagged() {
+  const container = document.getElementById('my-tagged-cards');
+  const emptyEl   = document.getElementById('my-tagged-empty');
+  if (!container || !emptyEl) return;
+  if (!currentIdentity || currentIdentity.kind !== 'person') {
+    container.innerHTML = '';
+    emptyEl.style.display = '';
+    emptyEl.textContent = 'Select your name to see tagged booths.';
+    return;
+  }
+  const allCards = buildExploreCards(currentIdentity.id, currentIdentity.kind);
+  // Tagged-by-others: everything that wasn't put there by the viewer's own
+  // my-list action. That covers dept invitations, peer flags, mixed, and
+  // anything they've engaged with.
+  const tagged = allCards.filter(c => c.origin !== 'mine');
+  if (tagged.length === 0) {
+    container.innerHTML = '';
+    emptyEl.style.display = '';
+    emptyEl.textContent = 'No one has tagged you on a booth yet.';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  // Sort newest first by activity, same default as For Us.
+  tagged.sort((a, b) => (b.latestTs || 0) - (a.latestTs || 0));
+  container.innerHTML = tagged.map(renderExploreCard).join('');
+
+  // Mount response photo blocks if any are inside the just-rendered cards.
+  container.querySelectorAll('.response-photo-mount').forEach(anchor => {
+    const formId = anchor.dataset.formId;
+    if (!formId) return;
+    let seed = [];
+    if (anchor.dataset.seedPhotos) {
+      try { seed = JSON.parse(anchor.dataset.seedPhotos) || []; } catch (e) {}
+    }
+    photoStates[formId] = seed.map(u => ({ url: u, name: 'photo.jpg' }));
+    buildPhotoCapture(formId, anchor);
+  });
+}
+window.renderMyTagged = renderMyTagged;
+
 function renderSentList() {
   const list = document.getElementById('sent-list');
   if (!currentIdentity) {
@@ -7375,12 +7726,17 @@ function renderSentList() {
     const latestTs = Math.max(
       ...card.entries.map(e => e.updatedAt || e.createdAt || 0)
     );
+    // Bookmark state: every entry from this user on this booth has no
+    // captured note yet. Renders muted on the card surface to signal
+    // "saved, not yet observed". Adding a real note flips this off.
+    const allBookmarks = card.entries.every(e => !e.note || !e.note.trim());
     return {
       ...card,
       origin: 'mine',
       engaged: false,
       count: totalOnBooth,
-      latestTs
+      latestTs,
+      isBookmark: allBookmarks
     };
   });
 
@@ -8594,7 +8950,9 @@ async function loadDemoScenario() {
   await saveEntries();
   renderExplore();
   updateSentCount();
-  if (document.getElementById('sent-list')?.classList.contains('open')) renderSentList();
+  renderSentList();
+  renderMyTagged();
+  renderMyNotes();
 
   // Set viewer to Andy so the demo lands on his Solutions-flavored Explore
   selectIdentity('andy', 'person');
@@ -8610,7 +8968,9 @@ function resetDemoScenario() {
   entries = [];
   renderExplore();
   updateSentCount();
-  if (document.getElementById('sent-list')?.classList.contains('open')) renderSentList();
+  renderSentList();
+  renderMyTagged();
+  renderMyNotes();
   if (document.getElementById('home-section-report')?.classList.contains('open')) renderReport();
 }
 window.resetDemoScenario = resetDemoScenario;
@@ -8745,6 +9105,8 @@ async function initApp() {
   updateLockedAffordances();
   // Update the Me chrome circle initials/color (may show "--" if no identity).
   if (typeof renderMeAvatar === 'function') renderMeAvatar();
+  // Populate the BOLO carousel from BOLO_ITEMS.
+  if (typeof renderBoloCarousel === 'function') renderBoloCarousel();
   // Populate the My Notes ticker so it has content on first paint, even
   // before the user touches anything.
   renderMyNotes();
