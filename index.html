@@ -109,7 +109,7 @@
     border-bottom: 1px solid var(--border);
   }
   .header-logo {
-    height: 140px;
+    height: 120px;
     width: auto;
     max-width: 80%;
     object-fit: contain;
@@ -5204,23 +5204,69 @@ async function loadExhibitorData() {
 
 // ── PHOTO UPLOAD ────────────────────────────────────────────────────────────
 
-async function uploadPhoto(file) {
+// Resize/compress an image File into a smaller JPEG Blob before upload.
+// This sidesteps Vercel's serverless body size limit (~4.5 MB) and shaves
+// transfer time on slow show-floor connections. Targets max-side 1600px,
+// JPEG quality 0.85. Returns the original File if the browser can't decode
+// it (e.g. HEIC on certain Android) so the upload still has a shot.
+async function compressImage(file) {
+  if (!file || !file.type || !file.type.startsWith('image/')) return file;
   try {
-    const r = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
+    const dataUrl = await new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = () => reject(new Error('FileReader failed'));
+      r.readAsDataURL(file);
+    });
+    const img = await new Promise((resolve, reject) => {
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = () => reject(new Error('Image decode failed'));
+      i.src = dataUrl;
+    });
+    const MAX = 1600;
+    const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+    const w = Math.round(img.width * scale);
+    const h = Math.round(img.height * scale);
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, w, h);
+    const blob = await new Promise((resolve) => {
+      canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.85);
+    });
+    if (!blob) return file;
+    // Wrap as a File so the server filename and type are clean.
+    const baseName = (file.name || 'photo').replace(/\.[^.]+$/, '');
+    return new File([blob], baseName + '.jpg', { type: 'image/jpeg' });
+  } catch (e) {
+    console.warn('compressImage failed, sending original', e);
+    return file;
+  }
+}
+
+async function uploadPhoto(file) {
+  // Compress before posting. Falls back to the original file if compression
+  // fails for any reason.
+  const toSend = await compressImage(file);
+  try {
+    const r = await fetch(`/api/upload?filename=${encodeURIComponent(toSend.name || 'photo.jpg')}`, {
       method: 'POST',
-      headers: { 'Content-Type': file.type || 'application/octet-stream' },
-      body: file
+      headers: { 'Content-Type': toSend.type || 'application/octet-stream' },
+      body: toSend
     });
     if (!r.ok) {
       const errText = await r.text().catch(() => '');
       console.warn('Upload failed', r.status, errText);
-      return null;
+      // Stash the status so the caller can surface a useful message.
+      return { url: null, status: r.status, error: errText || r.statusText };
     }
     const d = await r.json();
-    return d.url || null;
+    return { url: d.url || null };
   } catch (e) {
     console.warn('Upload request failed', e);
-    return null;
+    return { url: null, status: 0, error: (e && e.message) || 'Network error' };
   }
 }
 
@@ -5230,7 +5276,8 @@ const photoStates = {};
 
 function renderPhotoThumbs(formId) {
   const container = document.getElementById('photos-thumbs-' + formId);
-  const addBtn    = document.getElementById('photos-addbtn-' + formId);
+  const takeBtn   = document.getElementById('photos-takebtn-' + formId);
+  const attachBtn = document.getElementById('photos-attachbtn-' + formId);
   if (!container) return;
   const arr = photoStates[formId] || [];
   if (arr.length === 0) {
@@ -5243,14 +5290,15 @@ function renderPhotoThumbs(formId) {
       </div>
     `).join('');
   }
-  if (addBtn) {
-    if (arr.length >= PHOTO_MAX) {
-      addBtn.disabled = true;
-      addBtn.textContent = `Maximum ${PHOTO_MAX} photos`;
-    } else {
-      addBtn.disabled = false;
-      addBtn.textContent = arr.length === 0 ? 'Take / choose photo' : `Add another (${arr.length}/${PHOTO_MAX})`;
-    }
+  const atMax = arr.length >= PHOTO_MAX;
+  if (takeBtn) {
+    takeBtn.disabled = atMax;
+    takeBtn.textContent = atMax ? `Max ${PHOTO_MAX} reached` : 'Take';
+  }
+  if (attachBtn) {
+    attachBtn.disabled = atMax;
+    attachBtn.style.display = atMax ? 'none' : '';
+    attachBtn.textContent = 'Attach';
   }
 }
 
@@ -5261,6 +5309,10 @@ async function handlePhotoPick(formId, fileInput) {
   if (!photoStates[formId]) photoStates[formId] = [];
   if (photoStates[formId].length >= PHOTO_MAX) return;
 
+  // Clear any prior error.
+  const errEl = document.getElementById('photos-error-' + formId);
+  if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+
   const container = document.getElementById('photos-thumbs-' + formId);
   if (container) {
     const placeholder = document.createElement('div');
@@ -5270,15 +5322,28 @@ async function handlePhotoPick(formId, fileInput) {
     container.appendChild(placeholder);
   }
 
-  const url = await uploadPhoto(file);
+  const result = await uploadPhoto(file);
   document.querySelectorAll('.photo-thumb-loading').forEach(el => el.remove());
 
-  if (!url) {
-    alert('Photo upload failed. Please try again.');
+  if (!result || !result.url) {
+    const status = result && result.status ? result.status : 0;
+    const detail = result && result.error ? String(result.error).slice(0, 140) : '';
+    let msg;
+    if (status === 413) msg = 'Photo too large for the server. Try a smaller photo.';
+    else if (status === 0) msg = 'Network error. Check your connection and try again.';
+    else if (status >= 500) msg = `Server error (${status}). ${detail || 'Please try again.'}`;
+    else if (status > 0) msg = `Upload failed (${status}). ${detail || 'Please try again.'}`;
+    else msg = 'Upload failed. Please try again.';
+    if (errEl) {
+      errEl.textContent = msg;
+      errEl.style.display = '';
+    } else {
+      alert(msg);
+    }
     renderPhotoThumbs(formId);
     return;
   }
-  photoStates[formId].push({ url, name: file.name });
+  photoStates[formId].push({ url: result.url, name: file.name });
   renderPhotoThumbs(formId);
 }
 
@@ -5301,15 +5366,24 @@ function buildPhotoCapture(formId, anchorEl) {
   if (!anchorEl || !anchorEl.parentNode) return;
   if (document.getElementById('photos-thumbs-' + formId)) return;
   const wrap = document.createElement('div');
+  // Two inputs: one camera (capture attribute hints camera on mobile),
+  // one library (no capture). Two buttons trigger them. A third area
+  // surfaces upload errors when they happen.
   wrap.innerHTML = `
     <div style="font-size: 14px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-hint);margin-top:10px;margin-bottom:4px;">Photos (optional, up to ${PHOTO_MAX})</div>
     <div class="photos-thumbs-grid" id="photos-thumbs-${formId}"></div>
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-      <input type="file" id="photos-input-${formId}" accept="image/*" capture="environment" style="display:none">
-      <button type="button" id="photos-addbtn-${formId}" style="flex:1;padding:8px;font-size: 17px;background:transparent;color:var(--text-secondary);border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);cursor:pointer;" onclick="document.getElementById('photos-input-${formId}').click()">Take / choose photo</button>
-    </div>`;
+      <input type="file" id="photos-input-take-${formId}" accept="image/*" capture="environment" style="display:none">
+      <input type="file" id="photos-input-attach-${formId}" accept="image/*" style="display:none">
+      <button type="button" id="photos-takebtn-${formId}" style="flex:1;padding:8px;font-size: 17px;background:transparent;color:var(--text-secondary);border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);cursor:pointer;" onclick="document.getElementById('photos-input-take-${formId}').click()">Take</button>
+      <button type="button" id="photos-attachbtn-${formId}" style="flex:1;padding:8px;font-size: 17px;background:transparent;color:var(--text-secondary);border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);cursor:pointer;" onclick="document.getElementById('photos-input-attach-${formId}').click()">Attach</button>
+    </div>
+    <div id="photos-error-${formId}" style="display:none;font-size:13px;color:var(--record-red);margin:-4px 0 8px;line-height:1.4;"></div>`;
   anchorEl.parentNode.insertBefore(wrap, anchorEl);
-  document.getElementById('photos-input-' + formId).addEventListener('change', function() {
+  document.getElementById('photos-input-take-' + formId).addEventListener('change', function() {
+    handlePhotoPick(formId, this);
+  });
+  document.getElementById('photos-input-attach-' + formId).addEventListener('change', function() {
     handlePhotoPick(formId, this);
   });
   if (!photoStates[formId]) photoStates[formId] = [];
@@ -7592,12 +7666,20 @@ function memoAddPhoto() {
   input.onchange = async () => {
     const file = input.files && input.files[0];
     if (!file) return;
-    const url = await uploadPhoto(file);
-    if (url) {
-      memoState.photos.push(url);
+    const result = await uploadPhoto(file);
+    if (result && result.url) {
+      memoState.photos.push(result.url);
       renderMemoPhotos();
     } else {
-      alert('Photo upload failed.');
+      const status = result && result.status ? result.status : 0;
+      const detail = result && result.error ? String(result.error).slice(0, 140) : '';
+      let msg;
+      if (status === 413) msg = 'Photo too large for the server. Try a smaller photo.';
+      else if (status === 0) msg = 'Network error. Check your connection and try again.';
+      else if (status >= 500) msg = `Server error (${status}). ${detail || 'Please try again.'}`;
+      else if (status > 0) msg = `Upload failed (${status}). ${detail || 'Please try again.'}`;
+      else msg = 'Photo upload failed.';
+      alert(msg);
     }
   };
   input.click();
