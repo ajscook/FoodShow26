@@ -14,20 +14,20 @@
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Oswald:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Oswald:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
 <style>
   :root {
     /* Single muted blue carrying every "interactive / system" signal. */
-    --blue: #7A9BC4;
-    --blue-dark: #6B8FB5;
-    --blue-light: rgba(122,155,196,0.16);
-    --blue-mid: #7A9BC4;
+    --blue: #5BA3F5;
+    --blue-dark: #4A90E2;
+    --blue-light: rgba(91,163,245,0.18);
+    --blue-mid: #5BA3F5;
 
     /* Green: Harbor's color. Reserved exclusively for From Departments
        origin signaling on Explore cards (left border + count). Not used
        anywhere else in the system. Aliases below redirect any other
        legacy --green references to blue so green never leaks. */
-    --green-harbor: #4BAD4A;
+    --green-harbor: #5DC95C;
     --green: #7A9BC4;
     --green-dark: #6B8FB5;
     --green-deep: #0F1410;
@@ -35,19 +35,19 @@
 
     /* Single warm amber, reserved for "your attention" (currently unused
        after engaged-state was removed). */
-    --amber: #C8902E;
-    --amber-light: rgba(200,144,46,0.14);
-    --yellow: #C8902E;
+    --amber: #E8A93D;
+    --amber-light: rgba(232,169,61,0.18);
+    --yellow: #E8A93D;
 
     /* Recording red — the one place red earns a place in the system. */
     --record-red: #E24B4A;
 
-    /* BOLO gold — used only for Be On the Lookout surfaces. Distinct from
-       orange (accent), green (Harbor), blue (system), and amber. */
-    --bolo: #E0B642;
+    /* Notes accent — formerly gold, now white. Used across My Notes
+       surfaces (notes head dash, memo modal border, ticker accents). */
+    --bolo: #F4F1EC;
     --trendline: var(--green-harbor);
     --trendline-light: rgba(75,173,74,0.10);
-    --bolo-light: rgba(224,182,66,0.10);
+    --bolo-light: rgba(244,241,236,0.08);
 
     --white: #F4F1EC;
     --off-white: #131211;
@@ -144,8 +144,8 @@
   }
   .chrome-item:active .chrome-circle { background: var(--surface); }
   .chrome-circle {
-    width: 44px;
-    height: 44px;
+    width: 53px;
+    height: 53px;
     border-radius: 50%;
     border: 1px solid var(--border-strong);
     background: transparent;
@@ -156,8 +156,8 @@
     flex-shrink: 0;
   }
   .chrome-circle svg {
-    width: 22px;
-    height: 22px;
+    width: 26px;
+    height: 26px;
     stroke: currentColor;
     stroke-width: 1.8;
     fill: none;
@@ -258,32 +258,55 @@
      uppercase section labels.
      ========================================================================= */
   #report-body .report-section {
-    margin: 0 0 18px;
+    margin: 0 0 22px;
   }
   #report-body .report-section-label {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-family: var(--font-headline);
-    font-weight: 400;
-    font-size: 15px;
-    color: var(--text-secondary);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 21px;
+    color: #D9D4CB;
     margin-bottom: 8px;
   }
   #report-body .report-section-label::before {
     content: "";
     width: 3px;
-    height: 16px;
+    height: 22px;
     background: var(--text-hint);
     border-radius: 2px;
   }
-  #report-body .report-section.section-notes .report-section-label::before {
-    background: var(--bolo);
+  /* Per-section dash colors. Matches the section's accent elsewhere in the app. */
+  #report-body .report-section:nth-of-type(1) .report-section-label::before { background: var(--green-harbor); }
+  #report-body .report-section:nth-of-type(2) .report-section-label::before { background: #E87D3E; }
+  #report-body .report-section:nth-of-type(3) .report-section-label::before { background: var(--amber); }
+  #report-body .report-section:nth-of-type(4) .report-section-label::before { background: var(--tertiary); }
+  #report-body .report-section:nth-of-type(5) .report-section-label::before { background: #FFFFFF; }
+  #report-body .report-section:nth-of-type(6) .report-section-label::before { background: var(--bolo); }
+  #report-body .report-section:nth-of-type(7) .report-section-label::before { background: var(--text-hint); }
+  #report-body .report-section-count {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text-hint);
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    padding: 2px 9px;
+    min-width: 24px;
+    text-align: center;
   }
-  #report-body .report-section.section-discoveries .report-section-label::before {
-    background: var(--green-harbor);
+  #report-body .report-item-from {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--text-hint);
   }
   #report-body .report-empty {
     font-family: var(--font-body);
@@ -713,7 +736,7 @@
     line-height: 1;
   }
   .tab.active .tab-label {
-    color: var(--secondary) !important;
+    color: var(--primary) !important;
   }
 
   /* Memo button - circular, lives in tab bar but visually distinct */
@@ -1293,7 +1316,7 @@
     padding: 10px 12px;
     border: 1.5px solid var(--border-strong);
     border-radius: var(--radius-sm);
-    background: var(--surface-raised);
+    background: transparent;
     color: var(--text-primary);
     outline: none;
     margin-bottom: 10px;
@@ -1309,10 +1332,10 @@
   .exhibitor-search-input {
     font-size: 20px;
     padding: 14px 16px;
-    border-color: var(--blue);
+    border-color: var(--white);
   }
   .voice-field-wrap:has(> .exhibitor-search-input) .voice-field-icon {
-    color: var(--blue);
+    color: var(--white);
   }
 
   .form-label {
@@ -1691,6 +1714,7 @@
     color: var(--text-hint);
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 6px;
   }
   .selected-exhibitor-clear {
@@ -1852,32 +1876,32 @@
   .dot-btn {
     flex: 1;
     padding: 10px 12px;
-    background: var(--surface-raised);
+    background: transparent;
     color: var(--text-secondary);
     border: 1.5px solid var(--border-strong);
     border-radius: var(--radius-sm);
     font-family: var(--font);
-    font-size: 17px;
+    font-size: 13px;
     font-weight: 600;
     letter-spacing: 0.04em;
-    text-transform: uppercase;
+    text-transform: none;
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
   }
   .dot-btn:hover { border-color: var(--text-secondary); }
   .dot-btn.selected {
-    background: var(--blue);
-    border-color: var(--blue);
+    background: transparent;
+    border-color: var(--white);
     color: var(--white);
   }
   .dot-followup {
     display: none;
     padding: 10px 12px;
     border-radius: var(--radius-sm);
-    font-size: 17px;
+    font-size: 15px;
     line-height: 1.5;
     margin-bottom: 10px;
-    background: var(--surface-raised);
+    background: transparent;
     border: 1px solid var(--border-strong);
     color: var(--text-primary);
   }
@@ -2021,8 +2045,20 @@
   .explore-section-head[data-section="peerFlags"] .explore-section-title::before {
     background: var(--tertiary);
   }
+  .explore-section-head[data-section="peerFlags"] .explore-section-title {
+    color: var(--tertiary);
+  }
   .explore-section-head[data-section="engaged"] .explore-section-title::before {
     background: var(--secondary);
+  }
+  .explore-section-head[data-section="hitlist"] .explore-section-title {
+    color: var(--white);
+  }
+  .explore-section-head[data-section="hitlist"] .explore-section-title::before {
+    background: transparent;
+    border-left: 3px dashed var(--white);
+    border-radius: 0;
+    width: 0;
   }
   .explore-section-head[data-section="trendlines"] .explore-section-title::before {
     background: var(--trendline);
@@ -2030,13 +2066,16 @@
   .explore-section-head[data-section="trendlines"] .explore-section-title {
     color: var(--trendline);
   }
-  /* Our EB Brands: expandable partner-introduction section on For Us. */
+  /* Our Partners: expandable partner-introduction section on For Us. */
   .explore-section-head.eb-partners-head {
     cursor: pointer;
     user-select: none;
   }
+  .explore-section-head.eb-partners-head .explore-section-title {
+    color: var(--amber);
+  }
   .explore-section-head.eb-partners-head .explore-section-title::before {
-    background: var(--primary);
+    background: var(--amber);
   }
   .eb-partners-arrow {
     color: var(--text-hint);
@@ -2066,7 +2105,7 @@
   .eb-partner-row {
     padding: 10px 12px;
     border: 1px solid var(--border);
-    border-left: 3px solid var(--primary);
+    border-left: 3px solid var(--amber);
     border-radius: var(--radius-sm);
     background: transparent;
     cursor: pointer;
@@ -2078,7 +2117,7 @@
     font-family: var(--font-headline);
     font-weight: 700;
     font-size: 15px;
-    color: var(--primary);
+    color: var(--text-primary);
     margin: 0 0 2px;
   }
   .eb-partner-row-meta {
@@ -2096,6 +2135,55 @@
     flex-direction: column;
     gap: 8px;
   }
+
+  /* PNW Trend Lines: outlined green pill toggle that expands/collapses the
+     trend stack. Typography matches the BOLO ticker bar above it. */
+  .trend-toggle {
+    align-self: center;
+    background: transparent;
+    border: 1.5px solid var(--green-harbor);
+    border-radius: 999px;
+    color: var(--green-harbor);
+    cursor: pointer;
+    padding: 8px 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 8px auto;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: background 0.15s;
+  }
+  .trend-toggle:hover { background: rgba(93,201,92,0.10); }
+  /* Solid triangle pointing down; rotates 180° when open. */
+  .trend-toggle-icon {
+    width: 0;
+    height: 0;
+    display: inline-block;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid var(--green-harbor);
+    transition: transform 0.2s ease;
+  }
+  .trend-toggle.open .trend-toggle-icon { transform: rotate(180deg); }
+  .trend-toggle-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 0 4px;
+  }
+
+  /* Collapsible stack of trend pills. */
+  .trend-stack {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .trend-stack.open { display: flex; }
+  .trend-toggle-bottom { margin-top: 4px; }
   .trend-pill {
     border: 1px solid var(--border);
     border-left: 3px solid var(--trendline);
@@ -2176,7 +2264,26 @@
   .explore-card-mylist-actions {
     padding: 12px 16px 16px;
     display: flex;
-    justify-content: flex-end;
+    gap: 8px;
+  }
+  .explore-card-mylist-actions .btn-primary,
+  .explore-card-mylist-actions .explore-card-mylist-remove {
+    flex: 1;
+    width: auto;
+    margin: 0;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    background: transparent;
+    color: var(--text-primary);
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+  .explore-card-mylist-actions .btn-primary:hover {
+    background: transparent;
+    border-color: var(--white);
   }
   .explore-card-mylist-remove {
     background: transparent;
@@ -2658,6 +2765,24 @@
     border-top: 1px solid var(--border);
     background: transparent;
   }
+  .add-partner-btn {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: transparent;
+    color: var(--amber);
+    border: 1.5px solid var(--amber);
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .add-partner-btn:hover { background: rgba(232,169,61,0.10); }
+  .add-partner-btn:active { background: rgba(232,169,61,0.18); }
   .exhibitor-details-row {
     display: flex;
     flex-wrap: wrap;
@@ -2941,8 +3066,8 @@
      ========================================================================= */
   :root {
     --primary: var(--green-harbor);   /* #4BAD4A */
-    --secondary: #E87D3E;             /* Orange - Accent */
-    --tertiary: #7A9BC4;              /* Azure Blue - System */
+    --secondary: #F4F1EC;             /* Was orange, now white */
+    --tertiary: #5BA3F5;              /* Brighter blue - System */
     --font-headline: 'Bricolage Grotesque', sans-serif;
     --font-body:     'Plus Jakarta Sans', sans-serif;
   }
@@ -2982,9 +3107,9 @@
     box-shadow: none !important;
   }
 
-  /* Active tab indicator: orange accent per spec */
+  /* Active tab indicator: green accent */
   .tab.active::after {
-    background: var(--secondary) !important;
+    background: var(--primary) !important;
   }
 
   /* Hall pill S color stays blue accent */
@@ -2993,15 +3118,32 @@
     border-color: var(--tertiary);
   }
 
-  /* Origin signals (engaged shifts amber -> orange) */
+  /* Origin signals. Engaged stays orange; other --secondary surfaces are white. */
   .explore-card.origin-dept { border-left: 4px solid var(--primary) !important; }
   .explore-card.origin-peer { border-left: 4px solid var(--tertiary) !important; }
   .explore-card.origin-mine { border-left: 4px solid var(--text-primary) !important; }
   .explore-card.origin-mixed { border-left: 4px solid var(--primary) !important; border-right: 4px solid var(--tertiary) !important; }
-  .explore-card.engaged { border-left: 4px solid var(--secondary) !important; }
+  .explore-card.engaged { border-left: 4px solid #E87D3E !important; }
   .explore-card.engaged .explore-card-count {
-    color: var(--secondary) !important;
-    border-color: var(--secondary) !important;
+    color: #E87D3E !important;
+    border-color: #E87D3E !important;
+  }
+
+  /* From Teammates section: every card came from a peer, so left = blue
+     always. If the card also carries a trend-line signal (origin mine/mixed/
+     dept), paint the right edge green. Count number stays blue. */
+  .explore-section-body[data-section="peerFlags"] .explore-card {
+    border-left: 4px solid var(--tertiary) !important;
+    border-right: none;
+  }
+  .explore-section-body[data-section="peerFlags"] .explore-card.origin-mine,
+  .explore-section-body[data-section="peerFlags"] .explore-card.origin-mixed,
+  .explore-section-body[data-section="peerFlags"] .explore-card.origin-dept {
+    border-right: 4px solid var(--green-harbor) !important;
+  }
+  .explore-section-body[data-section="peerFlags"] .explore-card .explore-card-count {
+    color: var(--tertiary) !important;
+    border-color: var(--tertiary) !important;
   }
 
   /* =========================================================================
@@ -3084,6 +3226,32 @@
     color: var(--secondary);
   }
 
+  /* Section titles styled like the greeting name: Playfair italic 600, no caps. */
+  .my-discoveries-section .my-discoveries-head-title,
+  .my-engaged-section .my-discoveries-head-title,
+  .notes-head-title,
+  .explore-section-head[data-section="trendlines"] .explore-section-title,
+  .explore-section-head[data-section="hitlist"] .explore-section-title,
+  .explore-section-head[data-section="peerFlags"] .explore-section-title,
+  .explore-section-head[data-section="invitations"] .explore-section-title,
+  .explore-section-head.eb-partners-head .explore-section-title {
+    font-family: 'Playfair Display', serif !important;
+    font-style: italic !important;
+    font-weight: 600 !important;
+    font-size: 21px !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+  }
+  /* Section-color text for each title. All titles off-white; the dash carries the color. */
+  .my-discoveries-section .my-discoveries-head-title { color: #D9D4CB !important; }
+  .my-engaged-section .my-discoveries-head-title { color: #D9D4CB !important; }
+  .notes-head-title { color: #D9D4CB !important; }
+  .explore-section-head[data-section="trendlines"] .explore-section-title { color: #D9D4CB !important; }
+  .explore-section-head[data-section="hitlist"] .explore-section-title { color: #D9D4CB !important; }
+  .explore-section-head[data-section="peerFlags"] .explore-section-title { color: #D9D4CB !important; }
+  .explore-section-head[data-section="invitations"] .explore-section-title { color: #D9D4CB !important; }
+  .explore-section-head.eb-partners-head .explore-section-title { color: #D9D4CB !important; }
+
   /* Size scale per font-system spec */
   .home-greeting { font-size: 30px; }
   .home-section-title { font-size: 15px; }
@@ -3114,7 +3282,7 @@
   .home-greeting-name {
     font-style: italic;
     font-weight: 400;
-    color: var(--secondary);
+    color: #E87D3E;
   }
 
   /* Day card date badge: enlarge existing .day-icon to match spec (15, 16, 17...) */
@@ -3208,13 +3376,13 @@
     border-color: var(--text-secondary);
   }
 
-  /* Capture card: orange-bordered container around the Discovery form */
+  /* Capture card: white-bordered container around the Discovery form */
   .capture-card {
     margin: 0 16px 20px;
     padding: 16px 16px 14px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-left: 4px solid var(--secondary);
+    border-left: 4px solid var(--white);
     border-radius: var(--radius-md);
   }
   .capture-card .form-section-label {
@@ -3228,6 +3396,18 @@
     margin: 0 0 8px;
   }
   .capture-card .form-section-label + * { margin-top: 0; }
+  .capture-card .form-input {
+    background: transparent;
+    border: 1px solid var(--border);
+    font-size: 17px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+  .capture-card .form-input::placeholder {
+    font-family: var(--font-headline);
+    font-style: italic;
+    color: var(--text-hint);
+  }
   .capture-card .form-textarea {
     background: transparent;
     border: 1px solid var(--border);
@@ -3299,10 +3479,10 @@
     background: #FFFFFF;
   }
 
-  /* Submit Discovery: orange full-width with play-triangle icon */
+  /* Submit Discovery: white full-width with play-triangle icon */
   .capture-card .btn-primary {
-    background: var(--secondary) !important;
-    color: #FFFFFF !important;
+    background: var(--white) !important;
+    color: #000000 !important;
     width: 100%;
     display: flex;
     align-items: center;
@@ -3315,7 +3495,7 @@
     font-weight: 700;
     margin-bottom: 10px;
   }
-  .capture-card .btn-primary:hover { background: #D86A2A !important; }
+  .capture-card .btn-primary:hover { background: var(--white) !important; color: #000000 !important; }
   .capture-card .btn-primary:disabled {
     background: var(--surface-raised) !important;
     color: var(--text-hint) !important;
@@ -3354,8 +3534,15 @@
     background: var(--primary);
     border-radius: 2px;
   }
+  /* My Discoveries section uses a white dash (no origin, viewer's own work). */
+  .my-discoveries-section .my-discoveries-head::before {
+    background: var(--text-primary);
+  }
   .my-engaged-section .my-discoveries-head::before {
-    background: var(--amber);
+    background: #E87D3E;
+  }
+  .my-engaged-section .my-discoveries-head-title {
+    color: #E87D3E;
   }
   .my-discoveries-head-title {
     font-family: var(--font-headline);
@@ -3471,7 +3658,7 @@
     color: currentColor;
   }
   .tab.active {
-    color: var(--secondary) !important;
+    color: var(--primary) !important;
   }
   .tab::after,
   .tab.active::after {
@@ -3539,7 +3726,7 @@
   .capture-card .btn-primary-icon { width: 13px !important; height: 13px !important; }
 
   /* Discovery search bar */
-  .search-bar .exhibitor-search-input { font-size: 15px !important; padding-top: 30px !important; padding-bottom: 30px !important; border: 1.5px solid var(--tertiary) !important; }
+  .search-bar .exhibitor-search-input { font-size: 15px !important; padding-top: 30px !important; padding-bottom: 30px !important; border: 1.5px solid var(--white) !important; }
   .search-bar-icon { width: 16px !important; height: 16px !important; }
 
   /* Sent-item cards */
@@ -3743,6 +3930,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .my-note-from-inline {
+    color: var(--tertiary);
+    font-weight: 700;
+    margin-right: 4px;
   }
   .my-note-time {
     flex-shrink: 0;
@@ -4101,12 +4293,11 @@
     line-height: 1;
   }
 
-  /* EB partner signal: instead of a white H badge, the exhibitor name renders
-     in Harbor green. Applies to both the card header name and the
-     selected-exhibitor name in the capture flow. */
+  /* EB partner signal: the amber accent lives on the row/card border. The
+     name itself stays white. */
   .explore-card-name-line.eb-partner,
   .selected-exhibitor-name.eb-partner {
-    color: var(--primary) !important;
+    color: var(--text-primary) !important;
   }
 
   /* =========================================================================
@@ -4655,20 +4846,46 @@
     transform: rotate(180deg);
   }
   /* Flash on the My Notes head when there are unseen shared-in notes.
-     Pulses the dash and title in blue (the shared-in signal color) until
-     the section is expanded. */
+     Pulses the dash and shows a persistent blue badge counting unseen
+     notes. Clears when the section is expanded. */
   @keyframes notesFlash {
-    0%, 100% { opacity: 1; }
-    50%      { opacity: 0.4; }
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(91,163,245,0.0);
+      transform: scale(1);
+    }
+    50% {
+      box-shadow: 0 0 12px 2px rgba(91,163,245,0.55);
+      transform: scale(1.15);
+    }
   }
   .notes-head.flash::before {
     background: var(--tertiary);
-    animation: notesFlash 1s ease-in-out infinite;
-    box-shadow: 0 0 8px var(--tertiary);
+    animation: notesFlash 1.6s ease-in-out infinite;
   }
   .notes-head.flash .notes-head-title {
-    color: var(--tertiary);
-    animation: notesFlash 1s ease-in-out infinite;
+    color: var(--tertiary) !important;
+  }
+  /* Persistent unseen-count badge. Renders only when count > 0. Sits to the
+     right of the title; survives until the user opens the section. */
+  .notes-head-badge {
+    display: none;
+    margin-left: 8px;
+    padding: 2px 9px;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 11px;
+    background: var(--tertiary);
+    color: #0F1410;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 18px;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  .notes-head.flash .notes-head-badge {
+    display: inline-block;
+    animation: notesFlash 1.6s ease-in-out infinite;
   }
   /* Hide the ticker when expanded so the vertical list is the only surface. */
   .notes-section.open .notes-ticker {
@@ -4697,7 +4914,7 @@
     display: flex;
     gap: 14px;
     width: max-content;
-    animation: notes-drift 60s linear infinite;
+    animation: notes-drift 30s linear infinite;
     will-change: transform;
     transform: translateZ(0);
     backface-visibility: hidden;
@@ -4874,6 +5091,7 @@
       <div class="notes-section" id="notes-section">
         <div class="notes-head" id="notes-head" onclick="toggleNotesSection()" role="button" aria-expanded="false" aria-controls="notes-section-body">
           <span class="notes-head-title">My Notes</span>
+          <span class="notes-head-badge" id="notes-head-badge"></span>
           <span class="notes-head-arrow">&#9660;</span>
         </div>
         <!-- Collapsed state: BOLO-style ticker of the most recent 5 notes. -->
@@ -4980,22 +5198,16 @@
           <div class="picker-list" id="recipient-list"></div>
         </div>
 
-        <div class="details-toggle-row">
-          <span class="details-toggle-row-label">Add details</span>
-          <button type="button" class="toggle-switch" id="details-toggle" onclick="toggleDiscoverDetails()" aria-label="Toggle details"></button>
-        </div>
-        <div id="discover-details-block" class="details-block">
-          <label class="form-label">Who you spoke with</label>
-          <input class="form-input" id="disc-contact" type="text" placeholder="Contact name" autocomplete="off">
+        <label class="form-section-label">Who you spoke with</label>
+        <input class="form-input" id="disc-contact" type="text" placeholder="Contact name" autocomplete="off">
 
-          <div id="dot-question-block" style="display:none;">
-            <label class="form-label">Are they on DOT?</label>
-            <div class="dot-toggle-row">
-              <button type="button" class="dot-btn" id="dot-btn-yes" onclick="setDotAnswer('yes')">Yes</button>
-              <button type="button" class="dot-btn" id="dot-btn-no" onclick="setDotAnswer('no')">No</button>
-            </div>
-            <div class="dot-followup" id="dot-followup"></div>
+        <div id="dot-question-block" style="display:none;">
+          <label class="form-section-label">Are they on DOT?</label>
+          <div class="dot-toggle-row">
+            <button type="button" class="dot-btn" id="dot-btn-yes" onclick="setDotAnswer('yes')">Yes</button>
+            <button type="button" class="dot-btn" id="dot-btn-no" onclick="setDotAnswer('no')">No</button>
           </div>
+          <div class="dot-followup" id="dot-followup"></div>
         </div>
 
         <button class="btn-primary" id="disc-submit-btn" onclick="submitEntry()">
@@ -5175,7 +5387,7 @@
 </div>
 
 <!-- Voice memo popup -->
-<div id="memo-overlay" class="memo-overlay">
+<div id="memo-overlay" class="memo-overlay" onclick="if(event.target===this)closeMemoUI()">
   <div class="memo-modal">
     <div class="memo-modal-title">My Note</div>
     <textarea id="memo-textarea" class="memo-textarea" placeholder="Your transcript will appear here as you speak. You can also edit it."></textarea>
@@ -5270,7 +5482,7 @@ function resolveIdentity(id) {
 let BOOTHS = {};        // booth number -> {n, h, c, d, cat, bg, f}
 let SEARCH_DATA = [];   // [boothNum, name, hallCode]
 let entries = [];       // canonical data: array of entry records (see data model)
-let EB_PARTNER_BOOTHS = new Set(["1488","1671","1863","2454","2712","3472","5607","6245","7207","7659","7850","7980","8067","11518","12006","12807","13102","13239","13306","13345","13823"]);
+let EB_PARTNER_BOOTHS = new Set(["1488","1671","1863","2454","2712","3472","5607","6100.","6245","7207","7659","7850","7980","8067","11518","12006","12807","13102","13239","13306","13345","13823"]);
 
 // ── STORAGE: UPSTASH KV ─────────────────────────────────────────────────────
 
@@ -5355,6 +5567,31 @@ async function saveTeamAddition(person) {
   list.push(person);
   await kvSet(TEAM_ADDITIONS_KEY, list);
 }
+
+// EB partner additions: booth numbers added during the show by ADMINS via the
+// "Add to Partners" CTA on an expanded exhibitor card. Persisted to KV so the
+// addition propagates to all teammates on their next load.
+const EB_PARTNER_ADDITIONS_KEY = 'harbor:eb_partner_additions:v1';
+
+async function loadEbPartnerAdditions() {
+  const saved = await kvGet(EB_PARTNER_ADDITIONS_KEY);
+  if (!Array.isArray(saved)) return;
+  saved.forEach(b => { if (b) EB_PARTNER_BOOTHS.add(String(b)); });
+}
+
+async function addBoothToPartners(booth) {
+  const b = String(booth);
+  if (EB_PARTNER_BOOTHS.has(b)) return;
+  EB_PARTNER_BOOTHS.add(b);
+  const saved = await kvGet(EB_PARTNER_ADDITIONS_KEY);
+  const list = Array.isArray(saved) ? saved : [];
+  if (!list.includes(b)) {
+    list.push(b);
+    await kvSet(EB_PARTNER_ADDITIONS_KEY, list);
+  }
+  renderExplore();
+}
+window.addBoothToPartners = addBoothToPartners;
 
 // ── MY LIST: PRE-SHOW PERSONAL HIT LIST ─────────────────────────────────────
 // Each user maintains a private list of exhibitors they want to walk. Surfaces
@@ -5619,16 +5856,12 @@ async function fetchAndCacheExhibitors() {
 }
 
 async function loadExhibitorData() {
-  // ARTIFACT PREVIEW BUILD: seed records inlined so the expand-and-see-details flow
-  // works without a network fetch. The deployable index.html does NOT contain this
-  // seed; it fetches NRA_Show_2026_Exhibitors.json from the repo at runtime.
-  const ARTIFACT_SEED = [{"name":"Ajinomoto Foods North America","exhibitor_id":"demo_0","booth":"13306","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Buyers Edge Platform","exhibitor_id":"demo_1","booth":"6634","hall": {"code":"N","name":"North"},"categories":["Services"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"MarginEdge","exhibitor_id":"demo_2","booth":"6647","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Popmenu","exhibitor_id":"demo_3","booth":"6257","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"SpotOn","exhibitor_id":"demo_4","booth":"5639","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"V. Formusa Company-Marconi Foods","exhibitor_id":"demo_5","booth":"7845","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"PCB Cr\u00e9ation","exhibitor_id":"demo_6","booth":"12635","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Southeastern Seaproducts","exhibitor_id":"demo_7","booth":"7973","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Peggy's Bloodies","exhibitor_id":"demo_8","booth":"8076","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"La Preferida","exhibitor_id":"demo_9","booth":"7960","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Prickly Foods","exhibitor_id":"demo_10","booth":"7864","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Hitchcock Farms, Inc.","exhibitor_id":"demo_11","booth":"2085","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"DI MARCO CORRADO s.r.l.","exhibitor_id":"demo_12","booth":"11350","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"ROYAL OF JAPAN, LTD.","exhibitor_id":"demo_13","booth":"11521","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"rebellyous foods","exhibitor_id":"demo_14","booth":"988","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Zoe's Meats","exhibitor_id":"demo_15","booth":"1588","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Bueno Foods","exhibitor_id":"demo_16","booth":"7866","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Vandemoortele","exhibitor_id":"demo_17","booth":"2480","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Chicago Vegan Foods","exhibitor_id":"demo_18","booth":"186","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"MIKUNIYA Co. Ltd.","exhibitor_id":"demo_19","booth":"11628","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Colonel Jim's Breading Co.","exhibitor_id":"demo_20","booth":"13647","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"White Russet","exhibitor_id":"demo_21","booth":"5747","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Lawton's Chicken Sausage","exhibitor_id":"demo_22","booth":"7966","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Veggies Made Great","exhibitor_id":"demo_23","booth":"989","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Sempio Food Company","exhibitor_id":"demo_24","booth":"13020","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Nu Products Seasoning Co.","exhibitor_id":"demo_25","booth":"13330","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Derlea Brand Foods Inc","exhibitor_id":"demo_26","booth":"13029","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Tapatio Hot Sauce","exhibitor_id":"demo_27","booth":"5405","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"KINJIRUSHI Co., Ltd.","exhibitor_id":"demo_28","booth":"11321","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Louisa Food Products Inc","exhibitor_id":"demo_29","booth":"260","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Deko International Co., Ltd.","exhibitor_id":"demo_30","booth":"12523","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Rainbow Robotics","exhibitor_id":"demo_31","booth":"460","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"TRUFF","exhibitor_id":"demo_32","booth":"690","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Laura's Gourmet, LLC","exhibitor_id":"demo_33","booth":"12646","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"ITSUKIFOODS CO.,LTD.","exhibitor_id":"demo_34","booth":"11321","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Maple Leaf Farms","exhibitor_id":"demo_35","booth":"11739","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Cuisine Solutions","exhibitor_id":"demo_36","booth":"4850","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Nanak Foods","exhibitor_id":"demo_37","booth":"8265","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"DE MATTEIS FOOD,\u202fCORP","exhibitor_id":"demo_38","booth":"11444","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Papa's Brittle","exhibitor_id":"demo_39","booth":"8170","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Dumpling Masters","exhibitor_id":"demo_40","booth":"13139","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"ROCKY MOUNTAIN SPICE COMPANY","exhibitor_id":"demo_41","booth":"8154","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Fujian Hailitian Food Co., Ltd.","exhibitor_id":"demo_42","booth":"2048","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Lulu Restaurant Group","exhibitor_id":"demo_43","booth":"13733","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"MEGAMEX","exhibitor_id":"demo_44","booth":"7207","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Ahara Rasa","exhibitor_id":"demo_45","booth":"7777","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Crunch Factory","exhibitor_id":"demo_46","booth":"8259","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"MR. MOMO","exhibitor_id":"demo_47","booth":"8250","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Italoil LLC","exhibitor_id":"demo_48","booth":"1084","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Mowi USA","exhibitor_id":"demo_49","booth":"7925","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Casa Sabor LLC","exhibitor_id":"demo_50","booth":"11942","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Alpha Baking Company, Inc.","exhibitor_id":"demo_51","booth":"1671","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Father Sam's Bakery","exhibitor_id":"demo_52","booth":"13436","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"ColdSnap","exhibitor_id":"demo_53","booth":"13736","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Lotus Bakeries North America Inc","exhibitor_id":"demo_54","booth":"334","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Soom Foods LLC","exhibitor_id":"demo_55","booth":"289","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"ALLGOT CO., LTD.","exhibitor_id":"demo_56","booth":"588","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"NxTrade","exhibitor_id":"demo_57","booth":"11631","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Riceland Foods","exhibitor_id":"demo_58","booth":"13633","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"GELAGRI IBERICA","exhibitor_id":"demo_59","booth":"11530","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Oatly","exhibitor_id":"demo_60","booth":"1874","hall": {"code":"S","name":"South"},"categories":["Beverage"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Private Spring Water, Inc.","exhibitor_id":"demo_61","booth":"1344","hall": {"code":"S","name":"South"},"categories":["Beverage"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Walters Bay","exhibitor_id":"demo_62","booth":"5537","hall": {"code":"N","name":"North"},"categories":["Beverage"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Green Experts Corp","exhibitor_id":"demo_63","booth":"126","hall": {"code":"S","name":"South"},"categories":["Beverage"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"De Soi","exhibitor_id":"demo_64","booth":"13849","hall": {"code":"E","name":"East"},"categories":["Beverage"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"VendiBean","exhibitor_id":"demo_65","booth":"12244","hall": {"code":"E","name":"East"},"categories":["Beverage"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"IGC","exhibitor_id":"demo_66","booth":"11632","hall": {"code":"E","name":"East"},"categories":["Beverage"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"MUD\\WTR","exhibitor_id":"demo_67","booth":"284","hall": {"code":"S","name":"South"},"categories":["Beverage"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"eCard Systems","exhibitor_id":"demo_68","booth":"7053","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"SIGNET INTERNATIONAL, LLC","exhibitor_id":"demo_69","booth":"8332","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Metafoodx","exhibitor_id":"demo_70","booth":"5930","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Long Range Solutions LLC","exhibitor_id":"demo_71","booth":"3961","hall": {"code":"S","name":"South"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"IdealTraits","exhibitor_id":"demo_72","booth":"8430","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Castle Gaming","exhibitor_id":"demo_73","booth":"8829","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Share-ify","exhibitor_id":"demo_74","booth":"8537","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"JTECH","exhibitor_id":"demo_75","booth":"5565","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Nory","exhibitor_id":"demo_76","booth":"5857","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Trivedi Advanced Technologies LLC","exhibitor_id":"demo_77","booth":"8915","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Advantech","exhibitor_id":"demo_78","booth":"6470","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Taiv","exhibitor_id":"demo_79","booth":"8540","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Informa Connect Foodservice","exhibitor_id":"demo_80","booth":"6100","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"DoorDash","exhibitor_id":"demo_81","booth":"5653","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Solink","exhibitor_id":"demo_82","booth":"6872","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"QSR Automations, LLC.","exhibitor_id":"demo_83","booth":"6021","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Rota Robotics LLC","exhibitor_id":"demo_84","booth":"8613","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"CreatoRain","exhibitor_id":"demo_85","booth":"8614","hall": {"code":"N","name":"North"},"categories":["Technology & Entertainment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"MicroTouch Interactive, Inc.","exhibitor_id":"demo_86","booth":"8307","hall": {"code":"N","name":"North"},"categories":["Equipment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"IND END. DAYANIKLI TUKETIM URUNLERI SAN. VE TIC. A.S.","exhibitor_id":"demo_87","booth":"808","hall": {"code":"S","name":"South"},"categories":["Equipment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Easy Ice","exhibitor_id":"demo_88","booth":"13936","hall": {"code":"E","name":"East"},"categories":["Equipment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"UNOX INC.","exhibitor_id":"demo_89","booth":"4818","hall": {"code":"S","name":"South"},"categories":["Equipment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"GUANGZHOU JORUI ELECTICAL CO.,LTD","exhibitor_id":"demo_90","booth":"5433","hall": {"code":"S","name":"South"},"categories":["Equipment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"During USA","exhibitor_id":"demo_91","booth":"8612","hall": {"code":"N","name":"North"},"categories":["Equipment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Suzhou Ever Ocean Electronic Technology Co.,Ltd.","exhibitor_id":"demo_92","booth":"13339","hall": {"code":"E","name":"East"},"categories":["Equipment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"PizzaMaster","exhibitor_id":"demo_93","booth":"3808","hall": {"code":"S","name":"South"},"categories":["Equipment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Arcobaleno Pasta Machines, LLC","exhibitor_id":"demo_94","booth":"1268","hall": {"code":"S","name":"South"},"categories":["Equipment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"AyrKing, LLC.","exhibitor_id":"demo_95","booth":"4012","hall": {"code":"S","name":"South"},"categories":["Equipment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"MRCOOL LLC","exhibitor_id":"demo_96","booth":"8912","hall": {"code":"N","name":"North"},"categories":["Equipment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"TEKNIK ISISAN REZISTANS SAN. VE TIC. LTD. STI.","exhibitor_id":"demo_97","booth":"1209","hall": {"code":"S","name":"South"},"categories":["Equipment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Sephra USA LLC","exhibitor_id":"demo_98","booth":"12338","hall": {"code":"E","name":"East"},"categories":["Equipment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"C. Cretors & Co.","exhibitor_id":"demo_99","booth":"1938","hall": {"code":"S","name":"South"},"categories":["Equipment"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Norpac Fisheries Export","exhibitor_id":"demo_100","booth":"7766","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Donna Italia USA Inc","exhibitor_id":"demo_101","booth":"3249","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"DNI Group, LLC","exhibitor_id":"demo_102","booth":"11227","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Sky Blue Enterprises","exhibitor_id":"demo_103","booth":"11102","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Maeda Kaisan","exhibitor_id":"demo_104","booth":"11321","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Sriracha2Go","exhibitor_id":"demo_105","booth":"12119","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Klimon","exhibitor_id":"demo_106","booth":"2188","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Plenus Group Inc.","exhibitor_id":"demo_107","booth":"1275","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Celtrade","exhibitor_id":"demo_108","booth":"791","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Seafresh Trading Inc","exhibitor_id":"demo_109","booth":"12342","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"BioTech Foods SL","exhibitor_id":"demo_110","booth":"350","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Terrapin Ridge Farms LLC","exhibitor_id":"demo_111","booth":"13212","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"McCall Farms, Inc.","exhibitor_id":"demo_112","booth":"8070","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Finding Home Farms","exhibitor_id":"demo_113","booth":"8057","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"PizzaSi","exhibitor_id":"demo_114","booth":"11142","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"BSF","exhibitor_id":"demo_115","booth":"13034","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Rotella's Italian Bakery","exhibitor_id":"demo_116","booth":"12624","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"SUGIYO U.S.A., INC.","exhibitor_id":"demo_117","booth":"8164","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"California Specialty Farms","exhibitor_id":"demo_118","booth":"11029","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Shoup's Country Foods, Inc.","exhibitor_id":"demo_119","booth":"7759","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Wonderful Citrus","exhibitor_id":"demo_120","booth":"13505","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Amafruits","exhibitor_id":"demo_121","booth":"1485","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Mylk Labs","exhibitor_id":"demo_122","booth":"1490","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"The Sugarman of Vermont, LLC","exhibitor_id":"demo_123","booth":"11938","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Whoa Dough","exhibitor_id":"demo_124","booth":"13105","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Nisshin OilliO America Inc","exhibitor_id":"demo_125","booth":"11028","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Gordian","exhibitor_id":"demo_126","booth":"11729","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Fortune Trading LLC","exhibitor_id":"demo_127","booth":"12718","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"franz foods llc","exhibitor_id":"demo_128","booth":"591","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Ernestine Foods","exhibitor_id":"demo_129","booth":"7747","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Gumusdoga Seafood","exhibitor_id":"demo_130","booth":"11542","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"KOTRA - Korea Trade Investment Promotion Agency","exhibitor_id":"demo_131","booth":"460","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Todd's Foods","exhibitor_id":"demo_132","booth":"13439","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Green Mountain Flavors, Inc.","exhibitor_id":"demo_133","booth":"7955","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Fresh Origins","exhibitor_id":"demo_134","booth":"12344","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Alden Oils","exhibitor_id":"demo_135","booth":"7863","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Michigan Potatoes","exhibitor_id":"demo_136","booth":"8171","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Litehouse Foodservice","exhibitor_id":"demo_137","booth":"13233","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Local Hive Honey","exhibitor_id":"demo_138","booth":"8055","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Bambuza Vietnam Kitchen","exhibitor_id":"demo_139","booth":"7876","hall": {"code":"N","name":"North"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"THAI AGRI FOODS PUBLIC COMPANY LIMITED","exhibitor_id":"demo_140","booth":"11536","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Adelina Baking Co.","exhibitor_id":"demo_141","booth":"13044","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Lund's Fisheries Inc.","exhibitor_id":"demo_142","booth":"12807","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Sweet Mesquite Bakery","exhibitor_id":"demo_143","booth":"3663","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Labrezza S.A.","exhibitor_id":"demo_144","booth":"11532","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Padilla Import Sales & Marketing","exhibitor_id":"demo_145","booth":"1951","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Sabatino Truffles","exhibitor_id":"demo_146","booth":"12727","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Primstar BV","exhibitor_id":"demo_147","booth":"11345","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Chaucer Foods Inc.","exhibitor_id":"demo_148","booth":"12732","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Gusto Brazil","exhibitor_id":"demo_149","booth":"12332","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"La Tourangelle","exhibitor_id":"demo_150","booth":"1189","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Trinity Frozen Foods, LLC","exhibitor_id":"demo_151","booth":"2090","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"HOS Global Foods","exhibitor_id":"demo_152","booth":"585","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Magic Seasoning Blends","exhibitor_id":"demo_153","booth":"1531","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Culinevo Kitchen","exhibitor_id":"demo_154","booth":"13332","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"FINE9 INTERNATIONAL CO., LTD.","exhibitor_id":"demo_155","booth":"11629","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Somi Shokuhin Co., Ltd","exhibitor_id":"demo_156","booth":"11521","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Stacked Farm","exhibitor_id":"demo_157","booth":"589","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"SUREE INTERFOODS CO., LTD.","exhibitor_id":"demo_158","booth":"11527","hall": {"code":"E","name":"East"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Thoma Food International","exhibitor_id":"demo_159","booth":"457","hall": {"code":"S","name":"South"},"categories":["Food"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Dayou Industrial (Shanghai) Co., Ltd.\u00a0","exhibitor_id":"demo_160","booth":"3145","hall": {"code":"S","name":"South"},"categories":["Beverage"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Winebow","exhibitor_id":"demo_161","booth":"11236","hall": {"code":"E","name":"East"},"categories":["Adult Beverage","Beverage"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"North Canna Co","exhibitor_id":"demo_162","booth":"14037","hall": {"code":"E","name":"East"},"categories":["Adult Beverage","Beverage"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Elite Wine Selections Inc","exhibitor_id":"demo_163","booth":"11136","hall": {"code":"E","name":"East"},"categories":["Beverage"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"BolognaFiere S.p.A.","exhibitor_id":"demo_164","booth":"11121","hall": {"code":"E","name":"East"},"categories":["Adult Beverage","Beverage"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Liquid Death","exhibitor_id":"demo_165","booth":"12335","hall": {"code":"E","name":"East"},"categories":["Beverage"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Margarita Man","exhibitor_id":"demo_166","booth":"12716","hall": {"code":"E","name":"East"},"categories":["Beverage"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"PKN","exhibitor_id":"demo_167","booth":"1691","hall": {"code":"S","name":"South"},"categories":["Beverage"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"PepsiCo","exhibitor_id":"demo_168","booth":"3224","hall": {"code":"S","name":"South"},"categories":["Beverage"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Ponthier","exhibitor_id":"demo_169","booth":"12635","hall": {"code":"E","name":"East"},"categories":["Beverage"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"DURE Co.,Ltd.","exhibitor_id":"demo_170","booth":"11742","hall": {"code":"E","name":"East"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Able Packaging Co., Ltd.","exhibitor_id":"demo_171","booth":"125","hall": {"code":"S","name":"South"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Inline Plastics Corp.","exhibitor_id":"demo_172","booth":"12734","hall": {"code":"E","name":"East"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Custom Cup Factory","exhibitor_id":"demo_173","booth":"11309","hall": {"code":"E","name":"East"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Solupac","exhibitor_id":"demo_174","booth":"12822","hall": {"code":"E","name":"East"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"KCooper Brands","exhibitor_id":"demo_175","booth":"13111","hall": {"code":"E","name":"East"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"GM Resource Inc","exhibitor_id":"demo_176","booth":"9125","hall": {"code":"N","name":"North"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Shantou Rongya Packaging Industry Co., Ltd","exhibitor_id":"demo_177","booth":"3370","hall": {"code":"S","name":"South"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Tronex International","exhibitor_id":"demo_178","booth":"5253","hall": {"code":"S","name":"South"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Pando EP Technology","exhibitor_id":"demo_179","booth":"127","hall": {"code":"S","name":"South"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"GARCIA DE POU","exhibitor_id":"demo_180","booth":"4476","hall": {"code":"S","name":"South"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"ReGen","exhibitor_id":"demo_181","booth":"11230","hall": {"code":"E","name":"East"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Suvjay Industries India LLP","exhibitor_id":"demo_182","booth":"11026","hall": {"code":"E","name":"East"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Art Printing Co.","exhibitor_id":"demo_183","booth":"1661","hall": {"code":"S","name":"South"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Roses Southwest Papers Inc.","exhibitor_id":"demo_184","booth":"12947","hall": {"code":"E","name":"East"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Otor Technology Co., Ltd.","exhibitor_id":"demo_185","booth":"2238","hall": {"code":"S","name":"South"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Unican Commercial Limited","exhibitor_id":"demo_186","booth":"1414","hall": {"code":"S","name":"South"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"TCI - Textiles Coated International","exhibitor_id":"demo_187","booth":"4674","hall": {"code":"S","name":"South"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"South Plastic Industry Co., Ltd","exhibitor_id":"demo_188","booth":"238","hall": {"code":"S","name":"South"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Quality Carton & Converting","exhibitor_id":"demo_189","booth":"13118","hall": {"code":"E","name":"East"},"categories":["Paper; Plastics & Supplies"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Able Solutions USA, Inc","exhibitor_id":"demo_190","booth":"13527","hall": {"code":"E","name":"East"},"categories":["Services"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Emerald Lawn and Landscaping Facilities","exhibitor_id":"demo_191","booth":"9011","hall": {"code":"N","name":"North"},"categories":["Services"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Baker Commodities Inc.","exhibitor_id":"demo_192","booth":"1735","hall": {"code":"S","name":"South"},"categories":["Services"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Movie Night International","exhibitor_id":"demo_193","booth":"949","hall": {"code":"S","name":"South"},"categories":["Services"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Modisoft","exhibitor_id":"demo_194","booth":"5662","hall": {"code":"N","name":"North"},"categories":["Services"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"ZT Logistics Inc.","exhibitor_id":"demo_195","booth":"13734","hall": {"code":"E","name":"East"},"categories":["Services"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Prefix Maintenance, Inc","exhibitor_id":"demo_196","booth":"8541","hall": {"code":"N","name":"North"},"categories":["Services"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"BILGE INOKS SAN VE TIC AS","exhibitor_id":"demo_197","booth":"810","hall": {"code":"S","name":"South"},"categories":["Services"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"86DeadStock","exhibitor_id":"demo_198","booth":"13811","hall": {"code":"E","name":"East"},"categories":["Services"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."},{"name":"Aztec Promotional Group","exhibitor_id":"demo_199","booth":"5553","hall": {"code":"N","name":"North"},"categories":["Services"],"badges":[],"featured":false,"description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}];
-  const seedLookups = translateSourceToLookups(ARTIFACT_SEED);
-  BOOTHS = seedLookups.BOOTHS;
-  SEARCH_DATA = seedLookups.SEARCH_DATA;
-  return;
-
-  // Original fetch logic preserved below for porting back to deployable index.html.
+  // Deployable build: fetches NRA_Show_2026_Exhibitors.json from the repo at
+  // runtime. Cached in localStorage after first successful fetch so subsequent
+  // loads are immediate; cached data is also refreshed in the background on
+  // each visit so updates to the JSON propagate without a hard reload.
+  // The chat-artifact build (index_artifact.html) inlines a seed array here
+  // instead, since the artifact preview cannot fetch external files.
   let cached = null;
   try {
     const raw = localStorage.getItem(EXHIBITOR_CACHE_KEY);
@@ -5647,11 +5880,11 @@ async function loadExhibitorData() {
     return;
   }
 
-  // No cache - show loader
+  // No cache - show a loader while the first fetch completes.
   const loader = document.createElement('div');
   loader.id = 'exhibitor-loader';
   loader.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:var(--off-white);display:flex;align-items:center;justify-content:center;z-index:9999;font-family:var(--font);color:var(--text-secondary);font-size: 20px;text-align:center;padding:20px;';
-  loader.textContent = 'Loading exhibitor list...';
+  loader.textContent = 'Loading exhibitor list\u2026';
   document.body.appendChild(loader);
 
   try {
@@ -5835,13 +6068,13 @@ function buildPhotoCapture(formId, anchorEl) {
   // one library (no capture). Two buttons trigger them. A third area
   // surfaces upload errors when they happen.
   wrap.innerHTML = `
-    <div style="font-size: 14px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-hint);margin-top:10px;margin-bottom:4px;">Photos (optional, up to ${PHOTO_MAX})</div>
+    <div style="font-family:var(--font-body);font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-primary);margin-top:10px;margin-bottom:8px;">Photos (optional, up to ${PHOTO_MAX})</div>
     <div class="photos-thumbs-grid" id="photos-thumbs-${formId}"></div>
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
       <input type="file" id="photos-input-take-${formId}" accept="image/*" capture="environment" style="display:none">
       <input type="file" id="photos-input-attach-${formId}" accept="image/*" style="display:none">
-      <button type="button" id="photos-takebtn-${formId}" style="flex:1;padding:8px;font-size: 17px;background:transparent;color:var(--text-secondary);border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);cursor:pointer;" onclick="document.getElementById('photos-input-take-${formId}').click()">Take</button>
-      <button type="button" id="photos-attachbtn-${formId}" style="flex:1;padding:8px;font-size: 17px;background:transparent;color:var(--text-secondary);border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);cursor:pointer;" onclick="document.getElementById('photos-input-attach-${formId}').click()">Attach</button>
+      <button type="button" id="photos-takebtn-${formId}" style="flex:1;padding:10px;font-size:15px;background:transparent;color:var(--text-secondary);border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);cursor:pointer;" onclick="document.getElementById('photos-input-take-${formId}').click()">Take</button>
+      <button type="button" id="photos-attachbtn-${formId}" style="flex:1;padding:10px;font-size:15px;background:transparent;color:var(--text-secondary);border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);cursor:pointer;" onclick="document.getElementById('photos-input-attach-${formId}').click()">Attach</button>
     </div>
     <div id="photos-error-${formId}" style="display:none;font-size:13px;color:var(--record-red);margin:-4px 0 8px;line-height:1.4;"></div>`;
   anchorEl.parentNode.insertBefore(wrap, anchorEl);
@@ -5975,11 +6208,6 @@ function buildIdentityDropdown() {
   const sortedPeople = [...PEOPLE].sort((a,b) => a.first.localeCompare(b.first));
   sortedPeople.forEach(p => {
     dd.appendChild(makeIdentityItem(p.id, p.name, formatTagsForDisplay(p.tags), 'person'));
-  });
-
-  dd.appendChild(makeSection('Departments'));
-  DEPARTMENTS.forEach(d => {
-    dd.appendChild(makeIdentityItem(d.id, d.name, '', 'department'));
   });
 
   dd.appendChild(makeSection('All Team'));
@@ -6339,15 +6567,15 @@ function selectExhibitor(booth, name, hall, hallCode) {
   const block = document.getElementById('selected-exhibitor-block');
   block.style.display = 'block';
   const selInfo = BOOTHS[booth];
-  const selFirstCat = selInfo && selInfo.cat && selInfo.cat.length ? selInfo.cat[0] : '';
-  const isEbPartnerSelected = ["1488","1671","1863","2454","2712","3472","5607","6245","7207","7659","7850","7980","8067","11518","12006","12807","13102","13239","13306","13345","13823"].includes(String(booth));
+  const selCats = (selInfo && Array.isArray(selInfo.cat)) ? selInfo.cat : [];
+  const isEbPartnerSelected = EB_PARTNER_BOOTHS.has(String(booth));
   block.innerHTML = `
     <div class="selected-exhibitor">
       <div class="selected-exhibitor-name${isEbPartnerSelected ? ' eb-partner' : ''}">${name}</div>
       <div class="selected-exhibitor-meta">
         <span class="hall-pill hall-${hallCode}">${hall}</span>
         <span class="booth-pill">#${booth}</span>
-        ${selFirstCat ? `<span class="category-pill">${escapeHtml(selFirstCat)}</span>` : ''}
+        ${selCats.map(c => `<span class="category-pill">${escapeHtml(c)}</span>`).join('')}
       </div>
       <button type="button" class="selected-exhibitor-clear" onclick="clearExhibitor()" aria-label="Clear" title="Clear">
         <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
@@ -6357,9 +6585,10 @@ function selectExhibitor(booth, name, hall, hallCode) {
 
   document.getElementById('discover-form-block').style.display = 'block';
 
-  // DOT question visible only for food vendors
+  // DOT question visible for consumable categories (Food + beverages)
   const info = BOOTHS[booth];
-  const isFood = info && Array.isArray(info.cat) && info.cat.includes('Food');
+  const DOT_CATEGORIES = ['Food', 'Beverage', 'Adult Beverage'];
+  const isFood = info && Array.isArray(info.cat) && info.cat.some(c => DOT_CATEGORIES.includes(c));
   document.getElementById('dot-question-block').style.display = isFood ? 'block' : 'none';
   // If DOT applies, auto-open the Add details disclosure so the user sees it
   if (isFood) {
@@ -6663,9 +6892,10 @@ async function submitEntry() {
   const onlySelf = selectedRecipientSelf && selectedRecipientPeople.length === 0 && selectedRecipientGroups.length === 0;
   if (!note && !onlySelf) { alert('Add a note before submitting.'); return; }
 
-  // DOT answer required if the food question was shown
+  // DOT answer required if the question was shown (Food + beverages)
   const info = BOOTHS[selectedExhibitor.booth];
-  const isFood = info && Array.isArray(info.cat) && info.cat.includes('Food');
+  const DOT_CATEGORIES = ['Food', 'Beverage', 'Adult Beverage'];
+  const isFood = info && Array.isArray(info.cat) && info.cat.some(c => DOT_CATEGORIES.includes(c));
   if (isFood && !dotAnswer) {
     alert('Answer the DOT question before submitting.');
     return;
@@ -7186,7 +7416,7 @@ function renderExploreSection(title, cards, sectionKey) {
       <span class="explore-section-title">${title}</span>
       <span class="explore-section-count">${cards.length}</span>
     </div>
-    <div class="${sectionClass}">${body}</div>
+    <div class="${sectionClass} explore-section-body" data-section="${sectionKey}">${body}</div>
   `;
 }
 
@@ -7201,7 +7431,7 @@ function renderExploreCard(card) {
   const viewerId = currentIdentity ? currentIdentity.id : '';
   const hasDiscovery = (card.entries || []).some(e => e.creator === viewerId && e.note && e.note.trim());
   const discoveryClass = hasDiscovery ? ' has-discovery' : '';
-  const isEbPartner = ["1488","1671","1863","2454","2712","3472","5607","6245","7207","7659","7850","7980","8067","11518","12006","12807","13102","13239","13306","13345","13823"].includes(String(card.booth));
+  const isEbPartner = EB_PARTNER_BOOTHS.has(String(card.booth));
 
   // My-list cards have no entries and no "From" attribution. They are private
   // intentions the viewer added themselves before the show.
@@ -7250,17 +7480,26 @@ function renderExploreCard(card) {
        </div>`
     : '';
 
-  // Body for my-list cards: exhibitor details + remove action. For dept/peer
-  // cards: exhibitor details + entries.
+  // Body for my-list cards: exhibitor details + remove action. For bookmark
+  // hit-list cards (origin 'mine' with an empty self-entry): show details, a
+  // "Capture discovery" CTA that routes to Discover with the booth
+  // pre-selected, and Remove. For peer/dept cards: details + entries.
   const bodyContent = isMyListCard
     ? `${expandedMeta}
        ${renderExhibitorDetailsBlock(card.booth)}
        <div class="explore-card-mylist-actions">
          <button type="button" class="explore-card-mylist-remove" onclick="handleRemoveFromMyList('${card.booth}', event)">Remove from your list</button>
        </div>`
-    : `${expandedMeta}
-       ${renderExhibitorDetailsBlock(card.booth)}
-       ${card.entries.map(e => renderExploreEntry(e, card)).join('')}`;
+    : card.isBookmark
+      ? `${expandedMeta}
+         ${renderExhibitorDetailsBlock(card.booth)}
+         <div class="explore-card-mylist-actions">
+           <button type="button" class="btn-primary" onclick="event.stopPropagation();captureFromBookmark('${card.booth}')">Discovery Capture</button>
+           <button type="button" class="explore-card-mylist-remove" onclick="handleRemoveFromMyList('${card.booth}', event)">Remove</button>
+         </div>`
+      : `${expandedMeta}
+         ${renderExhibitorDetailsBlock(card.booth)}
+         ${card.entries.map(e => renderExploreEntry(e, card)).join('')}`;
 
   return `
     <div class="explore-card ${originClass}${engagedClass}${expandedClass}${justEngagedClass}${discoveryClass}${card.isBookmark ? ' bookmark' : ''}" data-booth="${card.booth}">
@@ -7389,11 +7628,22 @@ function renderExhibitorDetailsBlock(booth) {
   const aboutToggle = info.d ? `
     <button class="exhibitor-about-toggle" onclick="event.stopPropagation();toggleAbout(this)">About this exhibitor &#9660;</button>
     <div class="exhibitor-about-text">${escapeHtml(info.d)}</div>` : '';
-  if (chips.length === 0 && !info.d) return '';
+
+  // Admins (Andy, Darrin, Dawn, Wade) get an "Add to Partners" CTA on any
+  // booth that isn't already a partner.
+  const viewerId = currentIdentity && currentIdentity.kind === 'person' ? currentIdentity.id : '';
+  const isAdmin = ADMINS.includes(viewerId);
+  const alreadyPartner = EB_PARTNER_BOOTHS.has(String(booth));
+  const addPartnerCta = (isAdmin && !alreadyPartner)
+    ? `<button type="button" class="add-partner-btn" onclick="event.stopPropagation();addBoothToPartners('${booth}')">Add to Partners</button>`
+    : '';
+
+  if (chips.length === 0 && !info.d && !addPartnerCta) return '';
   return `
     <div class="exhibitor-details-block">
       ${chips.length ? `<div class="exhibitor-details-row">${chips.join('')}</div>` : ''}
       ${aboutToggle}
+      ${addPartnerCta}
     </div>
   `;
 }
@@ -8156,7 +8406,7 @@ function renderMeAvatar() {
   const el = document.getElementById('chrome-me-initials');
   const circle = el ? el.parentElement : null;
   if (!el || !circle) return;
-  const BLUE = '#7A9BC4'; // matches --tertiary / --blue
+  const ACCENT = '#E87D3E'; // matches greeting-name orange
   if (!currentIdentity) {
     el.textContent = '--';
     el.style.color = 'var(--text-hint)';
@@ -8183,8 +8433,8 @@ function renderMeAvatar() {
     initialsStr = initials(ident.name);
   }
   el.textContent = initialsStr;
-  el.style.color = BLUE;
-  circle.style.borderColor = BLUE;
+  el.style.color = ACCENT;
+  circle.style.borderColor = ACCENT;
 }
 window.renderMeAvatar = renderMeAvatar;
 
@@ -8287,15 +8537,18 @@ function renderMyNotes() {
   });
 
   // Flash signal: if there are shared-in notes the viewer hasn't seen yet,
-  // pulse the My Notes head. Seen-state is keyed per viewer in localStorage;
-  // expanding the section (toggleNotesSection) clears it.
+  // pulse the My Notes head AND show a persistent unseen-count badge. Seen
+  // state is keyed per viewer in localStorage; expanding the section clears.
   if (notesHead) {
     const seenKey = 'notes:seen:' + viewerId;
     let seen = [];
     try { seen = JSON.parse(localStorage.getItem(seenKey) || '[]'); } catch(e) {}
     const sharedIds = mine.filter(e => e.creator !== viewerId).map(e => e.id);
-    const hasUnseen = sharedIds.some(id => !seen.includes(id));
+    const unseenCount = sharedIds.filter(id => !seen.includes(id)).length;
+    const hasUnseen = unseenCount > 0;
     notesHead.classList.toggle('flash', hasUnseen);
+    const badge = document.getElementById('notes-head-badge');
+    if (badge) badge.textContent = hasUnseen ? String(unseenCount) : '';
   }
 
   // Vertical list (expanded state): all notes.
@@ -8397,22 +8650,23 @@ window.toggleNotesSection = toggleNotesSection;
 // Render a single note item (collapsed by default; expandable).
 function renderMyNoteItem(entry) {
   const text = (entry.note || '').trim();
-  // Title = first line of the note (truncated by CSS via white-space:nowrap).
-  // If the note is empty (photo-only memo), use a fallback title.
   const firstLine = text.split('\n')[0] || '(photo note)';
-  const title = escapeHtml(firstLine);
   const timeStr = formatRelativeTime(entry.timestamp || entry.createdAt || Date.now());
   const photos = (entry.photoUrls || []).map(url =>
     `<img src="${escapeHtml(url)}" alt="" onclick="openLightbox('${escapeHtml(url)}')">`
   ).join('');
-  // From byline if the viewer isn't the author.
+  // Shared-in: title becomes "First L. note text" inline. Own notes: title is
+  // just the first line. The FROM byline row is dropped for shared-in since
+  // the author now sits inline in the title.
   const viewerId = currentIdentity ? currentIdentity.id : '';
   const isShared = entry.creator && entry.creator !== viewerId;
-  let fromLine = '';
+  let title;
   if (isShared) {
     const author = PEOPLE.find(p => p.id === entry.creator);
     const displayName = author ? formatAuthorShort(author) : entry.creator;
-    fromLine = `<div class="my-note-from">FROM ${escapeHtml(displayName.toUpperCase())}</div>`;
+    title = `<span class="my-note-from-inline">${escapeHtml(displayName)}</span>`;
+  } else {
+    title = escapeHtml(firstLine);
   }
   return `
     <div class="my-note-item${isShared ? ' shared-in' : ''}" onclick="toggleMyNoteItem(this)">
@@ -8421,7 +8675,6 @@ function renderMyNoteItem(entry) {
         <span class="my-note-time">${escapeHtml(timeStr)}</span>
         <span class="my-note-arrow">&#9660;</span>
       </div>
-      ${fromLine}
       <div class="my-note-body">
         ${text ? `<div class="my-note-text">${escapeHtml(text)}</div>` : ''}
         ${photos ? `<div class="my-note-photos">${photos}</div>` : ''}
@@ -8473,14 +8726,7 @@ function formatRelativeTime(ts) {
 // re-renders preserve which pills are open.
 const expandedTrendLines = new Set();
 
-// EB_PARTNER_BOOTHS already declared above as a Set. Reuse it here.
-let ebPartnersExpanded = false;
-
-function toggleEbPartners() {
-  ebPartnersExpanded = !ebPartnersExpanded;
-  if (typeof renderExplore === 'function') renderExplore();
-}
-window.toggleEbPartners = toggleEbPartners;
+// EB_PARTNER_BOOTHS already declared above as a Set.
 
 function renderEbPartnersSection() {
   // Resolve booth numbers to exhibitor names + halls via BOOTHS.
@@ -8493,48 +8739,57 @@ function renderEbPartnersSection() {
     };
   }).filter(r => r.name).sort((a, b) => a.name.localeCompare(b.name));
 
-  const headerText = ebPartnersExpanded
-    ? 'Our EB Brands'
-    : 'Our EB Brands (Tap to Expand)';
-
-  if (!ebPartnersExpanded) {
+  const rowsHtml = rows.map(r => {
+    const hallCode = r.hall ? r.hall.charAt(0) : '';
     return `
-      <div class="explore-section-head eb-partners-head" data-section="ebpartners" onclick="toggleEbPartners()">
-        <span class="explore-section-title">${headerText}</span>
-        <span class="eb-partners-arrow">&#9660;</span>
+      <div class="eb-partner-row" onclick="captureFromBookmark('${r.booth}')">
+        <div class="eb-partner-row-name">${escapeHtml(r.name)}</div>
+        <div class="eb-partner-row-meta">${escapeHtml(r.hall || '')} &middot; Booth ${escapeHtml(r.booth)}</div>
       </div>`;
-  }
-
-  const rowsHtml = rows.map(r => `
-    <div class="eb-partner-row" onclick="openExhibitorCard('${escapeHtml(r.booth)}')">
-      <div class="eb-partner-row-name">${escapeHtml(r.name)}</div>
-      <div class="eb-partner-row-meta">${escapeHtml(r.hall || '')} &middot; Booth ${escapeHtml(r.booth)}</div>
-    </div>`).join('');
+  }).join('');
 
   return `
-    <div class="explore-section-head eb-partners-head open" data-section="ebpartners" onclick="toggleEbPartners()">
-      <span class="explore-section-title">${headerText}</span>
-      <span class="eb-partners-arrow">&#9660;</span>
+    <div class="explore-section-head eb-partners-head open" data-section="ebpartners">
+      <span class="explore-section-title">Our Partners</span>
     </div>
     <div class="eb-partners-body">
       <div class="eb-partners-message">
-        Stop by these booths and introduce yourself. Be yourself, leave a card (and/or Wade's). These are our partners year-round, a few minutes face-to-face with them now, and a stack of Harbor business cards that dominate is partnership building, that keep us, you, and your accounts their priority.
+        Stop by these booths and introduce yourself. Be yourself, leave a card (and/or Wade's).
+        <br><br>
+        These are our partners year-round, a few minutes face-to-face with them now, your scanned badges and the stack of Harbor business cards feeds the relationship that keep us, you, and your accounts their priority.
       </div>
       <div class="eb-partner-list">${rowsHtml}</div>
     </div>`;
 }
 
-// Open the standard exhibitor card UI for a given booth. Opens the Discover
-// tab and pre-selects the exhibitor so the card flow takes over from there.
-function openExhibitorCard(booth) {
+// Open the standard exhibitor card UI for a given booth. Switches to the
+// Discover screen and pre-selects the exhibitor so the discovery flow takes
+// over from there.
+function openExhibitorCard(booth, name, hall, hallCode) {
+  // Switch to the screen that carries the exhibitor selection / discovery
+  // capture flow ('explore' is the For Us tab where this lives).
+  if (typeof showScreen === 'function') showScreen('explore');
   if (typeof selectExhibitor === 'function') {
-    selectExhibitor(String(booth));
+    selectExhibitor(String(booth), name || '', hall || '', hallCode || '');
   }
-  // Switch to Discover screen if available.
-  const btn = document.querySelector('[data-screen="discover"]');
-  if (btn) btn.click();
+  // Scroll the selected exhibitor block into view after layout settles.
+  setTimeout(() => {
+    const block = document.getElementById('selected-exhibitor-block');
+    if (block) block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 50);
 }
 window.openExhibitorCard = openExhibitorCard;
+
+// Helper for Hit List bookmark CTA. Looks up the booth in BOOTHS and routes
+// through the standard openExhibitorCard flow.
+function captureFromBookmark(booth) {
+  const info = (typeof BOOTHS !== 'undefined') ? BOOTHS[String(booth)] : null;
+  const name = info && info.n ? info.n : '';
+  const hallCode = info && info.h ? info.h : '';
+  const hallName = (typeof HALL_FULL !== 'undefined' && HALL_FULL[hallCode]) ? HALL_FULL[hallCode] : hallCode;
+  openExhibitorCard(String(booth), name, hallName, hallCode);
+}
+window.captureFromBookmark = captureFromBookmark;
 
 function renderTrendLinesSection() {
   if (!Array.isArray(BOLO_ITEMS) || BOLO_ITEMS.length === 0) return '';
@@ -8551,12 +8806,36 @@ function renderTrendLinesSection() {
         </div>
       </div>`;
   });
+  const openClass = trendLinesExpanded ? ' open' : '';
+  const topLabel = trendLinesExpanded ? 'Collapse' : 'See our trend lines';
   return `
     <div class="explore-section-head" data-section="trendlines">
       <span class="explore-section-title">PNW Trend Lines</span>
     </div>
-    <div class="trend-pills">${body}</div>`;
+    <div class="trend-pills">
+      <div class="eb-partners-message" style="padding: 0 4px 12px; margin-bottom: 4px;">
+        Here's what our frontline TSCs and back-line Category Managers are seeing right now, plus what their industry instincts are telling them.
+        <br><br>
+        Open each card for the full read: recommended booths, the reasoning behind them, and the questions worth asking so we come home with answers our people can use.
+      </div>
+      <button type="button" class="trend-toggle${openClass}" onclick="toggleTrendLines()" aria-label="Toggle trend lines">
+        <span>${topLabel}</span>
+        <span class="trend-toggle-icon"></span>
+      </button>
+      <div class="trend-stack${openClass}">
+        ${body}
+      </div>
+      <div class="trend-toggle-divider"></div>
+    </div>`;
 }
+
+// Collapsed by default. Toggled by the plus/x buttons at the top and bottom.
+let trendLinesExpanded = false;
+function toggleTrendLines() {
+  trendLinesExpanded = !trendLinesExpanded;
+  renderExplore();
+}
+window.toggleTrendLines = toggleTrendLines;
 
 // Render the expandable body of a trend line. Mirrors the BOLO detail
 // modal: categories strip, trend paragraph, structured who list, and the
@@ -9309,35 +9588,198 @@ function renderReport() {
     body.innerHTML = '<div class="report-empty">Pick an identity to see your report.</div>';
     return;
   }
+  const viewerId = currentIdentity.id;
   const data = buildReportData();
 
-  // Notes: voice memos the viewer captured.
-  let notesHtml = '';
-  if (data.memos.length === 0) {
-    notesHtml = '<div class="report-empty">No notes captured yet.</div>';
-  } else {
-    notesHtml = data.memos.map(renderReportNote).join('');
+  // Classify each captured booth entry into a bucket.
+  //   - bookmark: empty-note self-tag (Hit List)
+  //   - engaged:  the booth has at least one inbound entry the viewer responded to
+  //               OR the viewer's capture exists alongside a teammate's tag
+  //   - fromTrend: entry carries a boloId (originated from a trend line)
+  //   - discovery: everything else they captured (real notes, sent to others)
+  // An entry can fall into more than one bucket; precedence (most specific
+  // first): bookmark > fromTrend > engaged > discovery. This way the Hit List
+  // surfaces unaddressed bookmarks; once the user captures real content the
+  // entry moves out of the Hit List and into Discovery / Engaged / FromTrend.
+  const discoveries = [];
+  const engaged = [];
+  const fromTrends = [];
+  const hitList = [];
+
+  data.captured.forEach(e => {
+    const isBookmark = !e.note || !e.note.trim();
+    const hasBolo = (e.boloId !== null && e.boloId !== undefined);
+    const boothInbound = data.inbound.filter(i => i.booth === e.booth);
+    const isEngaged = boothInbound.length > 0;
+
+    if (isBookmark) {
+      hitList.push(e);
+    } else if (hasBolo) {
+      fromTrends.push(e);
+    } else if (isEngaged) {
+      engaged.push(e);
+    } else {
+      discoveries.push(e);
+    }
+  });
+
+  // Shared With Me: every inbound booth entry + every memo where the viewer
+  // is tagged but didn't author.
+  const sharedBooths = data.inbound.slice();
+  const sharedMemos = entries.filter(e =>
+    e.kind === 'memo' &&
+    e.creator !== viewerId &&
+    Array.isArray(e.taggedPeople) &&
+    e.taggedPeople.includes(viewerId)
+  );
+  const sharedAll = [...sharedBooths, ...sharedMemos];
+
+  // Responses the viewer authored on someone else's booth entry.
+  const responsesSent = [];
+  entries.forEach(e => {
+    if (!Array.isArray(e.responses)) return;
+    e.responses.forEach(r => {
+      if (r.responder === viewerId) {
+        responsesSent.push({ ...r, parentEntry: e });
+      }
+    });
+  });
+
+  // Sort each bucket newest-first by its own timestamp/createdAt.
+  const byTime = (a, b) => (
+    (b.timestamp || b.createdAt || 0) - (a.timestamp || a.createdAt || 0)
+  );
+  discoveries.sort(byTime);
+  engaged.sort(byTime);
+  fromTrends.sort(byTime);
+  sharedAll.sort(byTime);
+  hitList.sort(byTime);
+  data.memos.sort(byTime);
+  responsesSent.sort((a, b) =>
+    (b.timestamp || b.createdAt || 0) - (a.timestamp || a.createdAt || 0)
+  );
+
+  function section(title, count, html) {
+    if (count === 0) {
+      return `
+        <div class="report-section">
+          <div class="report-section-label">${title} <span class="report-section-count">0</span></div>
+          <div class="report-empty">Nothing here yet.</div>
+        </div>`;
+    }
+    return `
+      <div class="report-section">
+        <div class="report-section-label">${title} <span class="report-section-count">${count}</span></div>
+        ${html}
+      </div>`;
   }
 
-  // Discoveries: booth entries the viewer captured (their own captures only).
-  // Bolo-tagged discoveries appear in this same list with a Bolo chip.
-  const myDiscoveries = data.captured.slice().sort((a,b) =>
-    (b.timestamp || b.createdAt || 0) - (a.timestamp || a.createdAt || 0));
-  let discoveriesHtml = '';
-  if (myDiscoveries.length === 0) {
-    discoveriesHtml = '<div class="report-empty">No discoveries logged yet.</div>';
-  } else {
-    discoveriesHtml = myDiscoveries.map(renderReportDiscovery).join('');
+  function renderSharedItem(e) {
+    if (e.kind === 'memo') return renderReportSharedMemo(e);
+    return renderReportSharedBooth(e);
   }
 
   body.innerHTML = `
-    <div class="report-section section-notes">
-      <div class="report-section-label">My Notes</div>
-      ${notesHtml}
+    ${section('My Discoveries', discoveries.length, discoveries.map(renderReportDiscovery).join(''))}
+    ${section('My Engaged', engaged.length, engaged.map(renderReportDiscovery).join(''))}
+    ${section('From Trends', fromTrends.length, fromTrends.map(renderReportDiscovery).join(''))}
+    ${section('Shared With Me', sharedAll.length, sharedAll.map(renderSharedItem).join(''))}
+    ${section('My Hit List', hitList.length, hitList.map(renderReportBookmark).join(''))}
+    ${section('My Notes', data.memos.length, data.memos.map(renderReportNote).join(''))}
+    ${section('Responses Sent', responsesSent.length, responsesSent.map(renderReportResponseSent).join(''))}
+  `;
+}
+
+// Hit List bookmark: just the booth identity + when bookmarked + trend tag if any.
+function renderReportBookmark(entry) {
+  const ts = (entry.timestamp || entry.createdAt) ? new Date(entry.timestamp || entry.createdAt) : null;
+  const stamp = ts ? `${ts.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()} · ${ts.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}` : '';
+  const boloChip = (entry.boloId !== null && entry.boloId !== undefined && BOLO_ITEMS && BOLO_ITEMS[entry.boloId])
+    ? `<span class="report-item-bolo">${escapeHtml(BOLO_ITEMS[entry.boloId].name)}</span>`
+    : '';
+  const booth = entry.booth ? `Booth ${escapeHtml(entry.booth)}` : '';
+  const hall = entry.hallCode ? `${escapeHtml(entry.hallCode)} · ` : '';
+  return `
+    <div class="report-item">
+      <div class="report-item-head">
+        <span class="report-item-stamp">${escapeHtml(stamp)}</span>
+        ${boloChip}
+      </div>
+      <div class="report-item-booth">${escapeHtml(entry.name || '')}</div>
+      <div class="report-item-stamp" style="margin-bottom:4px;">${hall}${booth}</div>
     </div>
-    <div class="report-section section-discoveries">
-      <div class="report-section-label">My Discoveries</div>
-      ${discoveriesHtml}
+  `;
+}
+
+// Shared booth entry: who tagged you + the booth + their note.
+function renderReportSharedBooth(entry) {
+  const sender = resolveCreator(entry);
+  const senderName = sender.name || 'Unknown';
+  const ts = (entry.timestamp || entry.createdAt) ? new Date(entry.timestamp || entry.createdAt) : null;
+  const stamp = ts ? `${ts.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()} · ${ts.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}` : '';
+  const photos = entry.photoUrls || [];
+  const thumbs = photos.length === 0 ? '' : `
+    <div class="report-thumbs">
+      ${photos.map(u => `<img src="${u}" class="report-thumb" onclick="openLightbox('${u}')">`).join('')}
+    </div>`;
+  const booth = entry.booth ? `Booth ${escapeHtml(entry.booth)}` : '';
+  const hall = entry.hallCode ? `${escapeHtml(entry.hallCode)} · ` : '';
+  return `
+    <div class="report-item">
+      <div class="report-item-head">
+        <span class="report-item-stamp">${escapeHtml(stamp)}</span>
+        <span class="report-item-from">FROM ${escapeHtml(senderName.toUpperCase())}</span>
+      </div>
+      <div class="report-item-booth">${escapeHtml(entry.name || '')}</div>
+      <div class="report-item-stamp" style="margin-bottom:4px;">${hall}${booth}</div>
+      ${entry.note ? `<div class="report-item-note">${escapeHtml(entry.note)}</div>` : ''}
+      ${thumbs}
+    </div>
+  `;
+}
+
+// Shared memo: a teammate's voice note where you were tagged.
+function renderReportSharedMemo(memo) {
+  const sender = resolveCreator(memo);
+  const senderName = sender.name || 'Unknown';
+  const photos = memo.photoUrls || [];
+  const ts = memo.timestamp ? new Date(memo.timestamp) : null;
+  const stamp = ts ? `${ts.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()} · ${ts.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}` : '';
+  const thumbs = photos.length === 0 ? '' : `
+    <div class="report-thumbs">
+      ${photos.map(u => `<img src="${u}" class="report-thumb" onclick="openLightbox('${u}')">`).join('')}
+    </div>`;
+  return `
+    <div class="report-item">
+      <div class="report-item-head">
+        <span class="report-item-stamp">${escapeHtml(stamp)}</span>
+        <span class="report-item-from">FROM ${escapeHtml(senderName.toUpperCase())}</span>
+      </div>
+      ${memo.note ? `<div class="report-item-note">${escapeHtml(memo.note)}</div>` : ''}
+      ${thumbs}
+    </div>
+  `;
+}
+
+// Response the viewer sent on someone else's booth entry.
+function renderReportResponseSent(r) {
+  const parent = r.parentEntry || {};
+  const recipient = resolveCreator(parent);
+  const recipientName = recipient.name || 'Unknown';
+  const ts = r.timestamp || r.createdAt;
+  const tsObj = ts ? new Date(ts) : null;
+  const stamp = tsObj ? `${tsObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()} · ${tsObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}` : '';
+  const booth = parent.booth ? `Booth ${escapeHtml(parent.booth)}` : '';
+  const hall = parent.hallCode ? `${escapeHtml(parent.hallCode)} · ` : '';
+  return `
+    <div class="report-item">
+      <div class="report-item-head">
+        <span class="report-item-stamp">${escapeHtml(stamp)}</span>
+        <span class="report-item-from">TO ${escapeHtml(recipientName.toUpperCase())}</span>
+      </div>
+      <div class="report-item-booth">${escapeHtml(parent.name || '')}</div>
+      <div class="report-item-stamp" style="margin-bottom:4px;">${hall}${booth}</div>
+      ${r.note ? `<div class="report-item-note">${escapeHtml(r.note)}</div>` : ''}
     </div>
   `;
 }
@@ -10109,6 +10551,7 @@ window.closeRequestModal = closeRequestModal;
 async function initApp() {
   await loadExhibitorData();
   await loadTeamAdditions();
+  await loadEbPartnerAdditions();
   await loadMyList();
   buildIdentityDropdown();
   buildRecipientPicker();
