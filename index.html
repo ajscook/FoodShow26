@@ -2020,6 +2020,7 @@
     padding: 14px 16px 8px;
   }
   .explore-section-title {
+    flex: 1;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -2238,6 +2239,30 @@
     text-align: right;
     font-family: var(--font-mono);
   }
+  /* My Hit List: + button on the section head. Opens the My List picker. */
+  .explore-section-add {
+    margin-left: 12px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-primary);
+    border: 1.5px solid var(--border-strong);
+    font-family: var(--font);
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .explore-section-add:active {
+    background: var(--surface-raised);
+    border-color: #FFFFFF;
+    color: #FFFFFF;
+  }
 
   /* MY LIST: add button row at top of Explore */
   .mylist-add-row {
@@ -2265,6 +2290,18 @@
     padding: 12px 16px 16px;
     display: flex;
     gap: 8px;
+  }
+  /* MY LIST: the note the viewer wrote when they added the booth, displayed
+     dim to signal the discovery hasn't happened on the floor yet. */
+  .mylist-card-note {
+    padding: 10px 16px 8px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--text-hint);
+    font-style: italic;
+    border-left: 2px solid var(--border-strong);
+    margin: 0 14px 6px;
   }
   .explore-card-mylist-actions .btn-primary,
   .explore-card-mylist-actions .explore-card-mylist-remove {
@@ -2400,6 +2437,80 @@
     color: var(--text-hint);
     font-size: 14px;
   }
+  /* Note-entry pane that replaces the picker results when a booth is selected. */
+  .mylist-note-pane {
+    padding: 16px 16px 12px;
+  }
+  .mylist-note-booth {
+    padding: 0 0 14px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 14px;
+  }
+  .mylist-note-booth-name {
+    font-family: var(--font-body);
+    font-size: 17px;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  .mylist-note-booth-meta {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-hint);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .mylist-note-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .mylist-note-textarea {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.4;
+    padding: 10px 12px;
+    resize: vertical;
+    box-sizing: border-box;
+  }
+  .mylist-note-textarea:focus {
+    outline: none;
+    border-color: #FFFFFF;
+  }
+  .mylist-note-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .mylist-note-cancel,
+  .mylist-note-save {
+    flex: 1;
+    padding: 11px 12px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    border: 1.5px solid var(--border-strong);
+    background: transparent;
+    color: var(--text-secondary);
+  }
+  .mylist-note-save {
+    background: #FFFFFF;
+    color: #000;
+    border-color: #FFFFFF;
+  }
+  .mylist-note-save:active { filter: brightness(0.95); }
+  .mylist-note-cancel:active { background: var(--surface-raised); }
 
   /* EXPLORE: cards */
   .explore-card {
@@ -5615,12 +5726,18 @@ function getMyListForUser(userId) {
   return Array.isArray(myListByUser[userId]) ? myListByUser[userId] : [];
 }
 
-async function addToMyList(userId, booth) {
+async function addToMyList(userId, booth, note) {
   if (!userId || !booth) return;
   const boothStr = String(booth);
   const list = getMyListForUser(userId);
-  if (list.some(item => String(item.booth) === boothStr)) return;
-  list.push( { booth: boothStr, addedAt: Date.now() });
+  const noteText = (note || '').trim();
+  // If the booth is already on the list, update its note (don't duplicate).
+  const existing = list.find(item => String(item.booth) === boothStr);
+  if (existing) {
+    existing.note = noteText;
+  } else {
+    list.push( { booth: boothStr, addedAt: Date.now(), note: noteText });
+  }
   myListByUser[userId] = list;
   await persistMyList();
 }
@@ -5661,6 +5778,9 @@ function closeMyListPicker() {
   const overlay = document.getElementById('mylist-picker-overlay');
   if (!overlay) return;
   overlay.classList.remove('open');
+  // Restore the search input in case the modal was closed during note entry.
+  const input = document.getElementById('mylist-picker-input');
+  if (input) input.style.display = '';
   if (myListPickerDebounce) {
     clearTimeout(myListPickerDebounce);
     myListPickerDebounce = null;
@@ -5713,12 +5833,68 @@ function renderMyListPickerResults(q) {
   }).join('');
 }
 
-async function handleMyListPickerSelect(booth) {
+function handleMyListPickerSelect(booth) {
   if (!currentIdentity || currentIdentity.kind !== 'person') return;
-  await addToMyList(currentIdentity.id, booth);
+  // Switch the picker results pane into a note-entry pane. The user types
+  // an optional note for why they want to walk this booth, then taps Save.
+  const results = document.getElementById('mylist-picker-results');
+  const input = document.getElementById('mylist-picker-input');
+  if (!results) return;
+  const info = BOOTHS[String(booth)] || {};
+  const name = info.n || '';
+  const hall = info.h || '';
+  const hallCode = hall ? hall.charAt(0) : '?';
+  // Hide the search input while the note pane is open so the keyboard goes
+  // straight to the textarea.
+  if (input) input.style.display = 'none';
+  results.innerHTML = `
+    <div class="mylist-note-pane">
+      <div class="mylist-note-booth">
+        <div class="mylist-note-booth-name">${escapeHtml(name)}</div>
+        <div class="mylist-note-booth-meta">${escapeHtml(hallCode)} &middot; Booth ${escapeHtml(String(booth))}</div>
+      </div>
+      <label class="mylist-note-label">Why this one? (optional)</label>
+      <textarea class="mylist-note-textarea" id="mylist-note-textarea" rows="4" placeholder="A reason you flagged this booth for yourself."></textarea>
+      <div class="mylist-note-actions">
+        <button type="button" class="mylist-note-cancel" onclick="cancelMyListNote()">Cancel</button>
+        <button type="button" class="mylist-note-save" onclick="saveMyListNote('${booth}')">Save to hit list</button>
+      </div>
+    </div>
+  `;
+  setTimeout(() => {
+    const ta = document.getElementById('mylist-note-textarea');
+    if (ta) ta.focus();
+  }, 50);
+}
+window.handleMyListPickerSelect = handleMyListPickerSelect;
+
+function cancelMyListNote() {
+  // Reset the picker back to a fresh search state.
+  const results = document.getElementById('mylist-picker-results');
+  const input = document.getElementById('mylist-picker-input');
+  if (input) {
+    input.style.display = '';
+    input.value = '';
+    setTimeout(() => input.focus(), 30);
+  }
+  if (results) {
+    results.innerHTML = `<div class="mylist-picker-hint">Start typing an exhibitor name.</div>`;
+  }
+}
+window.cancelMyListNote = cancelMyListNote;
+
+async function saveMyListNote(booth) {
+  if (!currentIdentity || currentIdentity.kind !== 'person') return;
+  const ta = document.getElementById('mylist-note-textarea');
+  const note = ta ? ta.value : '';
+  await addToMyList(currentIdentity.id, booth, note);
   closeMyListPicker();
+  // Restore the search-input visibility for the next open.
+  const input = document.getElementById('mylist-picker-input');
+  if (input) input.style.display = '';
   renderExplore();
 }
+window.saveMyListNote = saveMyListNote;
 
 async function handleRemoveFromMyList(booth, ev) {
   if (ev) ev.stopPropagation();
@@ -7090,7 +7266,8 @@ function buildExploreCards(viewerId, viewerKind) {
       hallCode: info.h ? info.h.charAt(0) : '',
       entries: [],
       isMyList: true,
-      myListAddedAt: item.addedAt || 0
+      myListAddedAt: item.addedAt || 0,
+      myListNote: item.note || ''
     };
   });
 
@@ -7392,7 +7569,7 @@ function renderExploreSection(title, cards, sectionKey) {
   if (sorted.length === 0) {
     let emptyMsg = 'Nothing here yet.';
     if (sectionKey === 'hitlist') {
-      emptyMsg = 'Tap a PNW Trend Line above and add exhibitors to build your hit list.';
+      emptyMsg = 'Tap the + above to search exhibitors and add them to your hit list. Or tap a PNW Trend Line and add from there.';
     } else if (sectionKey === 'peerFlags') {
       emptyMsg = 'When a teammate tags you on a booth, it will show up here.';
     }
@@ -7403,10 +7580,15 @@ function renderExploreSection(title, cards, sectionKey) {
   // Hit list and From Teammates cards are muted until the viewer engages.
   // Section-level wrapper class scopes the muted treatment.
   const sectionClass = (sectionKey === 'hitlist' || sectionKey === 'peerFlags') ? 'explore-section-muted' : '';
+  // Hit list gets a "+" add-to-list affordance on the head.
+  const addBtn = (sectionKey === 'hitlist')
+    ? `<button type="button" class="explore-section-add" onclick="event.stopPropagation();openMyListPicker()" aria-label="Add an exhibitor to your hit list">+</button>`
+    : '';
   return `
     <div class="explore-section-head" data-section="${sectionKey}">
       <span class="explore-section-title">${title}</span>
       <span class="explore-section-count">${cards.length}</span>
+      ${addBtn}
     </div>
     <div class="${sectionClass} explore-section-body" data-section="${sectionKey}">${body}</div>
   `;
@@ -7472,15 +7654,22 @@ function renderExploreCard(card) {
        </div>`
     : '';
 
-  // Body for my-list cards: exhibitor details + remove action. For bookmark
-  // hit-list cards (origin 'mine' with an empty self-entry): show details, a
-  // "Capture discovery" CTA that routes to Discover with the booth
-  // pre-selected, and Remove. For peer/dept cards: details + entries.
+  // Body for my-list cards: exhibitor details, the optional note the viewer
+  // wrote when they added the booth (dimmed to signal "not yet walked"), and
+  // a Discovery Capture / Remove pair. For bookmark hit-list cards (origin
+  // 'mine' with empty self-entries): same shape, no note text. For peer/dept
+  // cards: details + entries.
+  const myListNote = (card.myListNote || '').trim();
+  const myListNoteBlock = (isMyListCard && myListNote)
+    ? `<div class="mylist-card-note">${escapeHtml(myListNote)}</div>`
+    : '';
   const bodyContent = isMyListCard
     ? `${expandedMeta}
+       ${myListNoteBlock}
        ${renderExhibitorDetailsBlock(card.booth)}
        <div class="explore-card-mylist-actions">
-         <button type="button" class="explore-card-mylist-remove" onclick="handleRemoveFromMyList('${card.booth}', event)">Remove from your list</button>
+         <button type="button" class="btn-primary" onclick="event.stopPropagation();captureFromMyListBookmark('${card.booth}')">Discovery Capture</button>
+         <button type="button" class="explore-card-mylist-remove" onclick="handleRemoveFromMyList('${card.booth}', event)">Remove</button>
        </div>`
     : card.isBookmark
       ? `${expandedMeta}
@@ -8782,6 +8971,31 @@ function captureFromBookmark(booth) {
   openExhibitorCard(String(booth), name, hallName, hallCode);
 }
 window.captureFromBookmark = captureFromBookmark;
+
+// Helper for My Hit List (pre-show, note-attached) cards. Same as the
+// bookmark capture, but also pre-fills the Discovery note textarea with the
+// note the viewer wrote when they added the booth to their list. The viewer
+// can edit it before submitting the real discovery.
+function captureFromMyListBookmark(booth) {
+  captureFromBookmark(booth);
+  if (!currentIdentity || currentIdentity.kind !== 'person') return;
+  const list = getMyListForUser(currentIdentity.id);
+  const item = list.find(i => String(i.booth) === String(booth));
+  const note = item && item.note ? item.note : '';
+  if (!note) return;
+  // Wait for selectExhibitor to render the capture form, then populate the
+  // note textarea. selectExhibitor runs synchronously but the textarea may
+  // not be focused/ready until next tick.
+  setTimeout(() => {
+    const ta = document.getElementById('disc-note');
+    if (ta && !ta.value) {
+      ta.value = note;
+      // Trigger any oninput listeners (voice-to-text wrapper, etc.).
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  }, 80);
+}
+window.captureFromMyListBookmark = captureFromMyListBookmark;
 
 function renderTrendLinesSection() {
   if (!Array.isArray(BOLO_ITEMS) || BOLO_ITEMS.length === 0) return '';
