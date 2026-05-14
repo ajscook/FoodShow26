@@ -109,7 +109,7 @@
     border-bottom: 1px solid var(--border);
   }
   .header-logo {
-    height: 120px;
+    height: 72px;
     width: auto;
     max-width: 80%;
     object-fit: contain;
@@ -7755,10 +7755,11 @@ function renderMyTagged() {
     return;
   }
   const allCards = buildExploreCards(currentIdentity.id, currentIdentity.kind);
-  // Tagged-by-others: everything that wasn't put there by the viewer's own
-  // my-list action. That covers dept invitations, peer flags, mixed, and
-  // anything they've engaged with.
-  const tagged = allCards.filter(c => c.origin !== 'mine');
+  // Only show booths where a teammate tagged the viewer directly. That's
+  // peer flags (blue) and mixed-origin (a person tagged plus a department
+  // invitation on the same booth). Department-only invitations stay on
+  // For Us under "From Departments" and don't duplicate here.
+  const tagged = allCards.filter(c => c.origin === 'peer' || c.origin === 'mixed');
   if (tagged.length === 0) {
     container.innerHTML = '';
     emptyEl.style.display = '';
