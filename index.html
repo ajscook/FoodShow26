@@ -6223,14 +6223,6 @@ function buildIdentityDropdown() {
     openAddTeammateForm();
   };
   dd.appendChild(addItem);
-
-  // === DEMO BUILD ONLY ===
-  dd.appendChild(makeSection('Demo'));
-  const demoItem = makeIdentityItem('__demo_load', 'Load demo scenario', 'Replaces all entries', 'demo');
-  dd.appendChild(demoItem);
-  const demoResetItem = makeIdentityItem('__demo_reset', '[RESET]', 'Clears Demo', 'demo');
-  dd.appendChild(demoResetItem);
-  // === END DEMO BUILD ONLY ===
 }
 
 function openAddTeammateForm() {
@@ -9980,6 +9972,10 @@ function renderReportBlock(entry, viewer, kind) {
 // people have been on the floor since the show opened and have been logging
 // discoveries to each other for the past few hours.
 async function loadDemoScenario() {
+  // Deploy build: demo state is disabled. The artifact build runs the full
+  // body below; in deploy we return immediately so no demo entries are ever
+  // pushed into the live KV-backed `entries` array.
+  return;
   window.__demoMode = true;
   try { localStorage.removeItem('__demoReset'); } catch(e) {}
   const now = Date.now();
@@ -10430,6 +10426,10 @@ window.loadDemoScenario = loadDemoScenario;
 // and stops the polling loop from pulling KV data back in. Real KV data is
 // untouched - reloading the page restores it.
 function resetDemoScenario() {
+  // Deploy build: demo reset is disabled. Returning here prevents the
+  // `__demoMode` flag from being set, which would otherwise pause KV polling
+  // and leave the interface empty.
+  return;
   window.__demoMode = true; // keep polling paused so real entries don't repopulate
   try { localStorage.setItem('__demoReset', '1'); } catch(e) {}
   entries = [];
@@ -10567,19 +10567,9 @@ async function initApp() {
   const submitBtn = document.getElementById('disc-submit-btn');
   if (submitBtn) buildPhotoCapture('disc', submitBtn);
 
-  // === DEMO BUILD ONLY: auto-preload demo scenario on fresh load ===
-  // The artifact build opens straight into a populated demo so we don't have
-  // to tap through the dropdown each time we show it to teammates.
-  // If "__demoReset" is set in localStorage (via the [RESET] menu item),
-  // skip auto-preload and let the user start clean.
-  const demoReset = (() => { try { return localStorage.getItem('__demoReset') === '1'; } catch(e) { return false; } })();
-  if (!demoReset) {
-    window.__demoMode = true;
-    await loadDemoScenario();
-  } else {
-    restoreIdentity();
-  }
-  // === END DEMO BUILD ONLY ===
+  // Deploy build: never auto-load the demo scenario. Real KV data flows in
+  // via polling once an identity is restored.
+  restoreIdentity();
   renderDiscoverContext();
   updateReportButtonState();
   updateLockedAffordances();
