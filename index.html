@@ -7479,10 +7479,9 @@ function renderExplore() {
     }
   }
 
-  if (cards.length === 0) {
-    sectionsContainer.innerHTML = `<div class="empty-state">Nothing has been shared with you yet.</div>`;
-    return;
-  }
+  // Note: no early return on cards.length === 0. PNW Trend Lines, My Hit List,
+  // From Teammates (as permanent sections), and Our Partners all render below
+  // even when there are zero booth cards.
 
   // Group cards by section
   const bySection = {};
