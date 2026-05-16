@@ -4282,6 +4282,148 @@
     border-radius: var(--radius-sm);
     cursor: pointer;
   }
+  /* Owner-only action row inside an open memo: small, quiet icon buttons. */
+  .my-note-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .my-note-action {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.12s, border-color 0.12s;
+  }
+  .my-note-action:hover,
+  .my-note-action:active {
+    color: var(--text-primary);
+    border-color: var(--text-primary);
+  }
+  .my-note-action svg { width: 16px; height: 16px; }
+  .my-note-action-delete:hover,
+  .my-note-action-delete:active {
+    color: #E15454;
+    border-color: #E15454;
+  }
+  /* Memo inline edit form (shown when user taps the pencil). */
+  .memo-edit-textarea {
+    width: 100%;
+    min-height: 100px;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.5;
+    padding: 10px 12px;
+    margin-top: 8px;
+    resize: vertical;
+  }
+  .memo-edit-textarea:focus { outline: none; border-color: var(--text-secondary); }
+  .memo-edit-photos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .memo-edit-photo {
+    position: relative;
+    width: 84px;
+    height: 84px;
+  }
+  .memo-edit-photo img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+  }
+  .memo-edit-photo-remove {
+    position: absolute;
+    top: -6px; right: -6px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.7);
+    color: #FFFFFF;
+    border: 1px solid var(--border-strong);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .memo-edit-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .memo-edit-add-photo {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--text-secondary);
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .memo-edit-cancel {
+    margin-left: auto;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--text-secondary);
+    font-family: var(--font);
+    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+  .memo-edit-save {
+    background: var(--tertiary);
+    border: 1px solid var(--tertiary);
+    color: #FFFFFF;
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+  /* Owner-only delete button on a discovery entry, shown next to the time. */
+  .explore-entry-delete {
+    margin-left: 8px;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--text-hint);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    flex-shrink: 0;
+  }
+  .explore-entry-delete svg { width: 14px; height: 14px; }
+  .explore-entry-delete:hover,
+  .explore-entry-delete:active {
+    color: #E15454;
+    border-color: #E15454;
+  }
 
   /* =========================================================================
      HOME REPORT BUTTON (Generate Progress Report)
@@ -8078,12 +8220,20 @@ function renderExploreEntry(entry, card) {
       </div>`;
   }
 
+  // Owner-only delete: only the entry's creator can remove it.
+  const ownerDelete = (entry.creator && entry.creator === viewerId) ? `
+    <button type="button" class="explore-entry-delete" title="Delete"
+      onclick="event.stopPropagation();deleteDiscoveryEntry('${escapeHtml(entry.id)}')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
+    </button>` : '';
+
   return `
     <div class="explore-entry">
       <div class="explore-entry-from">
         <div class="explore-entry-avatar">${creatorInitials}</div>
         <div class="explore-entry-from-text">${escapeHtml(creator.name)}</div>
         <div class="explore-entry-time">${timeAgo(entry.updatedAt || entry.createdAt)}</div>
+        ${ownerDelete}
       </div>
       ${(entry.boloId !== null && entry.boloId !== undefined && BOLO_ITEMS[entry.boloId]) ? `<div class="explore-entry-bolo">${escapeHtml(BOLO_ITEMS[entry.boloId].name)}</div>` : ''}
       ${entry.contact ? `<div class="explore-entry-contact"><strong>Spoke with:</strong> ${escapeHtml(entry.contact)}</div>` : ''}
@@ -9159,7 +9309,7 @@ function renderMyNoteItem(entry) {
   const firstLine = text.split('\n')[0] || '(photo note)';
   const timeStr = formatRelativeTime(entry.timestamp || entry.createdAt || Date.now());
   const photos = (entry.photoUrls || []).map(url =>
-    `<img src="${escapeHtml(url)}" alt="" onclick="openLightbox('${escapeHtml(url)}')">`
+    `<img src="${escapeHtml(url)}" alt="" onclick="event.stopPropagation();openLightbox('${escapeHtml(url)}')">`
   ).join('');
   // Shared-in: title becomes "First L. note text" inline. Own notes: title is
   // just the first line. The FROM byline row is dropped for shared-in since
@@ -9174,8 +9324,21 @@ function renderMyNoteItem(entry) {
   } else {
     title = escapeHtml(firstLine);
   }
+  // Owner controls: edit + delete buttons only render on the viewer's own
+  // notes. Shared-in notes are read-only.
+  const ownerControls = isShared ? '' : `
+    <div class="my-note-actions">
+      <button type="button" class="my-note-action" title="Edit"
+        onclick="event.stopPropagation();editMemo('${escapeHtml(entry.id)}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+      <button type="button" class="my-note-action my-note-action-delete" title="Delete"
+        onclick="event.stopPropagation();deleteMemo('${escapeHtml(entry.id)}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
+      </button>
+    </div>`;
   return `
-    <div class="my-note-item${isShared ? ' shared-in' : ''}" onclick="toggleMyNoteItem(this)">
+    <div class="my-note-item${isShared ? ' shared-in' : ''}" data-entry-id="${escapeHtml(entry.id)}" onclick="toggleMyNoteItem(this)">
       <div class="my-note-head">
         <span class="my-note-title">${title}</span>
         <span class="my-note-time">${escapeHtml(timeStr)}</span>
@@ -9184,6 +9347,7 @@ function renderMyNoteItem(entry) {
       <div class="my-note-body">
         ${text ? `<div class="my-note-text">${escapeHtml(text)}</div>` : ''}
         ${photos ? `<div class="my-note-photos">${photos}</div>` : ''}
+        ${ownerControls}
       </div>
     </div>
   `;
@@ -9933,6 +10097,141 @@ async function saveMemo() {
   closeMemoUI();
 }
 window.saveMemo = saveMemo;
+
+// ── MEMO + DISCOVERY OWNER ACTIONS ──────────────────────────────────────────
+// Deleting a memo or discovery entry is owner-only (the creator). Editing is
+// memo-only (text + photos). All actions confirm before destructive removal.
+
+async function deleteMemo(entryId) {
+  if (!confirm('Delete this note? This cannot be undone.')) return;
+  const idx = entries.findIndex(e => e.id === entryId);
+  if (idx === -1) return;
+  // Safety: only the creator should be removing.
+  if (currentIdentity && entries[idx].creator !== currentIdentity.id) return;
+  entries.splice(idx, 1);
+  await saveEntries();
+  renderMyNotes();
+  if (typeof renderReport === 'function') renderReport();
+}
+window.deleteMemo = deleteMemo;
+
+async function deleteDiscoveryEntry(entryId) {
+  if (!confirm('Delete this entry? This cannot be undone.')) return;
+  const idx = entries.findIndex(e => e.id === entryId);
+  if (idx === -1) return;
+  if (currentIdentity && entries[idx].creator !== currentIdentity.id) return;
+  entries.splice(idx, 1);
+  await saveEntries();
+  if (typeof renderExplore === 'function') renderExplore();
+  if (typeof renderSentList === 'function') renderSentList();
+  if (typeof renderMyTagged === 'function') renderMyTagged();
+  if (typeof renderReport === 'function') renderReport();
+  if (typeof updateSentCount === 'function') updateSentCount();
+}
+window.deleteDiscoveryEntry = deleteDiscoveryEntry;
+
+// Flip a memo's expanded body into an inline edit form (textarea + photos +
+// Save/Cancel). On Save, the entry's note + photoUrls are updated and the
+// list re-renders. On Cancel, the list re-renders unchanged.
+const __memoEditState = { id: null, photos: [] };
+
+function editMemo(entryId) {
+  const entry = entries.find(e => e.id === entryId);
+  if (!entry || entry.kind !== 'memo') return;
+  if (currentIdentity && entry.creator !== currentIdentity.id) return;
+  __memoEditState.id = entryId;
+  __memoEditState.photos = (entry.photoUrls || []).slice();
+  // Find the rendered item and replace its body with the edit form.
+  const items = document.querySelectorAll(`.my-note-item[data-entry-id="${cssEscape(entryId)}"]`);
+  items.forEach(item => {
+    item.classList.add('open', 'editing');
+    const body = item.querySelector('.my-note-body');
+    if (!body) return;
+    body.innerHTML = renderMemoEditForm(entry);
+  });
+}
+window.editMemo = editMemo;
+
+function cssEscape(s) {
+  if (window.CSS && CSS.escape) return CSS.escape(s);
+  return String(s).replace(/[^a-zA-Z0-9_-]/g, c => '\\' + c);
+}
+
+function renderMemoEditForm(entry) {
+  const text = entry.note || '';
+  const photos = __memoEditState.photos.map((url, i) => `
+    <div class="memo-edit-photo">
+      <img src="${escapeHtml(url)}" alt="">
+      <button type="button" class="memo-edit-photo-remove" title="Remove"
+        onclick="event.stopPropagation();removeMemoEditPhoto(${i})">&times;</button>
+    </div>`).join('');
+  return `
+    <textarea class="memo-edit-textarea" id="memo-edit-text-${escapeHtml(entry.id)}"
+      onclick="event.stopPropagation()">${escapeHtml(text)}</textarea>
+    <div class="memo-edit-photos">${photos}</div>
+    <div class="memo-edit-actions">
+      <button type="button" class="memo-edit-add-photo"
+        onclick="event.stopPropagation();addMemoEditPhoto()">Add photo</button>
+      <button type="button" class="memo-edit-cancel"
+        onclick="event.stopPropagation();cancelEditMemo()">Cancel</button>
+      <button type="button" class="memo-edit-save"
+        onclick="event.stopPropagation();saveEditedMemo('${escapeHtml(entry.id)}')">Save</button>
+    </div>`;
+}
+
+function addMemoEditPhoto() {
+  if (__memoEditState.photos.length >= MEMO_PHOTO_MAX) return;
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.capture = 'environment';
+  input.onchange = async () => {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    try {
+      const result = await uploadPhoto(file);
+      if (result && result.url) {
+        __memoEditState.photos.push(result.url);
+        // Re-render the form area.
+        const entry = entries.find(e => e.id === __memoEditState.id);
+        if (entry) editMemo(entry.id);
+      }
+    } catch (e) {}
+  };
+  input.click();
+}
+window.addMemoEditPhoto = addMemoEditPhoto;
+
+function removeMemoEditPhoto(idx) {
+  __memoEditState.photos.splice(idx, 1);
+  const entry = entries.find(e => e.id === __memoEditState.id);
+  if (entry) editMemo(entry.id);
+}
+window.removeMemoEditPhoto = removeMemoEditPhoto;
+
+async function saveEditedMemo(entryId) {
+  const entry = entries.find(e => e.id === entryId);
+  if (!entry) return;
+  if (currentIdentity && entry.creator !== currentIdentity.id) return;
+  const ta = document.getElementById(`memo-edit-text-${entryId}`);
+  const newText = ta ? (ta.value || '').trim() : (entry.note || '');
+  entry.note = newText;
+  entry.photoUrls = __memoEditState.photos.slice();
+  entry.updatedAt = Date.now();
+  __memoEditState.id = null;
+  __memoEditState.photos = [];
+  await saveEntries();
+  renderMyNotes();
+  if (typeof renderReport === 'function') renderReport();
+}
+window.saveEditedMemo = saveEditedMemo;
+
+function cancelEditMemo() {
+  __memoEditState.id = null;
+  __memoEditState.photos = [];
+  renderMyNotes();
+}
+window.cancelEditMemo = cancelEditMemo;
 
 // === Share With picker (memo modal) ===
 // Renders the chip row showing currently-tagged recipients, and the
