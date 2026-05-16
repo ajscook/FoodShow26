@@ -4424,6 +4424,29 @@
     color: #E15454;
     border-color: #E15454;
   }
+  .explore-entry-edit {
+    margin-left: auto;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--text-hint);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    flex-shrink: 0;
+  }
+  .explore-entry-edit svg { width: 14px; height: 14px; }
+  .explore-entry-edit:hover,
+  .explore-entry-edit:active {
+    color: var(--text-primary);
+    border-color: var(--text-primary);
+  }
+  .explore-entry-edit + .explore-entry-delete {
+    margin-left: 6px;
+  }
 
   /* =========================================================================
      HOME REPORT BUTTON (Generate Progress Report)
@@ -7505,30 +7528,26 @@ async function submitEntry() {
     return;
   }
   const note = document.getElementById('disc-note').value.trim();
+  const photoUrls = getPhotoUrls('disc');
+  const contact = document.getElementById('disc-contact').value.trim();
 
   // Send To is required
   const totalRecipients = (selectedRecipientSelf ? 1 : 0) + selectedRecipientPeople.length + selectedRecipientGroups.length;
   if (totalRecipients === 0) {
-    alert('Select at least one recipient (or "Send Note to Self") before submitting.');
+    alert('Select at least one recipient (or "Note to self") before submitting.');
     return;
   }
 
-  // A note is optional when sending only to self (a "bookmark" entry for
-  // later capture). Sending to anyone else still requires a note.
+  // Some content is required when sending to a teammate (note OR photo).
+  // Sending only to self can be a pure bookmark with no content.
   const onlySelf = selectedRecipientSelf && selectedRecipientPeople.length === 0 && selectedRecipientGroups.length === 0;
-  if (!note && !onlySelf) { alert('Add a note before submitting.'); return; }
-
-  // DOT answer required if the question was shown (Food + beverages)
-  const info = BOOTHS[selectedExhibitor.booth];
-  const DOT_CATEGORIES = ['Food', 'Beverage', 'Adult Beverage'];
-  const isFood = info && Array.isArray(info.cat) && info.cat.some(c => DOT_CATEGORIES.includes(c));
-  if (isFood && !dotAnswer) {
-    alert('Answer the DOT question before submitting.');
+  if (!onlySelf && !note && photoUrls.length === 0) {
+    alert('Add a note or photo before sending to teammates.');
     return;
   }
 
-  const contact = document.getElementById('disc-contact').value.trim();
-  const photoUrls = getPhotoUrls('disc');
+  // DOT is optional. If the user answered it, the answer is stored; if not,
+  // dotAnswer stays null and submission proceeds.
 
   // Resolve "Send to Self" into the actual current-identity person id
   // (Self only adds a person id if the current identity is a person.)
@@ -8220,24 +8239,35 @@ function renderExploreEntry(entry, card) {
       </div>`;
   }
 
-  // Owner-only delete: only the entry's creator can remove it.
-  const ownerDelete = (entry.creator && entry.creator === viewerId) ? `
+  // Owner-only edit + delete: only the entry's creator gets these controls.
+  const isOwner = entry.creator && entry.creator === viewerId;
+  const ownerControls = isOwner ? `
+    <button type="button" class="explore-entry-edit" title="Edit"
+      onclick="event.stopPropagation();editDiscoveryEntry('${escapeHtml(entry.id)}', event)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    </button>
     <button type="button" class="explore-entry-delete" title="Delete"
       onclick="event.stopPropagation();deleteDiscoveryEntry('${escapeHtml(entry.id)}')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
     </button>` : '';
 
+  // If this entry is currently being edited, render the edit form in place
+  // of the static body.
+  if (isOwner && __discoveryEditState && __discoveryEditState.id === entry.id) {
+    return renderDiscoveryEditForm(entry, creatorInitials, creator);
+  }
+
   return `
-    <div class="explore-entry">
+    <div class="explore-entry" data-entry-id="${escapeHtml(entry.id)}">
       <div class="explore-entry-from">
         <div class="explore-entry-avatar">${creatorInitials}</div>
         <div class="explore-entry-from-text">${escapeHtml(creator.name)}</div>
         <div class="explore-entry-time">${timeAgo(entry.updatedAt || entry.createdAt)}</div>
-        ${ownerDelete}
+        ${ownerControls}
       </div>
       ${(entry.boloId !== null && entry.boloId !== undefined && BOLO_ITEMS[entry.boloId]) ? `<div class="explore-entry-bolo">${escapeHtml(BOLO_ITEMS[entry.boloId].name)}</div>` : ''}
       ${entry.contact ? `<div class="explore-entry-contact"><strong>Spoke with:</strong> ${escapeHtml(entry.contact)}</div>` : ''}
-      <div class="explore-entry-note">${escapeHtml(entry.note)}</div>
+      ${entry.note ? `<div class="explore-entry-note">${escapeHtml(entry.note)}</div>` : ''}
       ${entry.dot ? renderDotBlock(entry.dot) : ''}
       ${photosHtml}
       ${taggedNames.length > 0 ? `<div class="explore-entry-tagged"><span class="explore-entry-tagged-label">Sent to:</span>${taggedNames.map(escapeHtml).join(', ')}</div>` : ''}
@@ -10232,6 +10262,115 @@ function cancelEditMemo() {
   renderMyNotes();
 }
 window.cancelEditMemo = cancelEditMemo;
+
+// ── DISCOVERY ENTRY EDIT ────────────────────────────────────────────────────
+// Owner-only inline edit: re-renders the entry inside its booth card with a
+// textarea + photo strip + Save/Cancel. Same shape as memo edit. Only the
+// note text + photos are editable. Recipients, trend tag, DOT, and contact
+// stay as captured.
+const __discoveryEditState = { id: null, photos: [] };
+
+function editDiscoveryEntry(entryId, evt) {
+  if (evt && evt.stopPropagation) evt.stopPropagation();
+  const entry = entries.find(e => e.id === entryId);
+  if (!entry) return;
+  if (currentIdentity && entry.creator !== currentIdentity.id) return;
+  __discoveryEditState.id = entryId;
+  __discoveryEditState.photos = (entry.photoUrls || []).slice();
+  // Re-render every surface that shows discovery entries so the edited entry
+  // flips to its form wherever it appears.
+  if (typeof renderExplore === 'function') renderExplore();
+  if (typeof renderSentList === 'function') renderSentList();
+  if (typeof renderMyTagged === 'function') renderMyTagged();
+}
+window.editDiscoveryEntry = editDiscoveryEntry;
+
+function renderDiscoveryEditForm(entry, creatorInitials, creator) {
+  const text = entry.note || '';
+  const photos = __discoveryEditState.photos.map((url, i) => `
+    <div class="memo-edit-photo">
+      <img src="${escapeHtml(url)}" alt="">
+      <button type="button" class="memo-edit-photo-remove" title="Remove"
+        onclick="event.stopPropagation();removeDiscoveryEditPhoto(${i})">&times;</button>
+    </div>`).join('');
+  return `
+    <div class="explore-entry editing" data-entry-id="${escapeHtml(entry.id)}">
+      <div class="explore-entry-from">
+        <div class="explore-entry-avatar">${creatorInitials}</div>
+        <div class="explore-entry-from-text">${escapeHtml(creator.name)}</div>
+        <div class="explore-entry-time">Editing…</div>
+      </div>
+      <textarea class="memo-edit-textarea" id="discovery-edit-text-${escapeHtml(entry.id)}"
+        onclick="event.stopPropagation()" placeholder="What caught your attention?">${escapeHtml(text)}</textarea>
+      <div class="memo-edit-photos">${photos}</div>
+      <div class="memo-edit-actions">
+        <button type="button" class="memo-edit-add-photo"
+          onclick="event.stopPropagation();addDiscoveryEditPhoto()">Add photo</button>
+        <button type="button" class="memo-edit-cancel"
+          onclick="event.stopPropagation();cancelEditDiscovery()">Cancel</button>
+        <button type="button" class="memo-edit-save"
+          onclick="event.stopPropagation();saveEditedDiscovery('${escapeHtml(entry.id)}')">Save</button>
+      </div>
+    </div>`;
+}
+
+function addDiscoveryEditPhoto() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.capture = 'environment';
+  input.onchange = async () => {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    try {
+      const result = await uploadPhoto(file);
+      if (result && result.url) {
+        __discoveryEditState.photos.push(result.url);
+        if (typeof renderExplore === 'function') renderExplore();
+        if (typeof renderSentList === 'function') renderSentList();
+        if (typeof renderMyTagged === 'function') renderMyTagged();
+      }
+    } catch (e) {}
+  };
+  input.click();
+}
+window.addDiscoveryEditPhoto = addDiscoveryEditPhoto;
+
+function removeDiscoveryEditPhoto(idx) {
+  __discoveryEditState.photos.splice(idx, 1);
+  if (typeof renderExplore === 'function') renderExplore();
+  if (typeof renderSentList === 'function') renderSentList();
+  if (typeof renderMyTagged === 'function') renderMyTagged();
+}
+window.removeDiscoveryEditPhoto = removeDiscoveryEditPhoto;
+
+async function saveEditedDiscovery(entryId) {
+  const entry = entries.find(e => e.id === entryId);
+  if (!entry) return;
+  if (currentIdentity && entry.creator !== currentIdentity.id) return;
+  const ta = document.getElementById(`discovery-edit-text-${entryId}`);
+  const newText = ta ? (ta.value || '').trim() : (entry.note || '');
+  entry.note = newText;
+  entry.photoUrls = __discoveryEditState.photos.slice();
+  entry.updatedAt = Date.now();
+  __discoveryEditState.id = null;
+  __discoveryEditState.photos = [];
+  await saveEntries();
+  if (typeof renderExplore === 'function') renderExplore();
+  if (typeof renderSentList === 'function') renderSentList();
+  if (typeof renderMyTagged === 'function') renderMyTagged();
+  if (typeof renderReport === 'function') renderReport();
+}
+window.saveEditedDiscovery = saveEditedDiscovery;
+
+function cancelEditDiscovery() {
+  __discoveryEditState.id = null;
+  __discoveryEditState.photos = [];
+  if (typeof renderExplore === 'function') renderExplore();
+  if (typeof renderSentList === 'function') renderSentList();
+  if (typeof renderMyTagged === 'function') renderMyTagged();
+}
+window.cancelEditDiscovery = cancelEditDiscovery;
 
 // === Share With picker (memo modal) ===
 // Renders the chip row showing currently-tagged recipients, and the
