@@ -2175,22 +2175,51 @@
     gap: 4px;
   }
   .eb-partner-row {
-    padding: 10px 12px;
+    padding: 12px;
     border: 1px solid var(--border);
     border-left: 3px solid var(--amber);
     border-radius: var(--radius-sm);
     background: transparent;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 14px;
   }
   .eb-partner-row:active {
     background: var(--surface-raised);
+  }
+  /* Hall tag: bold initial badge on the left so the floor location reads at
+     a glance instead of getting buried in meta text. */
+  .eb-partner-row-hall {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--amber);
+    color: var(--amber);
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.02em;
+    background: transparent;
+    flex-shrink: 0;
+  }
+  .eb-partner-row-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
   }
   .eb-partner-row-name {
     font-family: var(--font-headline);
     font-weight: 700;
     font-size: 15px;
     color: var(--text-primary);
-    margin: 0 0 2px;
+    margin: 0;
   }
   .eb-partner-row-meta {
     font-family: var(--font-mono);
@@ -9214,14 +9243,29 @@ function renderEbPartnersSection() {
       name: info ? (info.n || '') : '',
       hall: info ? (info.h || '') : ''
     };
-  }).filter(r => r.name).sort((a, b) => a.name.localeCompare(b.name));
+  }).filter(r => r.name);
+
+  // Sort: primary by hall in the order South, East, North (anything else
+  // sinks to the bottom alphabetically); secondary by exhibitor name.
+  const HALL_ORDER = { 'South': 0, 'East': 1, 'North': 2 };
+  rows.sort((a, b) => {
+    const ra = HALL_ORDER[a.hall];
+    const rb = HALL_ORDER[b.hall];
+    const oa = (ra === undefined) ? 99 : ra;
+    const ob = (rb === undefined) ? 99 : rb;
+    if (oa !== ob) return oa - ob;
+    return a.name.localeCompare(b.name);
+  });
 
   const rowsHtml = rows.map(r => {
-    const hallCode = r.hall ? r.hall.charAt(0) : '';
+    const hallCode = r.hall ? r.hall.charAt(0).toUpperCase() : '?';
     return `
       <div class="eb-partner-row" onclick="captureFromBookmark('${r.booth}')">
-        <div class="eb-partner-row-name">${escapeHtml(r.name)}</div>
-        <div class="eb-partner-row-meta">${escapeHtml(r.hall || '')} &middot; Booth ${escapeHtml(r.booth)}</div>
+        <div class="eb-partner-row-hall">${escapeHtml(hallCode)}</div>
+        <div class="eb-partner-row-text">
+          <div class="eb-partner-row-name">${escapeHtml(r.name)}</div>
+          <div class="eb-partner-row-meta">Booth ${escapeHtml(r.booth)} &middot; ${escapeHtml(r.hall || '')} Hall</div>
+        </div>
       </div>`;
   }).join('');
 
