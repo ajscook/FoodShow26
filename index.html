@@ -2224,29 +2224,22 @@
     text-align: right;
     font-family: var(--font-mono);
   }
-  /* My Hit List: + button on the section head. Opens the My List picker. */
+  /* My Hit List: big + on the section head. Opens the My List picker.
+     No circle — just a large, obvious plus sign. */
   .explore-section-add {
     margin-left: 12px;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
     background: transparent;
-    color: var(--text-primary);
-    border: 1.5px solid var(--border-strong);
+    color: #FFFFFF;
+    border: none;
     font-family: var(--font);
-    font-size: 18px;
-    font-weight: 400;
+    font-size: 32px;
+    font-weight: 300;
     line-height: 1;
     cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
+    padding: 0 4px;
   }
   .explore-section-add:active {
-    background: var(--surface-raised);
-    border-color: #FFFFFF;
-    color: #FFFFFF;
+    color: var(--tertiary);
   }
 
   /* MY LIST: add button row at top of Explore */
@@ -3849,7 +3842,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 4px 16px 12px;
+    padding: 4px 16px 18px;
     margin-top: 8px;
   }
   .lookup-section-head::before {
@@ -8266,11 +8259,11 @@ const BOLO_ITEMS = [
     ]
   },
   {
-    name: 'RE-Center of Plate',
-    summary: 'Hold the price point on the plates the business runs on',
-    categories: ['Burgers', 'Value Proteins', 'Eggs', 'Price-Point Rebuilds'],
-    trend: "Operators are watching their highest-volume plates lose their pricing logic. A bar-and-grill burger that used to move at twelve dollars doesn't move at sixteen. New or alternative proteins, smaller portions, products that hold a price without dropping perceived quality.",
-    who: [ { name: 'Tony R',    note: 'Burger price has exceeded value at his bar-and-grill accounts. Wants any twist or value-add.' }, { name: 'Patrick S', note: "6 oz battered cod, affordable. The 4 oz doesn't size up for a cod sandwich." }, { name: 'David R',   note: 'Lower-cost eggs, staple proteins, better produce at better price.' }, { name: 'Dan G',     note: 'Affordability and menu items at attractive price points.' }
+    name: 'Menu Innovations',
+    summary: 'Rethink and adapt the plates the business runs on',
+    categories: ['Small Plates / High Margin', 'Burgers', 'Value Proteins', 'Eggs', 'Price-Point Rebuilds', 'Portion-Conscious Builds'],
+    trend: "Operators are watching their highest-volume plates lose their pricing logic. A bar-and-grill burger that used to move at twelve dollars doesn't move at sixteen. The plays are rethinking and adapting: new or alternative proteins, smaller portions priced sharply with stronger margin, products that hold a price without dropping perceived quality, and small-plate builds Christina K. is calling out as a margin lever her operators are ready for.",
+    who: [ { name: 'Christina K', note: 'Small plates, small price, high margin. Portion-conscious builds as a margin play her operators are asking for.' }, { name: 'Tony R',    note: 'Burger price has exceeded value at his bar-and-grill accounts. Wants any twist or value-add.' }, { name: 'Patrick S', note: "6 oz battered cod, affordable. The 4 oz doesn't size up for a cod sandwich." }, { name: 'David R',   note: 'Lower-cost eggs, staple proteins, better produce at better price.' }, { name: 'Dan G',     note: 'Affordability and menu items at attractive price points.' }
     ],
     exhibitors: [ {
         name: 'JBS',
