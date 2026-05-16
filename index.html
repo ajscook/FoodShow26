@@ -7531,11 +7531,11 @@ async function submitEntry() {
   const photoUrls = getPhotoUrls('disc');
   const contact = document.getElementById('disc-contact').value.trim();
 
-  // Send To is required
+  // No recipient selected? Default to "Note to self" so the user never has to
+  // pick a recipient just to capture a thought for themselves.
   const totalRecipients = (selectedRecipientSelf ? 1 : 0) + selectedRecipientPeople.length + selectedRecipientGroups.length;
   if (totalRecipients === 0) {
-    alert('Select at least one recipient (or "Note to self") before submitting.');
-    return;
+    selectedRecipientSelf = true;
   }
 
   // Some content is required when sending to a teammate (note OR photo).
