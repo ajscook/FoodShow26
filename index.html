@@ -155,6 +155,13 @@
     color: var(--text-primary);
     flex-shrink: 0;
   }
+  /* My Trip and My Report: blue circle border, white icon stroke. Label
+     stays default. The Me circle keeps its identity-driven coloring. */
+  #chrome-trip .chrome-circle,
+  #chrome-report .chrome-circle {
+    border-color: var(--tertiary);
+    color: #FFFFFF;
+  }
   .chrome-circle svg {
     width: 26px;
     height: 26px;
@@ -1153,35 +1160,13 @@
   }
   .placeholder strong { color: var(--text-secondary); display: block; margin-bottom: 6px; }
 
-  /* Voice input wrap (used on text inputs/textareas) */
+  /* Voice input wrap (used on text inputs/textareas). The in-input mic icon
+     is hidden site-wide; users tap into a field and use the keyboard mic. The
+     standalone mic button at the bottom of the screen still handles voice
+     memos. The wrapper itself remains in the DOM so existing markup keeps
+     working. */
   .voice-field-wrap { position: relative; }
-  .voice-field-wrap > input,
-  .voice-field-wrap > textarea {
-    padding-right: 38px;
-  }
-  .voice-field-icon {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 22px;
-    height: 22px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-hint);
-    transition: color 0.15s;
-    user-select: none;
-    flex-shrink: 0;
-  }
-  .voice-field-wrap.is-textarea .voice-field-icon {
-    top: 10px;
-    transform: none;
-  }
-  .voice-field-icon:hover { color: var(--blue); }
-  .voice-field-icon.recording { color: var(--record-red); animation: recordPulse 1.2s infinite; }
-  .voice-field-icon svg { width: 16px; height: 16px; fill: currentColor; }
+  .voice-field-icon { display: none !important; }
   @keyframes recordPulse {
     0%,100% { opacity: 1; }
     50% { opacity: 0.5; }
@@ -1769,7 +1754,7 @@
     top: 50%;
     transform: translateY(-50%);
     font-size: 14px;
-    color: var(--green);
+    color: #FFFFFF;
   }
   .picker-list {
     display: none;
@@ -3257,6 +3242,18 @@
     border-color: var(--tertiary) !important;
   }
 
+  /* My Discoveries section: cards render via renderExploreCard with
+     origin='mine', but we want the blue treatment (matching the section
+     dash and From Teammates) instead of the default white origin-mine
+     treatment. Scope by the My Discoveries container (#sent-list). */
+  #sent-list .explore-card {
+    border-left: 4px solid var(--tertiary) !important;
+  }
+  #sent-list .explore-card .explore-card-count {
+    color: var(--tertiary) !important;
+    border-color: var(--tertiary) !important;
+  }
+
   /* =========================================================================
      FONT SYSTEM ENFORCEMENT
      Three-font system: Bricolage Grotesque (headlines), Plus Jakarta Sans
@@ -3475,7 +3472,6 @@
   }
   .search-bar .exhibitor-search-input {
     margin-bottom: 0;
-    padding-left: 42px;
     border-color: var(--border-strong);
     background: var(--surface);
     font-size: 17px;
@@ -3645,9 +3641,10 @@
     background: var(--primary);
     border-radius: 2px;
   }
-  /* My Discoveries section uses a white dash (no origin, viewer's own work). */
+  /* My Discoveries section uses the blue dash treatment, matching From
+     Teammates on For Us. */
   .my-discoveries-section .my-discoveries-head::before {
-    background: var(--text-primary);
+    background: var(--tertiary);
   }
   .my-engaged-section .my-discoveries-head::before {
     background: #E87D3E;
@@ -3662,12 +3659,15 @@
     color: var(--text-primary);
   }
 
-  /* Sent-item card redesign: title Playfair, italic note, booth+category pills */
+  /* Sent-item card redesign: title Playfair, italic note, booth+category pills.
+     Carries a 4px blue (--tertiary) left border to match the My Discoveries
+     section dash and the From Teammates card treatment on For Us. */
   .sent-list { padding: 0; }
   .sent-item {
     position: relative;
     background: var(--surface) !important;
     border: 1px solid var(--border) !important;
+    border-left: 4px solid var(--tertiary) !important;
     border-radius: var(--radius-md) !important;
     padding: 14px 16px !important;
     margin-bottom: 10px !important;
@@ -3776,7 +3776,8 @@
     display: none !important;
   }
 
-  /* Center mic button (memo-btn): big green circle, raised */
+  /* Center mic button (memo-btn): big green circle, raised. Icon is black
+     so it contrasts cleanly against the green; pure white reads as faint. */
   .memo-btn {
     position: static !important;
     flex: 0 0 auto !important;
@@ -3790,7 +3791,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #FFFFFF !important;
+    color: #000000 !important;
     cursor: pointer;
   }
   .memo-btn svg {
@@ -3837,8 +3838,35 @@
   .capture-card .btn-primary-icon { width: 13px !important; height: 13px !important; }
 
   /* Discovery search bar */
-  .search-bar .exhibitor-search-input { font-size: 15px !important; padding-top: 30px !important; padding-bottom: 30px !important; border: 1.5px solid var(--white) !important; }
+  .search-bar .exhibitor-search-input { font-size: 15px !important; padding-top: 14px !important; padding-bottom: 14px !important; border: 1.5px solid var(--white) !important; }
   .search-bar-icon { width: 16px !important; height: 16px !important; }
+  /* Look Up a Booth: section title above the search bar, matches the
+     Playfair italic 600 21px treatment used by My Notes / My Discoveries /
+     My Engaged. Dash is white to match the search bar accent. Spacing
+     (margins + head padding) matches the other home sections exactly. */
+  .lookup-section { margin: 0 0 18px; }
+  .lookup-section-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 16px 12px;
+    margin-top: 8px;
+  }
+  .lookup-section-head::before {
+    content: "";
+    width: 3px;
+    height: 22px;
+    background: #FFFFFF;
+    border-radius: 2px;
+  }
+  .lookup-section-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 21px;
+    color: #D9D4CB;
+    line-height: 1;
+  }
 
   /* Sent-item cards */
   .sent-item { padding: 12px 14px !important; border-left: 4px solid var(--primary) !important; }
@@ -4078,12 +4106,12 @@
   .my-note-photos {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 10px;
+    gap: 8px;
+    margin-top: 14px;
   }
   .my-note-photos img {
-    width: 64px;
-    height: 64px;
+    width: 140px;
+    height: 140px;
     object-fit: cover;
     border-radius: var(--radius-sm);
     cursor: pointer;
@@ -4354,7 +4382,11 @@
     /* No horizontal padding here: cards inside provide their own 16px margin
        via .explore-card. Adding section padding would double the inset and
        make cards narrower than they are on Explore. */
-    margin: 0 0 16px;
+    margin: 0 0 18px;
+  }
+  /* My Engaged: same spacing as My Discoveries for consistency. */
+  .my-engaged-section {
+    margin: 0 0 18px;
   }
 
   /* =========================================================================
@@ -5025,7 +5057,7 @@
     display: flex;
     gap: 14px;
     width: max-content;
-    animation: notes-drift 30s linear infinite;
+    animation: notes-drift 15s linear infinite;
     will-change: transform;
     transform: translateZ(0);
     backface-visibility: hidden;
@@ -5049,6 +5081,7 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+    opacity: 0.7;
   }
   /* Shared-in (someone tagged me) override: switch the accent to blue
      across border, headline, and photo icon. Gold stays for the viewer's
@@ -5160,7 +5193,7 @@
   <div class="header-chrome-row">
     <button type="button" class="chrome-item" id="chrome-trip" onclick="openTripModal()">
       <span class="chrome-circle">
-        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h18M3 17h12"/><circle cx="18" cy="17" r="2"/></svg>
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg>
       </span>
       <span class="chrome-label">My Trip</span>
     </button>
@@ -5218,6 +5251,72 @@
         </div>
       </div>
 
+      <!-- DISCOVER: search exhibitors, select one, capture a discovery.
+           Moved here from For Us (Explore) so a viewer can plan and capture
+           in one place. Includes the pending-bolo banner that appears after
+           tapping "Log a discovery for this" inside a trend-line modal. -->
+      <div id="discover-context-banner"></div>
+      <div id="discover-existing-notice"></div>
+      <div class="pending-bolo-banner" id="pending-bolo-banner">
+        <span class="pending-bolo-banner-label">TREND LINE</span>
+        <span class="pending-bolo-banner-name" id="pending-bolo-banner-name"></span>
+        <button type="button" class="pending-bolo-banner-clear" onclick="clearPendingBolo()" aria-label="Clear trend line tag">&times;</button>
+      </div>
+      <div class="lookup-section">
+        <div class="lookup-section-head">
+          <span class="lookup-section-title">Look Up a Booth</span>
+        </div>
+        <div class="search-bar">
+          <input class="form-input exhibitor-search-input" id="exhibitor-search" type="text" placeholder="Exhibitor Name or Booth Number" oninput="searchExhibitors(this.value)" autocomplete="off">
+        </div>
+      </div>
+      <div class="discover-wrap" style="padding-top:0;">
+        <div id="exhibitor-results"></div>
+        <div id="selected-exhibitor-block" style="display:none;"></div>
+      </div>
+      <div id="discover-form-block" style="display:none;">
+        <div class="capture-card">
+          <label class="form-section-label">Notes</label>
+          <textarea class="form-textarea" id="disc-note" rows="4" placeholder="What caught your attention?"></textarea>
+
+          <label class="form-section-label">Send to</label>
+          <div class="picker-wrap">
+            <div class="picker-trigger empty" id="recipient-trigger" onclick="toggleRecipientPicker()">
+              <span id="recipient-label">Select teammate</span>
+              <span class="picker-trigger-arrow">&#9660;</span>
+            </div>
+            <div class="picker-list" id="recipient-list"></div>
+          </div>
+
+          <label class="form-section-label">Tag-a-Trend (optional)</label>
+          <div class="picker-wrap">
+            <div class="picker-trigger empty" id="trend-trigger" onclick="toggleTrendPicker()">
+              <span id="trend-label">Select trend</span>
+              <span class="picker-trigger-arrow">&#9660;</span>
+            </div>
+            <div class="picker-list" id="trend-list"></div>
+          </div>
+
+          <label class="form-section-label">Who Did You Meet</label>
+          <input class="form-input" id="disc-contact" type="text" placeholder="Name" autocomplete="off">
+
+          <div id="dot-question-block" style="display:none;">
+            <label class="form-section-label">Are they on DOT?</label>
+            <div class="dot-toggle-row">
+              <button type="button" class="dot-btn" id="dot-btn-yes" onclick="setDotAnswer('yes')">Yes</button>
+              <button type="button" class="dot-btn" id="dot-btn-no" onclick="setDotAnswer('no')">No</button>
+            </div>
+            <div class="dot-followup" id="dot-followup"></div>
+          </div>
+
+          <button class="btn-primary" id="disc-submit-btn" onclick="submitEntry()">
+            <svg class="btn-primary-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Submit
+          </button>
+          <button class="btn-secondary" onclick="resetDiscoverForm()">Clear</button>
+        </div>
+      </div>
+
       <!-- My Discoveries: booths the viewer captured a real note on
            (or has a viewer-self entry on with content). Excludes engaged
            booths (those drop down to My Engaged) and excludes untouched
@@ -5236,7 +5335,7 @@
            for peer). -->
       <div class="my-engaged-section">
         <div class="my-discoveries-head">
-          <span class="my-discoveries-head-title">My Engaged</span>
+          <span class="my-discoveries-head-title">My Collection</span>
         </div>
         <div id="my-engaged-cards"></div>
         <div id="my-engaged-empty" class="report-empty" style="display:none;">Booths you've engaged with will show here.</div>
@@ -5262,8 +5361,6 @@
     <div id="explore-empty-identity" class="empty-state" style="display:none;">
       Select an identity at the top of the screen to see what's been shared with you.
     </div>
-    <div id="discover-context-banner"></div>
-    <div id="discover-existing-notice"></div>
 
     <!-- BOLO (Be On the Lookout). Auto-scrolling ticker of mission cards.
          Cards are duplicated so the CSS keyframe can translate -50% and the
@@ -5274,58 +5371,6 @@
         <div class="bolo-track" id="bolo-track">
           <!-- Headlines rendered by renderBoloCarousel() from BOLO_ITEMS. -->
         </div>
-      </div>
-    </div>
-
-
-    <!-- Pending BOLO banner. Visible only after the user taps
-         "Log a discovery for this" inside a BOLO modal. -->
-    <div class="pending-bolo-banner" id="pending-bolo-banner">
-      <span class="pending-bolo-banner-label">TREND LINE</span>
-      <span class="pending-bolo-banner-name" id="pending-bolo-banner-name"></span>
-      <button type="button" class="pending-bolo-banner-clear" onclick="clearPendingBolo()" aria-label="Clear trend line tag">&times;</button>
-    </div>
-
-    <div class="search-bar">
-      <svg class="search-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
-      <input class="form-input exhibitor-search-input" id="exhibitor-search" type="text" placeholder="Search exhibitors or booth numbers..." oninput="searchExhibitors(this.value)" autocomplete="off">
-    </div>
-    <div class="discover-wrap" style="padding-top:0;">
-      <div id="exhibitor-results"></div>
-      <div id="selected-exhibitor-block" style="display:none;"></div>
-    </div>
-
-    <div id="discover-form-block" style="display:none;">
-      <div class="capture-card">
-        <label class="form-section-label">Notes</label>
-        <textarea class="form-textarea" id="disc-note" rows="4" placeholder="What stood out?"></textarea>
-
-        <label class="form-section-label">Send to</label>
-        <div class="picker-wrap">
-          <div class="picker-trigger empty" id="recipient-trigger" onclick="toggleRecipientPicker()">
-            <span id="recipient-label">No one selected</span>
-            <span class="picker-trigger-arrow">&#9660;</span>
-          </div>
-          <div class="picker-list" id="recipient-list"></div>
-        </div>
-
-        <label class="form-section-label">Who you spoke with</label>
-        <input class="form-input" id="disc-contact" type="text" placeholder="Contact name" autocomplete="off">
-
-        <div id="dot-question-block" style="display:none;">
-          <label class="form-section-label">Are they on DOT?</label>
-          <div class="dot-toggle-row">
-            <button type="button" class="dot-btn" id="dot-btn-yes" onclick="setDotAnswer('yes')">Yes</button>
-            <button type="button" class="dot-btn" id="dot-btn-no" onclick="setDotAnswer('no')">No</button>
-          </div>
-          <div class="dot-followup" id="dot-followup"></div>
-        </div>
-
-        <button class="btn-primary" id="disc-submit-btn" onclick="submitEntry()">
-          <svg class="btn-primary-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-          Submit Discovery
-        </button>
-        <button class="btn-secondary" onclick="resetDiscoverForm()">Clear</button>
       </div>
     </div>
 
@@ -6815,17 +6860,17 @@ function buildRecipientPicker() {
   const list = document.getElementById('recipient-list');
   list.innerHTML = '';
 
-  // Section: Self (top)
+  // Section: Me (top)
   const selfHeader = document.createElement('div');
   selfHeader.className = 'picker-section';
-  selfHeader.textContent = 'Self';
+  selfHeader.textContent = 'Me';
   list.appendChild(selfHeader);
 
   const selfItem = document.createElement('div');
   selfItem.className = 'picker-item';
   selfItem.dataset.kind = 'self';
   selfItem.dataset.value = 'self';
-  selfItem.innerHTML = `<span>Send Note to Self</span>`;
+  selfItem.innerHTML = `<span>Note to self</span>`;
   selfItem.onclick = () => toggleRecipientSelf(selfItem);
   list.appendChild(selfItem);
 
@@ -6899,7 +6944,7 @@ function updateRecipientLabel() {
   const trigger = document.getElementById('recipient-trigger');
   const label = document.getElementById('recipient-label');
   if (total === 0) {
-    label.textContent = 'No one selected';
+    label.textContent = 'Select teammate';
     trigger.classList.add('empty');
     return;
   }
@@ -6926,6 +6971,88 @@ function toggleRecipientPicker() {
 document.addEventListener('click', (e) => {
   const trigger = document.getElementById('recipient-trigger');
   const list = document.getElementById('recipient-list');
+  if (trigger && list && !trigger.contains(e.target) && !list.contains(e.target)) {
+    trigger.classList.remove('open');
+    list.classList.remove('open');
+  }
+});
+
+// ── DISCOVER: TREND TAG PICKER ──────────────────────────────────────────────
+// Lets the viewer optionally tag their discovery with one of the existing
+// PNW Trend Lines. Sets pendingBoloId, which submitEntry persists onto the
+// entry as boloId. The card surfacing the entry then picks up the green
+// trend-line treatment automatically (same path as the "Log a discovery
+// for this" flow from the trend-line modal).
+function buildTrendPicker() {
+  const list = document.getElementById('trend-list');
+  if (!list) return;
+  list.innerHTML = '';
+  // Clear option
+  const clearItem = document.createElement('div');
+  clearItem.className = 'picker-item';
+  clearItem.dataset.kind = 'trend-clear';
+  clearItem.innerHTML = `<span>Select trend</span>`;
+  clearItem.onclick = () => selectTrend(null);
+  list.appendChild(clearItem);
+  // Section: PNW Trend Lines
+  const head = document.createElement('div');
+  head.className = 'picker-section';
+  head.textContent = 'PNW Trend Lines';
+  list.appendChild(head);
+  if (Array.isArray(BOLO_ITEMS)) {
+    BOLO_ITEMS.forEach((item, idx) => {
+      const row = document.createElement('div');
+      row.className = 'picker-item';
+      row.dataset.kind = 'trend';
+      row.dataset.value = String(idx);
+      row.innerHTML = `<span>${escapeHtml(item.name || '')}</span>`;
+      row.onclick = () => selectTrend(idx);
+      list.appendChild(row);
+    });
+  }
+}
+
+function selectTrend(idx) {
+  pendingBoloId = (idx === null || idx === undefined) ? null : Number(idx);
+  const label = document.getElementById('trend-label');
+  const trigger = document.getElementById('trend-trigger');
+  const list = document.getElementById('trend-list');
+  if (label) {
+    if (pendingBoloId === null) {
+      label.textContent = 'Select trend';
+      if (trigger) trigger.classList.add('empty');
+    } else {
+      const item = BOLO_ITEMS[pendingBoloId];
+      label.textContent = item ? item.name : 'Tagged';
+      if (trigger) trigger.classList.remove('empty');
+    }
+  }
+  // Close the dropdown.
+  if (trigger) trigger.classList.remove('open');
+  if (list) list.classList.remove('open');
+  // Keep the pending-bolo banner in sync — it's the same state.
+  if (typeof renderPendingBoloBanner === 'function') renderPendingBoloBanner();
+}
+window.selectTrend = selectTrend;
+
+function toggleTrendPicker() {
+  const trigger = document.getElementById('trend-trigger');
+  const list = document.getElementById('trend-list');
+  if (!trigger || !list) return;
+  // Build the picker contents on first open.
+  if (!list.dataset.built) {
+    buildTrendPicker();
+    list.dataset.built = '1';
+  }
+  const open = list.classList.toggle('open');
+  trigger.classList.toggle('open', open);
+}
+window.toggleTrendPicker = toggleTrendPicker;
+
+// Tap-outside to close the trend picker
+document.addEventListener('click', (e) => {
+  const trigger = document.getElementById('trend-trigger');
+  const list = document.getElementById('trend-list');
   if (trigger && list && !trigger.contains(e.target) && !list.contains(e.target)) {
     trigger.classList.remove('open');
     list.classList.remove('open');
@@ -7125,8 +7252,9 @@ async function submitEntry() {
   renderExplore();
   updateSentCount();
 
-  // After submitting, send the user to Explore so they can see what they just did.
-  showScreen('explore');
+  // After submitting, stay on Home so the user sees what they just did
+  // appear immediately in My Discoveries / My Engaged below.
+  showScreen('home');
 }
 
 function resetDiscoverForm() {
@@ -7157,6 +7285,9 @@ function resetFormFields() {
   clearPhotos('disc');
   document.querySelectorAll('#recipient-list .picker-item').forEach(item => item.classList.remove('selected'));
   updateRecipientLabel();
+  // Sync the trend picker label with the current pendingBoloId so the trigger
+  // text reflects whatever's about to ride on the next submission.
+  if (typeof selectTrend === 'function') selectTrend(pendingBoloId);
   // Reset Add details to collapsed
   const dt = document.getElementById('details-toggle');
   const db = document.getElementById('discover-details-block');
@@ -8626,9 +8757,9 @@ function startBoloDiscovery() {
   pendingBoloId = boloActiveIdx;
   closeBolo();
   renderPendingBoloBanner();
-  // Make sure we're on For Us where capture lives, then scroll the
-  // capture surface into view.
-  showScreen('explore');
+  // Capture lives on For Me now. Switch there, then scroll the search bar
+  // into view and focus it.
+  showScreen('home');
   setTimeout(() => {
     const target = document.getElementById('exhibitor-search');
     if (target) {
@@ -8742,14 +8873,20 @@ function renderMyNotes() {
   }
 
   // Ticker (collapsed state): the 5 most recent (post-sort, so shared-in
-  // bubble up). Doubled for seamless loop.
+  // bubble up). Doubled for seamless loop animation — but only when there
+  // are at least 2 notes. With just one, doubling causes a visible duplicate.
   if (tickerTrack) {
     if (mine.length === 0) {
       tickerTrack.innerHTML = '<div class="notes-ticker-empty">No notes yet. Tap the mic to capture one.</div>';
+      tickerTrack.style.animationPlayState = 'paused';
+    } else if (mine.length === 1) {
+      tickerTrack.innerHTML = renderNoteTickerCard(mine[0]);
+      tickerTrack.style.animationPlayState = 'paused';
     } else {
       const top5 = mine.slice(0, 5);
       const cardHtml = top5.map(renderNoteTickerCard).join('');
       tickerTrack.innerHTML = cardHtml + cardHtml;
+      tickerTrack.style.animationPlayState = '';
     }
   }
 }
@@ -8946,9 +9083,9 @@ function renderEbPartnersSection() {
 // Discover screen and pre-selects the exhibitor so the discovery flow takes
 // over from there.
 function openExhibitorCard(booth, name, hall, hallCode) {
-  // Switch to the screen that carries the exhibitor selection / discovery
-  // capture flow ('explore' is the For Us tab where this lives).
-  if (typeof showScreen === 'function') showScreen('explore');
+  // Switch to For Me where the exhibitor selection / discovery capture flow
+  // now lives (moved from For Us).
+  if (typeof showScreen === 'function') showScreen('home');
   if (typeof selectExhibitor === 'function') {
     selectExhibitor(String(booth), name || '', hall || '', hallCode || '');
   }
@@ -9513,6 +9650,7 @@ function memoAddPhoto() {
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'image/*';
+  input.capture = 'environment';
   input.onchange = async () => {
     const file = input.files && input.files[0];
     if (!file) return;
@@ -9886,7 +10024,7 @@ function renderReport() {
 
   body.innerHTML = `
     ${section('My Discoveries', discoveries.length, discoveries.map(renderReportDiscovery).join(''))}
-    ${section('My Engaged', engaged.length, engaged.map(renderReportDiscovery).join(''))}
+    ${section('My Collection', engaged.length, engaged.map(renderReportDiscovery).join(''))}
     ${section('From Trends', fromTrends.length, fromTrends.map(renderReportDiscovery).join(''))}
     ${section('Shared With Me', sharedAll.length, sharedAll.map(renderSharedItem).join(''))}
     ${section('My Hit List', hitList.length, hitList.map(renderReportBookmark).join(''))}
@@ -10796,6 +10934,54 @@ async function initApp() {
   // Cycle the home greeting prefix every 3 minutes.
   startGreetingRotation();
   showScreen('home');
+
+  // Swipe gesture: swipe left → For Us, swipe right → For Me. Listens at the
+  // document level so any screen content can be the swipe origin. Ignored if
+  // the swipe starts inside an interactive element (text input, picker,
+  // dropdown, modal, ticker track), so a horizontal drag in those contexts
+  // doesn't accidentally flip the tab.
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartIgnore = false;
+  const SWIPE_MIN_DX = 80;          // minimum horizontal travel in pixels
+  const SWIPE_MAX_DY_RATIO = 0.5;   // vertical travel must be < 50% of horizontal
+  const SWIPE_IGNORE_SELECTOR = [
+    'input', 'textarea', 'select', 'button',
+    '.picker-list', '.picker-trigger', '.identity-dropdown',
+    '.modal', '.bolo-modal', '.report-modal', '.trip-modal',
+    '.notes-ticker', '.bolo-track', '.memo-modal',
+    '[contenteditable="true"]'
+  ].join(',');
+  document.addEventListener('touchstart', (e) => {
+    if (!e.touches || e.touches.length !== 1) {
+      touchStartIgnore = true;
+      return;
+    }
+    touchStartIgnore = false;
+    const t = e.touches[0];
+    touchStartX = t.clientX;
+    touchStartY = t.clientY;
+    // If the swipe origin is inside an interactive element, ignore.
+    if (e.target && typeof e.target.closest === 'function') {
+      if (e.target.closest(SWIPE_IGNORE_SELECTOR)) touchStartIgnore = true;
+    }
+  }, { passive: true });
+  document.addEventListener('touchend', (e) => {
+    if (touchStartIgnore) return;
+    if (!e.changedTouches || e.changedTouches.length === 0) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchStartX;
+    const dy = t.clientY - touchStartY;
+    if (Math.abs(dx) < SWIPE_MIN_DX) return;
+    if (Math.abs(dy) > Math.abs(dx) * SWIPE_MAX_DY_RATIO) return;
+    if (dx < 0) {
+      // Swipe left → next tab (For Us)
+      showScreen('explore');
+    } else {
+      // Swipe right → previous tab (For Me)
+      showScreen('home');
+    }
+  }, { passive: true });
 
   await loadFromKV();
 }
