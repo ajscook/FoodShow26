@@ -1248,6 +1248,124 @@
     justify-content: center;
     padding: 20px;
   }
+
+  /* Bottom-sheet picker used by both the recipient and trend dropdowns.
+     Slides up from the bottom over a soft backdrop; rounded top corners,
+     drag handle, sticky head with title + Done. */
+  .picker-sheet {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 8000;
+    align-items: flex-end;
+    justify-content: center;
+    animation: pickerSheetFade 0.18s ease-out;
+  }
+  .picker-sheet.open { display: flex; }
+  @keyframes pickerSheetFade {
+    from { background: rgba(0,0,0,0); }
+    to   { background: rgba(0,0,0,0.55); }
+  }
+  .picker-sheet-inner {
+    width: 100%;
+    max-width: 560px;
+    max-height: 80vh;
+    background: #14171A;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: pickerSheetSlide 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  @keyframes pickerSheetSlide {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+  .picker-sheet-handle {
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.20);
+    margin: 10px auto 4px;
+    flex-shrink: 0;
+  }
+  .picker-sheet-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px 8px;
+    flex-shrink: 0;
+  }
+  .picker-sheet-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 22px;
+    color: #D9D4CB;
+  }
+  .picker-sheet-done {
+    background: transparent;
+    border: none;
+    color: var(--tertiary);
+    font-family: var(--font);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 8px;
+  }
+  .picker-sheet-done:active { opacity: 0.6; }
+  .picker-sheet-filters {
+    display: flex;
+    gap: 8px;
+    padding: 8px 20px 12px;
+    flex-shrink: 0;
+    overflow-x: auto;
+  }
+  .picker-sheet-filter {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--text-secondary);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.12s, border-color 0.12s;
+  }
+  .picker-sheet-filter.active {
+    background: rgba(91,163,245,0.12);
+    border-color: var(--tertiary);
+    color: var(--tertiary);
+  }
+  .picker-sheet-filters:empty { display: none; }
+  .picker-sheet-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 8px 24px;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Reuse picker-item / picker-avatar styles inside the sheet but with
+     a touch more breathing room and full-width hover targets. */
+  .picker-sheet-body .picker-item {
+    padding: 14px 14px;
+    border-radius: 12px;
+    margin: 2px 4px;
+  }
+  .picker-sheet-body .picker-section {
+    padding: 14px 16px 6px;
+  }
+  /* Sheet row "selected" stays consistent with other picker selections. */
+  .picker-sheet-body .picker-item.selected {
+    background: rgba(91,163,245,0.12);
+  }
+  body.picker-sheet-open { overflow: hidden; }
   .photo-lightbox img {
     max-width: 100%;
     max-height: 100%;
@@ -1734,10 +1852,10 @@
     width: 100%;
     font-family: var(--font);
     font-size: 17px;
-    padding: 10px 36px 10px 12px;
-    border: 1.5px solid var(--border-strong);
+    padding: 12px 36px 12px 14px;
+    border: 1px solid var(--border-strong);
     border-radius: var(--radius-sm);
-    background: var(--surface-raised);
+    background: transparent;
     color: var(--text-primary);
     cursor: pointer;
     text-align: left;
@@ -1746,14 +1864,19 @@
     position: relative;
     line-height: 1.4;
   }
-  .picker-trigger.open { border-color: var(--green); }
+  .picker-trigger.open { border-color: #FFFFFF; }
   .picker-trigger.empty { color: var(--text-hint); }
   .picker-trigger-arrow {
     position: absolute;
-    right: 12px;
+    right: 14px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 14px;
+    font-size: 11px;
+    color: var(--text-hint);
+    transition: transform 0.15s ease;
+  }
+  .picker-trigger.open .picker-trigger-arrow {
+    transform: translateY(-50%) rotate(180deg);
     color: #FFFFFF;
   }
   .picker-list {
@@ -1762,50 +1885,108 @@
     top: 100%;
     left: 0;
     right: 0;
-    margin-top: 2px;
-    background: var(--surface-raised);
-    border: 1.5px solid var(--green);
-    border-radius: var(--radius-sm);
+    margin-top: 6px;
+    background: #14171A;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
     z-index: 200;
-    max-height: 280px;
+    max-height: 320px;
     overflow-y: auto;
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.45);
+    padding: 6px 0;
   }
   .picker-list.open { display: block; }
   .picker-section {
-    padding: 6px 12px 4px;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
+    padding: 10px 16px 4px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--text-hint);
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
+    background: transparent;
+    border: none;
   }
+  .picker-section + .picker-item { margin-top: 2px; }
   .picker-item {
-    padding: 9px 12px;
-    font-size: 17px;
+    padding: 12px 16px;
+    font-size: 16px;
     color: var(--text-primary);
     cursor: pointer;
-    border-bottom: 1px solid var(--border);
+    border: none;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
+    transition: background 0.12s;
   }
-  .picker-item:last-child { border-bottom: none; }
-  .picker-item:active, .picker-item:hover { background: var(--surface); }
+  .picker-item:active, .picker-item:hover {
+    background: rgba(255,255,255,0.04);
+  }
   .picker-item.selected {
-    background: var(--surface);
-    color: var(--green);
+    background: rgba(91,163,245,0.10);
+    color: var(--text-primary);
   }
   .picker-item.selected::before {
+    content: '';
+    margin: 0;
+  }
+  .picker-item.selected::after {
     content: '\2713';
-    margin-right: 6px;
-    color: var(--green);
+    color: var(--tertiary);
+    font-size: 15px;
+    font-weight: 700;
+    margin-left: auto;
+    padding-left: 8px;
+  }
+  /* Person + group rows in the recipient picker get an avatar-style initials
+     disc on the left and a stacked name / sub text block. */
+  .picker-item-person,
+  .picker-item-group {
+    align-items: center;
+  }
+  .picker-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    color: #E87D3E;
+    border: 1.5px solid #E87D3E;
+    background: transparent;
+  }
+  .picker-avatar-group {
+    color: var(--tertiary);
+    border-color: var(--tertiary);
+  }
+  .picker-avatar-trend {
+    color: var(--green-harbor);
+    border-color: var(--green-harbor);
+  }
+  .picker-item-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+  .picker-item-name {
+    font-size: 16px;
+    color: var(--text-primary);
+    line-height: 1.25;
   }
   .picker-item-sub {
-    font-size: 14px;
+    font-size: 12px;
     color: var(--text-hint);
+    font-family: var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
 
   /* Identity context banner on Discover */
@@ -2123,13 +2304,13 @@
   }
 
   /* PNW Trend Lines: outlined green pill toggle that expands/collapses the
-     trend stack. Typography matches the BOLO ticker bar above it. */
+     trend stack. Border + triangle green; label text white. */
   .trend-toggle {
     align-self: center;
     background: transparent;
     border: 1.5px solid var(--green-harbor);
     border-radius: 999px;
-    color: var(--green-harbor);
+    color: #FFFFFF;
     cursor: pointer;
     padding: 8px 16px;
     display: inline-flex;
@@ -2166,13 +2347,14 @@
   .trend-stack {
     display: none;
     flex-direction: column;
-    gap: 8px;
+    gap: 14px;
   }
   .trend-stack.open { display: flex; }
   .trend-toggle-bottom { margin-top: 4px; }
   .trend-pill {
     border: 1px solid var(--border);
-    border-left: 3px solid var(--trendline);
+    border-left: 3px solid var(--green-harbor);
+    border-bottom: 1px solid var(--green-harbor);
     border-radius: var(--radius-sm);
     background: transparent;
     overflow: hidden;
@@ -2204,12 +2386,39 @@
     color: var(--text-secondary);
     line-height: 1.35;
   }
-  .trend-pill-arrow {
-    color: var(--text-hint);
-    font-size: 22px;
+  /* PNW Trend Lines header doubles as the expand/collapse trigger. The whole
+     head row is tappable; a green + at the right rotates 45° to become an ×
+     when the stack is open. */
+  .trendlines-head { cursor: pointer; }
+  .trendlines-head-toggle {
+    margin-left: 12px;
+    color: var(--green-harbor);
+    font-family: var(--font);
+    font-size: 28px;
+    font-weight: 300;
     line-height: 1;
+    transition: transform 0.2s ease;
     flex-shrink: 0;
   }
+  .trendlines-head.open .trendlines-head-toggle {
+    transform: rotate(45deg);
+  }
+
+  /* Card arrow: green plus sign on the right of each trend pill head. */
+  .trend-pill-arrow {
+    color: var(--green-harbor);
+    font-family: var(--font);
+    font-size: 26px;
+    font-weight: 300;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+    width: auto;
+    height: auto;
+    border: none;
+  }
+  .trend-pill-arrow::before { content: "+"; }
+  .trend-pill.open .trend-pill-arrow { transform: rotate(45deg); }
   .trend-pill-body {
     padding: 4px 14px 14px;
     border-top: 1px solid var(--border);
@@ -5384,6 +5593,21 @@
 
 </div>
 
+<!-- Bottom-sheet picker. Used by both the recipient picker ("Send to") and
+     the trend picker ("Tag-a-Trend"). The active picker is set on
+     window.__pickerKind before opening, and content is built dynamically. -->
+<div id="picker-sheet" class="picker-sheet" onclick="if(event.target===this)closePickerSheet()">
+  <div class="picker-sheet-inner" role="dialog" aria-modal="true">
+    <div class="picker-sheet-handle"></div>
+    <div class="picker-sheet-head">
+      <span class="picker-sheet-title" id="picker-sheet-title">Send to</span>
+      <button type="button" class="picker-sheet-done" onclick="closePickerSheet()">Done</button>
+    </div>
+    <div class="picker-sheet-filters" id="picker-sheet-filters"></div>
+    <div class="picker-sheet-body" id="picker-sheet-body"></div>
+  </div>
+</div>
+
 <!-- Photo lightbox -->
 <div id="photo-lightbox" class="photo-lightbox" onclick="closeLightbox()">
   <button type="button" class="photo-lightbox-close" onclick="closeLightbox()" aria-label="Close">&times;</button>
@@ -5611,7 +5835,7 @@ let currentIdentity = null; // {id, kind: 'person'|'department'|'harbor'}
 // the raw tag values directly.
 function formatTagsForDisplay(tags) {
   return (tags || [])
-    .map(t => t === 'Cat Management' ? 'Category Management' : t)
+    .map(t => t === 'Cat Management' ? 'Cat Man' : t)
     .join(', ');
 }
 
@@ -6876,10 +7100,16 @@ function buildRecipientPicker() {
   const sortedPeople = [...PEOPLE].sort((a,b) => a.first.localeCompare(b.first));
   sortedPeople.forEach(p => {
     const item = document.createElement('div');
-    item.className = 'picker-item';
+    item.className = 'picker-item picker-item-person';
     item.dataset.kind = 'person';
     item.dataset.value = p.id;
-    item.innerHTML = `<span>${p.name}</span><span class="picker-item-sub">${formatTagsForDisplay(p.tags)}</span>`;
+    const initialsStr = (typeof initials === 'function') ? initials(p.name) : (p.first ? p.first.charAt(0) : '?');
+    item.innerHTML = `
+      <span class="picker-avatar">${escapeHtml(initialsStr)}</span>
+      <span class="picker-item-text">
+        <span class="picker-item-name">${escapeHtml(p.name)}</span>
+        <span class="picker-item-sub">${escapeHtml(formatTagsForDisplay(p.tags))}</span>
+      </span>`;
     item.onclick = () => toggleRecipientPerson(p.id, item);
     list.appendChild(item);
   });
@@ -6892,10 +7122,16 @@ function buildRecipientPicker() {
 
   ROLE_TAGS.forEach(tag => {
     const item = document.createElement('div');
-    item.className = 'picker-item';
+    item.className = 'picker-item picker-item-group';
     item.dataset.kind = 'group';
     item.dataset.value = tag;
-    item.innerHTML = `<span>${tag}</span>`;
+    const groupLabel = tag === 'Cat Management' ? 'Cat Man' : tag;
+    item.innerHTML = `
+      <span class="picker-avatar picker-avatar-group">${escapeHtml(groupLabel.charAt(0))}</span>
+      <span class="picker-item-text">
+        <span class="picker-item-name">${escapeHtml(groupLabel)}</span>
+        <span class="picker-item-sub">Group</span>
+      </span>`;
     item.onclick = () => toggleRecipientGroup(tag, item);
     list.appendChild(item);
   });
@@ -6954,21 +7190,8 @@ function updateRecipientLabel() {
 }
 
 function toggleRecipientPicker() {
-  const trigger = document.getElementById('recipient-trigger');
-  const list = document.getElementById('recipient-list');
-  const open = list.classList.toggle('open');
-  trigger.classList.toggle('open', open);
+  openPickerSheet('recipient');
 }
-
-// Tap-outside to close recipient picker
-document.addEventListener('click', (e) => {
-  const trigger = document.getElementById('recipient-trigger');
-  const list = document.getElementById('recipient-list');
-  if (trigger && list && !trigger.contains(e.target) && !list.contains(e.target)) {
-    trigger.classList.remove('open');
-    list.classList.remove('open');
-  }
-});
 
 // ── DISCOVER: TREND TAG PICKER ──────────────────────────────────────────────
 // Lets the viewer optionally tag their discovery with one of the existing
@@ -7029,28 +7252,210 @@ function selectTrend(idx) {
 window.selectTrend = selectTrend;
 
 function toggleTrendPicker() {
-  const trigger = document.getElementById('trend-trigger');
-  const list = document.getElementById('trend-list');
-  if (!trigger || !list) return;
-  // Build the picker contents on first open.
-  if (!list.dataset.built) {
-    buildTrendPicker();
-    list.dataset.built = '1';
-  }
-  const open = list.classList.toggle('open');
-  trigger.classList.toggle('open', open);
+  openPickerSheet('trend');
 }
 window.toggleTrendPicker = toggleTrendPicker;
 
-// Tap-outside to close the trend picker
-document.addEventListener('click', (e) => {
-  const trigger = document.getElementById('trend-trigger');
-  const list = document.getElementById('trend-list');
-  if (trigger && list && !trigger.contains(e.target) && !list.contains(e.target)) {
-    trigger.classList.remove('open');
-    list.classList.remove('open');
+// ── BOTTOM-SHEET PICKER (shared by recipient + trend pickers) ───────────────
+// Replaces the inline dropdown picker with a slide-up sheet. The active
+// picker is identified by window.__pickerKind ('recipient' or 'trend').
+// Content is built fresh each open. Filter pills (recipient only) let the
+// viewer narrow the list to People or Groups.
+window.__pickerKind = null;
+window.__pickerFilter = 'all';
+
+function openPickerSheet(kind) {
+  window.__pickerKind = kind;
+  window.__pickerFilter = 'all';
+  const sheet = document.getElementById('picker-sheet');
+  const title = document.getElementById('picker-sheet-title');
+  if (!sheet || !title) return;
+  if (kind === 'recipient') {
+    title.textContent = 'Send to';
+  } else if (kind === 'trend') {
+    title.textContent = 'Tag-a-Trend';
   }
-});
+  renderPickerSheet();
+  sheet.classList.add('open');
+  document.body.classList.add('picker-sheet-open');
+}
+window.openPickerSheet = openPickerSheet;
+
+function closePickerSheet() {
+  const sheet = document.getElementById('picker-sheet');
+  if (sheet) sheet.classList.remove('open');
+  document.body.classList.remove('picker-sheet-open');
+  window.__pickerKind = null;
+}
+window.closePickerSheet = closePickerSheet;
+
+function renderPickerSheet() {
+  const body = document.getElementById('picker-sheet-body');
+  const filters = document.getElementById('picker-sheet-filters');
+  if (!body || !filters) return;
+  body.innerHTML = '';
+  filters.innerHTML = '';
+
+  if (window.__pickerKind === 'recipient') {
+    renderRecipientSheetContent(body, filters);
+  } else if (window.__pickerKind === 'trend') {
+    renderTrendSheetContent(body, filters);
+  }
+}
+
+function setPickerFilter(filter) {
+  window.__pickerFilter = filter;
+  renderPickerSheet();
+}
+window.setPickerFilter = setPickerFilter;
+
+function renderRecipientSheetContent(body, filters) {
+  // Filter pills.
+  const pills = [
+    { id: 'all', label: 'All' },
+    { id: 'people', label: 'People' },
+    { id: 'groups', label: 'Groups' }
+  ];
+  pills.forEach(p => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'picker-sheet-filter' + (window.__pickerFilter === p.id ? ' active' : '');
+    btn.textContent = p.label;
+    btn.onclick = () => setPickerFilter(p.id);
+    filters.appendChild(btn);
+  });
+
+  const filter = window.__pickerFilter;
+  const showPeople = filter === 'all' || filter === 'people';
+  const showGroups = filter === 'all' || filter === 'groups';
+
+  // "Me" row (always visible, regardless of filter).
+  if (filter === 'all') {
+    const meItem = document.createElement('div');
+    meItem.className = 'picker-item picker-item-me';
+    if (selectedRecipientSelf) meItem.classList.add('selected');
+    meItem.innerHTML = `
+      <span class="picker-avatar">ME</span>
+      <span class="picker-item-text">
+        <span class="picker-item-name">Note to self</span>
+        <span class="picker-item-sub">Only you</span>
+      </span>`;
+    meItem.onclick = () => {
+      selectedRecipientSelf = !selectedRecipientSelf;
+      meItem.classList.toggle('selected', selectedRecipientSelf);
+      updateRecipientLabel();
+    };
+    body.appendChild(meItem);
+  }
+
+  if (showPeople) {
+    const head = document.createElement('div');
+    head.className = 'picker-section';
+    head.textContent = 'People';
+    body.appendChild(head);
+
+    const sortedPeople = [...PEOPLE].sort((a,b) => a.first.localeCompare(b.first));
+    sortedPeople.forEach(p => {
+      const item = document.createElement('div');
+      item.className = 'picker-item picker-item-person';
+      if (selectedRecipientPeople.includes(p.id)) item.classList.add('selected');
+      const initialsStr = (typeof initials === 'function') ? initials(p.name) : (p.first ? p.first.charAt(0) : '?');
+      item.innerHTML = `
+        <span class="picker-avatar">${escapeHtml(initialsStr)}</span>
+        <span class="picker-item-text">
+          <span class="picker-item-name">${escapeHtml(p.name)}</span>
+          <span class="picker-item-sub">${escapeHtml(formatTagsForDisplay(p.tags))}</span>
+        </span>`;
+      item.onclick = () => {
+        const idx = selectedRecipientPeople.indexOf(p.id);
+        if (idx >= 0) {
+          selectedRecipientPeople.splice(idx, 1);
+          item.classList.remove('selected');
+        } else {
+          selectedRecipientPeople.push(p.id);
+          item.classList.add('selected');
+        }
+        updateRecipientLabel();
+      };
+      body.appendChild(item);
+    });
+  }
+
+  if (showGroups) {
+    const head = document.createElement('div');
+    head.className = 'picker-section';
+    head.textContent = 'Groups';
+    body.appendChild(head);
+
+    ROLE_TAGS.forEach(tag => {
+      const item = document.createElement('div');
+      item.className = 'picker-item picker-item-group';
+      if (selectedRecipientGroups.includes(tag)) item.classList.add('selected');
+      const groupLabel = tag === 'Cat Management' ? 'Cat Man' : tag;
+      item.innerHTML = `
+        <span class="picker-avatar picker-avatar-group">${escapeHtml(groupLabel.charAt(0))}</span>
+        <span class="picker-item-text">
+          <span class="picker-item-name">${escapeHtml(groupLabel)}</span>
+          <span class="picker-item-sub">Group</span>
+        </span>`;
+      item.onclick = () => {
+        const idx = selectedRecipientGroups.indexOf(tag);
+        if (idx >= 0) {
+          selectedRecipientGroups.splice(idx, 1);
+          item.classList.remove('selected');
+        } else {
+          selectedRecipientGroups.push(tag);
+          item.classList.add('selected');
+        }
+        updateRecipientLabel();
+      };
+      body.appendChild(item);
+    });
+  }
+}
+
+function renderTrendSheetContent(body, filters) {
+  // No filter pills on the trend picker — only one source.
+  // "No trend tagged" clear row.
+  const clearItem = document.createElement('div');
+  clearItem.className = 'picker-item';
+  if (pendingBoloId === null || pendingBoloId === undefined) clearItem.classList.add('selected');
+  clearItem.innerHTML = `
+    <span class="picker-avatar picker-avatar-group">&minus;</span>
+    <span class="picker-item-text">
+      <span class="picker-item-name">No trend tagged</span>
+      <span class="picker-item-sub">Skip</span>
+    </span>`;
+  clearItem.onclick = () => {
+    selectTrend(null);
+    closePickerSheet();
+  };
+  body.appendChild(clearItem);
+
+  const head = document.createElement('div');
+  head.className = 'picker-section';
+  head.textContent = 'PNW Trend Lines';
+  body.appendChild(head);
+
+  if (Array.isArray(BOLO_ITEMS)) {
+    BOLO_ITEMS.forEach((trend, idx) => {
+      const item = document.createElement('div');
+      item.className = 'picker-item';
+      if (pendingBoloId === idx) item.classList.add('selected');
+      item.innerHTML = `
+        <span class="picker-avatar picker-avatar-trend">${escapeHtml(String(idx + 1))}</span>
+        <span class="picker-item-text">
+          <span class="picker-item-name">${escapeHtml(trend.name || '')}</span>
+          <span class="picker-item-sub">${escapeHtml(trend.summary || '')}</span>
+        </span>`;
+      item.onclick = () => {
+        selectTrend(idx);
+        closePickerSheet();
+      };
+      body.appendChild(item);
+    });
+  }
+}
 
 // ── DISCOVER: IDENTITY CONTEXT BANNER ───────────────────────────────────────
 
@@ -8195,70 +8600,6 @@ const BOLO_ITEMS = [
     ]
   },
   {
-    name: 'VAP Equipment & Serviceware',
-    summary: 'Labor-saving equipment and new dishware for new menus',
-    categories: ['Small-Format Vessels', 'Plateware', 'Beverage Equipment', 'Kitchen Innovation'],
-    trend: "Operators trying to do more with what they already have. A different plate, a different vessel, a smaller portion on a slate board, a fry flight instead of a fry order. The menu doesn't change. The presentation does. Equipment sits next to this when it opens a format the operator couldn't run before. What's the cheapest change that makes one of your accounts look new?",
-    who: [ { name: 'Dawn S', note: 'Fry flights, slider stands, ramekins, small-format serving pieces. Beverage equipment.' }, { name: 'Tony R', note: 'Burger presentation and the Gators rework. Vessels that restage existing items.' }, { name: 'Andy C', note: 'Operator-side experience driving the serviceware angle.' }
-    ],
-    exhibitors: [ {
-        name: 'American Metalcraft',
-        booth: '7029',
-        description: "Decades-deep catalog of small-format serveware. Fry cans, sauce cups, hammered serving trays, mezza boards, charcuterie platters, display risers, slider boards. The fry-flight conversation Dawn S. raised lives here, and so does the Gators burger-presentation angle Tony R. flagged.",
-        focusAreas: [
-          'Fry-flight setups and what operators are actually pulling off the catalog.',
-          'Slider stands and small-format vessels for bar-and-grill menu reworks.',
-          'Charcuterie and mezza boards for appetizer-program rebuilds.'
-        ]
-      }, {
-        name: 'Lodge Manufacturing',
-        booth: '5408',
-        description: "Cast iron mini-skillets, serving pans. The vessel that turns a regular menu item into something diners read as intentional. Heat retention is the operator benefit, presentation is the customer benefit.",
-        focusAreas: [
-          'Mini-skillet formats and the menu items operators are running in them.',
-          'Sizing across appetizer, slider, and dessert applications.',
-          'Care and turnover cost in real high-volume kitchens.'
-        ]
-      }, {
-        name: 'Steelite',
-        booth: '6016/6612',
-        description: "Major foodservice plateware brand. Worth the stop for the broader plateware conversation, especially operators looking to refresh their dining-room presentation without retooling the kitchen.",
-        focusAreas: [
-          'Small-plate and shareable-format collections.',
-          "What's moving in the casual-dining plateware refresh space.",
-          'Mix-and-match systems that let an operator rotate without buying a new set.'
-        ]
-      }, {
-        name: 'Botrista',
-        booth: '2775',
-        description: "Automated craft beverage dispenser. Five square feet of floor space. 2,000+ recipes including mocktails, infused teas, lemonades, smoothies. NRA Kitchen Innovations Award winner. Direct bridge to Roy K.'s and Dawn S.'s equipment-light-entry frame on the beverage program lane.",
-        focusAreas: [
-          'How counter-service and bar-and-grill operators are using it for non-alcoholic programs.',
-          'Per-drink cost economics and the menu price the system supports.',
-          'Footprint and back-of-house integration for operators with no bar.'
-        ]
-      }, {
-        name: 'Vitamix Commercial',
-        booth: '3216',
-        description: "Featured exhibitor, broad commercial blender catalog. Crossover to the beverage program lane. Lower-tech than Botrista, more flexibility, more labor.",
-        focusAreas: [
-          'Where Vitamix is the better answer than full automation.',
-          'Smoothie, mocktail, and frozen-drink program builds.',
-          'Operator cost-per-drink against the automated alternatives.'
-        ]
-      }, {
-        name: 'RATIONAL USA',
-        booth: '4831',
-        description: "Combi ovens. The equipment that opens formats an operator couldn't run before. Worth the stop for any account weighing whether to expand menu range without expanding kitchen square footage.",
-        focusAreas: [
-          'Menu categories operators are adding after a combi installation.',
-          'Labor and training math against existing kitchen setups.',
-          'Footprint and ROI for a mid-size independent.'
-        ]
-      }
-    ]
-  },
-  {
     name: 'Menu Innovations',
     summary: 'Rethink and adapt the plates the business runs on',
     categories: ['Small Plates / High Margin', 'Burgers', 'Value Proteins', 'Eggs', 'Price-Point Rebuilds', 'Portion-Conscious Builds'],
@@ -8378,11 +8719,75 @@ const BOLO_ITEMS = [
     ]
   },
   {
+    name: 'Equipment & Serviceware',
+    summary: 'Labor-saving equipment and new dishware for new menus',
+    categories: ['Small-Format Vessels', 'Plateware', 'Beverage Equipment', 'Kitchen Innovation'],
+    trend: "Operators trying to do more with what they already have. A different plate, a different vessel, a smaller portion on a slate board, a fry flight instead of a fry order. The menu doesn't change. The presentation does. Equipment sits next to this when it opens a format the operator couldn't run before. What's the cheapest change that makes one of your accounts look new?",
+    who: [ { name: 'Dawn S', note: 'Fry flights, slider stands, ramekins, small-format serving pieces. Beverage equipment.' }, { name: 'Tony R', note: 'Burger presentation and the Gators rework. Vessels that restage existing items.' }, { name: 'Andy C', note: 'Operator-side experience driving the serviceware angle.' }
+    ],
+    exhibitors: [ {
+        name: 'American Metalcraft',
+        booth: '7029',
+        description: "Decades-deep catalog of small-format serveware. Fry cans, sauce cups, hammered serving trays, mezza boards, charcuterie platters, display risers, slider boards. The fry-flight conversation Dawn S. raised lives here, and so does the Gators burger-presentation angle Tony R. flagged.",
+        focusAreas: [
+          'Fry-flight setups and what operators are actually pulling off the catalog.',
+          'Slider stands and small-format vessels for bar-and-grill menu reworks.',
+          'Charcuterie and mezza boards for appetizer-program rebuilds.'
+        ]
+      }, {
+        name: 'Lodge Manufacturing',
+        booth: '5408',
+        description: "Cast iron mini-skillets, serving pans. The vessel that turns a regular menu item into something diners read as intentional. Heat retention is the operator benefit, presentation is the customer benefit.",
+        focusAreas: [
+          'Mini-skillet formats and the menu items operators are running in them.',
+          'Sizing across appetizer, slider, and dessert applications.',
+          'Care and turnover cost in real high-volume kitchens.'
+        ]
+      }, {
+        name: 'Steelite',
+        booth: '6016/6612',
+        description: "Major foodservice plateware brand. Worth the stop for the broader plateware conversation, especially operators looking to refresh their dining-room presentation without retooling the kitchen.",
+        focusAreas: [
+          'Small-plate and shareable-format collections.',
+          "What's moving in the casual-dining plateware refresh space.",
+          'Mix-and-match systems that let an operator rotate without buying a new set.'
+        ]
+      }, {
+        name: 'Botrista',
+        booth: '2775',
+        description: "Automated craft beverage dispenser. Five square feet of floor space. 2,000+ recipes including mocktails, infused teas, lemonades, smoothies. NRA Kitchen Innovations Award winner. Direct bridge to Roy K.'s and Dawn S.'s equipment-light-entry frame on the beverage program lane.",
+        focusAreas: [
+          'How counter-service and bar-and-grill operators are using it for non-alcoholic programs.',
+          'Per-drink cost economics and the menu price the system supports.',
+          'Footprint and back-of-house integration for operators with no bar.'
+        ]
+      }, {
+        name: 'Vitamix Commercial',
+        booth: '3216',
+        description: "Featured exhibitor, broad commercial blender catalog. Crossover to the beverage program lane. Lower-tech than Botrista, more flexibility, more labor.",
+        focusAreas: [
+          'Where Vitamix is the better answer than full automation.',
+          'Smoothie, mocktail, and frozen-drink program builds.',
+          'Operator cost-per-drink against the automated alternatives.'
+        ]
+      }, {
+        name: 'RATIONAL USA',
+        booth: '4831',
+        description: "Combi ovens. The equipment that opens formats an operator couldn't run before. Worth the stop for any account weighing whether to expand menu range without expanding kitchen square footage.",
+        focusAreas: [
+          'Menu categories operators are adding after a combi installation.',
+          'Labor and training math against existing kitchen setups.',
+          'Footprint and ROI for a mid-size independent.'
+        ]
+      }
+    ]
+  },
+  {
     name: 'Pizza program',
     summary: 'A more cohesive pizza package: dough, cheese, flour, boxes',
     categories: ['Sheeted Dough', 'Crusts', 'Cheeses', 'Sauces', 'Boxes'],
     trend: "Pizza is on a lot of menus and most of them are leaving money on the table. Sheeted dough is a known gap. Cheese and flour education is underdeveloped. Box and packaging strategy is an afterthought. What does the pizza program look like for the operator who treats it as a real category and not a side menu?",
-    who: [ { name: 'Dustin S', note: 'Sheeted dough options. Wants to see what national trends look like.' }, { name: 'Dan G',    note: 'Cohesive pizza package end-to-end. Education on flours, cheeses, boxes.' }
+    who: [ { name: 'Dustin S', note: 'Sheeted dough options. Wants to see what national trends look like.' }, { name: 'Dan G',    note: 'Cohesive pizza package end-to-end. Education on flours, cheeses, boxes.' }, { name: 'Tony R',   note: 'Bar-and-grill angle. Pizza as a menu lever for the accounts he runs.' }
     ],
     exhibitors: [ {
         name: 'ItalCrust',
@@ -9137,15 +9542,15 @@ function renderTrendLinesSection() {
             <div class="trend-pill-title">${escapeHtml(it.name)}</div>
             <div class="trend-pill-subtitle">${escapeHtml(it.summary || '')}</div>
           </div>
-          <div class="trend-pill-arrow">&rsaquo;</div>
+          <div class="trend-pill-arrow"></div>
         </div>
       </div>`;
   });
   const openClass = trendLinesExpanded ? ' open' : '';
-  const topLabel = trendLinesExpanded ? 'Collapse' : 'See our trend lines';
   return `
-    <div class="explore-section-head" data-section="trendlines">
+    <div class="explore-section-head trendlines-head${openClass}" data-section="trendlines" onclick="toggleTrendLines()">
       <span class="explore-section-title">PNW Trend Lines</span>
+      <span class="trendlines-head-toggle" aria-label="Toggle trend lines">+</span>
     </div>
     <div class="trend-pills">
       <div class="eb-partners-message" style="padding: 0 4px 12px; margin-bottom: 4px;">
@@ -9153,14 +9558,9 @@ function renderTrendLinesSection() {
         <br><br>
         Open each card for the full read: recommended booths, the reasoning behind them, and the questions worth asking so we come home with answers our people can use.
       </div>
-      <button type="button" class="trend-toggle${openClass}" onclick="toggleTrendLines()" aria-label="Toggle trend lines">
-        <span>${topLabel}</span>
-        <span class="trend-toggle-icon"></span>
-      </button>
       <div class="trend-stack${openClass}">
         ${body}
       </div>
-      <div class="trend-toggle-divider"></div>
     </div>`;
 }
 
