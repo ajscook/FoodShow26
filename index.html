@@ -581,42 +581,71 @@
   .identity-dropdown {
     display: none;
     position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: var(--surface-raised);
+    top: calc(100% + 12px);
+    left: 12px;
+    right: 12px;
+    background: #14171A;
     border: 1px solid var(--border-strong);
-    border-top: none;
+    border-radius: 16px;
     z-index: 500;
-    max-height: 380px;
+    max-height: 420px;
     overflow-y: auto;
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.55);
+    padding: 8px 6px;
   }
   .identity-dropdown.open { display: block; }
   .identity-dropdown-section {
-    padding: 8px 16px 4px;
-    font-size: 14px;
+    padding: 10px 14px 4px;
+    font-family: var(--font-mono);
+    font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0;
-    text-transform: none;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--text-hint);
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
+    background: transparent;
+    border: none;
   }
   .identity-dropdown-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 11px 16px;
-    border-bottom: 1px solid var(--border);
+    gap: 14px;
+    padding: 12px 14px;
+    border: none;
     cursor: pointer;
-    transition: background 0.1s;
+    transition: background 0.12s;
   }
-  .identity-dropdown-item:last-child { border-bottom: none; }
-  .identity-dropdown-item:active { background: var(--surface); }
-  .identity-dropdown-item.selected { background: var(--surface); border-left: 3px solid var(--blue); padding-left: 13px; }
-  .identity-dropdown-item-name { font-size: 17px; font-weight: 500; color: var(--text-primary); }
-  .identity-dropdown-item-tags { font-size: 14px; color: var(--text-hint); }
+  .identity-dropdown-item:last-child { border: none; }
+  .identity-dropdown-item:hover,
+  .identity-dropdown-item:active { background: rgba(255,255,255,0.04); }
+  .identity-dropdown-item.selected { background: rgba(91,163,245,0.10); border-left: 3px solid var(--blue); padding-left: 11px; }
+  .identity-dropdown-avatar {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #E87D3E;
+    color: #E87D3E;
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    background: transparent;
+    flex-shrink: 0;
+  }
+  .identity-dropdown-avatar-dept { border-color: var(--tertiary); color: var(--tertiary); }
+  .identity-dropdown-avatar-harbor { border-color: #FFFFFF; color: #FFFFFF; }
+  .identity-dropdown-item-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
+  }
+  .identity-dropdown-item-name { font-size: 16px; font-weight: 500; color: var(--text-primary); line-height: 1.25; }
+  .identity-dropdown-item-tags { font-size: 11px; color: var(--text-hint); font-family: var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; }
   .identity-dropdown-item-add { color: var(--blue); font-weight: 500; }
   .add-teammate-form {
     padding: 14px 16px;
@@ -1249,123 +1278,6 @@
     padding: 20px;
   }
 
-  /* Bottom-sheet picker used by both the recipient and trend dropdowns.
-     Slides up from the bottom over a soft backdrop; rounded top corners,
-     drag handle, sticky head with title + Done. */
-  .picker-sheet {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.55);
-    z-index: 8000;
-    align-items: flex-end;
-    justify-content: center;
-    animation: pickerSheetFade 0.18s ease-out;
-  }
-  .picker-sheet.open { display: flex; }
-  @keyframes pickerSheetFade {
-    from { background: rgba(0,0,0,0); }
-    to   { background: rgba(0,0,0,0.55); }
-  }
-  .picker-sheet-inner {
-    width: 100%;
-    max-width: 560px;
-    max-height: 80vh;
-    background: #14171A;
-    border-top-left-radius: 18px;
-    border-top-right-radius: 18px;
-    box-shadow: 0 -8px 32px rgba(0,0,0,0.5);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    animation: pickerSheetSlide 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-  @keyframes pickerSheetSlide {
-    from { transform: translateY(100%); }
-    to   { transform: translateY(0); }
-  }
-  .picker-sheet-handle {
-    width: 40px;
-    height: 4px;
-    border-radius: 2px;
-    background: rgba(255,255,255,0.20);
-    margin: 10px auto 4px;
-    flex-shrink: 0;
-  }
-  .picker-sheet-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 20px 8px;
-    flex-shrink: 0;
-  }
-  .picker-sheet-title {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-weight: 600;
-    font-size: 22px;
-    color: #D9D4CB;
-  }
-  .picker-sheet-done {
-    background: transparent;
-    border: none;
-    color: var(--tertiary);
-    font-family: var(--font);
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    padding: 6px 8px;
-  }
-  .picker-sheet-done:active { opacity: 0.6; }
-  .picker-sheet-filters {
-    display: flex;
-    gap: 8px;
-    padding: 8px 20px 12px;
-    flex-shrink: 0;
-    overflow-x: auto;
-  }
-  .picker-sheet-filter {
-    background: transparent;
-    border: 1px solid var(--border-strong);
-    color: var(--text-secondary);
-    padding: 6px 14px;
-    border-radius: 999px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.12s, border-color 0.12s;
-  }
-  .picker-sheet-filter.active {
-    background: rgba(91,163,245,0.12);
-    border-color: var(--tertiary);
-    color: var(--tertiary);
-  }
-  .picker-sheet-filters:empty { display: none; }
-  .picker-sheet-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 4px 8px 24px;
-    -webkit-overflow-scrolling: touch;
-  }
-  /* Reuse picker-item / picker-avatar styles inside the sheet but with
-     a touch more breathing room and full-width hover targets. */
-  .picker-sheet-body .picker-item {
-    padding: 14px 14px;
-    border-radius: 12px;
-    margin: 2px 4px;
-  }
-  .picker-sheet-body .picker-section {
-    padding: 14px 16px 6px;
-  }
-  /* Sheet row "selected" stays consistent with other picker selections. */
-  .picker-sheet-body .picker-item.selected {
-    background: rgba(91,163,245,0.12);
-  }
-  body.picker-sheet-open { overflow: hidden; }
   .photo-lightbox img {
     max-width: 100%;
     max-height: 100%;
@@ -1909,28 +1821,28 @@
   }
   .picker-section + .picker-item { margin-top: 2px; }
   .picker-item {
-    padding: 12px 16px;
-    font-size: 16px;
-    color: var(--text-primary);
-    cursor: pointer;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    transition: background 0.12s;
+    padding: 14px 16px !important;
+    font-size: 16px !important;
+    color: var(--text-primary) !important;
+    cursor: pointer !important;
+    border: none !important;
+    border-bottom: none !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    background: transparent !important;
+    transition: background 0.12s !important;
   }
   .picker-item:active, .picker-item:hover {
-    background: rgba(255,255,255,0.04);
+    background: rgba(255,255,255,0.04) !important;
   }
   .picker-item.selected {
-    background: rgba(91,163,245,0.10);
-    color: var(--text-primary);
+    background: rgba(91,163,245,0.10) !important;
+    color: var(--text-primary) !important;
+    border-left: 3px solid var(--tertiary) !important;
+    padding-left: 13px !important;
   }
-  .picker-item.selected::before {
-    content: '';
-    margin: 0;
-  }
+  .picker-item.selected::before { content: '' !important; margin: 0 !important; }
   .picker-item.selected::after {
     content: '\2713';
     color: var(--tertiary);
@@ -1939,54 +1851,47 @@
     margin-left: auto;
     padding-left: 8px;
   }
-  /* Person + group rows in the recipient picker get an avatar-style initials
-     disc on the left and a stacked name / sub text block. */
+  /* Avatar disc on every person/group row. */
   .picker-item-person,
-  .picker-item-group {
-    align-items: center;
-  }
+  .picker-item-group { align-items: center !important; }
   .picker-avatar {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--font-headline);
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: 0.02em;
-    color: #E87D3E;
-    border: 1.5px solid #E87D3E;
-    background: transparent;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-family: var(--font-headline) !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    letter-spacing: 0.02em !important;
+    color: #E87D3E !important;
+    border: 1.5px solid #E87D3E !important;
+    background: transparent !important;
   }
-  .picker-avatar-group {
-    color: var(--tertiary);
-    border-color: var(--tertiary);
-  }
-  .picker-avatar-trend {
-    color: var(--green-harbor);
-    border-color: var(--green-harbor);
-  }
+  .picker-avatar-group { color: var(--tertiary) !important; border-color: var(--tertiary) !important; }
+  .picker-avatar-trend { color: var(--green-harbor) !important; border-color: var(--green-harbor) !important; }
   .picker-item-text {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    flex: 1;
-    min-width: 0;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+    flex: 1 !important;
+    min-width: 0 !important;
   }
   .picker-item-name {
-    font-size: 16px;
-    color: var(--text-primary);
-    line-height: 1.25;
+    font-size: 16px !important;
+    color: var(--text-primary) !important;
+    line-height: 1.25 !important;
+    font-weight: 500 !important;
   }
   .picker-item-sub {
-    font-size: 12px;
-    color: var(--text-hint);
-    font-family: var(--font-mono);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-size: 11px !important;
+    color: var(--text-hint) !important;
+    font-family: var(--font-mono) !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
   }
 
   /* Identity context banner on Discover */
@@ -4139,29 +4044,59 @@
   .first-time-picker-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 11px 14px;
+    gap: 14px;
+    padding: 12px 14px;
     background: transparent;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+    border: none;
+    border-radius: 12px;
     cursor: pointer;
     color: var(--text-primary);
     font-family: var(--font-body);
     text-align: left;
+    width: 100%;
+    transition: background 0.12s;
   }
-  .first-time-picker-item:hover { border-color: var(--text-secondary); }
-  .first-time-picker-item:active { background: var(--surface-raised); }
-  .first-time-picker-item-name {
-    font-size: 15px;
-    font-weight: 600;
+  .first-time-picker-item:hover,
+  .first-time-picker-item:active {
+    background: rgba(255,255,255,0.04);
+    border: none;
+  }
+  .first-time-picker-avatar {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #E87D3E;
+    color: #E87D3E;
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    background: transparent;
+    flex-shrink: 0;
+  }
+  .first-time-picker-item-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
     flex: 1;
+    min-width: 0;
+  }
+  .first-time-picker-item-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.25;
   }
   .first-time-picker-item-tag {
     font-size: 11px;
     color: var(--text-hint);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
+    font-family: var(--font-mono);
   }
 
   /* "Not me? Switch" reset link below the identity bar. Visible only for
@@ -5593,21 +5528,6 @@
 
 </div>
 
-<!-- Bottom-sheet picker. Used by both the recipient picker ("Send to") and
-     the trend picker ("Tag-a-Trend"). The active picker is set on
-     window.__pickerKind before opening, and content is built dynamically. -->
-<div id="picker-sheet" class="picker-sheet" onclick="if(event.target===this)closePickerSheet()">
-  <div class="picker-sheet-inner" role="dialog" aria-modal="true">
-    <div class="picker-sheet-handle"></div>
-    <div class="picker-sheet-head">
-      <span class="picker-sheet-title" id="picker-sheet-title">Send to</span>
-      <button type="button" class="picker-sheet-done" onclick="closePickerSheet()">Done</button>
-    </div>
-    <div class="picker-sheet-filters" id="picker-sheet-filters"></div>
-    <div class="picker-sheet-body" id="picker-sheet-body"></div>
-  </div>
-</div>
-
 <!-- Photo lightbox -->
 <div id="photo-lightbox" class="photo-lightbox" onclick="closeLightbox()">
   <button type="button" class="photo-lightbox-close" onclick="closeLightbox()" aria-label="Close">&times;</button>
@@ -6741,9 +6661,16 @@ function makeIdentityItem(id, name, sub, kind) {
   const el = document.createElement('div');
   el.className = 'identity-dropdown-item';
   el.dataset.identityId = id;
+  const initialsStr = (typeof initials === 'function') ? initials(name) : (name ? name.charAt(0) : '?');
+  let avatarClass = 'identity-dropdown-avatar';
+  if (kind === 'department') avatarClass += ' identity-dropdown-avatar-dept';
+  else if (kind === 'harbor') avatarClass += ' identity-dropdown-avatar-harbor';
   el.innerHTML = `
-    <span class="identity-dropdown-item-name">${name}</span>
-    ${sub ? `<span class="identity-dropdown-item-tags">${sub}</span>` : ''}
+    <span class="${avatarClass}">${escapeHtml(initialsStr)}</span>
+    <span class="identity-dropdown-item-text">
+      <span class="identity-dropdown-item-name">${name}</span>
+      ${sub ? `<span class="identity-dropdown-item-tags">${sub}</span>` : ''}
+    </span>
   `;
   el.onclick = (e) => {
     e.stopPropagation();
@@ -6845,9 +6772,13 @@ function showFirstTimePicker() {
     const item = document.createElement('button');
     item.type = 'button';
     item.className = 'first-time-picker-item';
+    const initialsStr = (typeof initials === 'function') ? initials(p.name) : (p.first ? p.first.charAt(0) : '?');
     item.innerHTML = `
-      <span class="first-time-picker-item-name">${escapeHtml(p.name)}</span>
-      <span class="first-time-picker-item-tag">${escapeHtml(formatTagsForDisplay(p.tags))}</span>
+      <span class="first-time-picker-avatar">${escapeHtml(initialsStr)}</span>
+      <span class="first-time-picker-item-text">
+        <span class="first-time-picker-item-name">${escapeHtml(p.name)}</span>
+        <span class="first-time-picker-item-tag">${escapeHtml(formatTagsForDisplay(p.tags))}</span>
+      </span>
     `;
     item.onclick = () => {
       modal.classList.remove('open');
@@ -7190,8 +7121,22 @@ function updateRecipientLabel() {
 }
 
 function toggleRecipientPicker() {
-  openPickerSheet('recipient');
+  const trigger = document.getElementById('recipient-trigger');
+  const list = document.getElementById('recipient-list');
+  if (!trigger || !list) return;
+  const open = list.classList.toggle('open');
+  trigger.classList.toggle('open', open);
 }
+
+// Tap outside closes the recipient picker.
+document.addEventListener('click', (e) => {
+  const trigger = document.getElementById('recipient-trigger');
+  const list = document.getElementById('recipient-list');
+  if (trigger && list && !trigger.contains(e.target) && !list.contains(e.target)) {
+    trigger.classList.remove('open');
+    list.classList.remove('open');
+  }
+});
 
 // ── DISCOVER: TREND TAG PICKER ──────────────────────────────────────────────
 // Lets the viewer optionally tag their discovery with one of the existing
@@ -7252,210 +7197,27 @@ function selectTrend(idx) {
 window.selectTrend = selectTrend;
 
 function toggleTrendPicker() {
-  openPickerSheet('trend');
+  const trigger = document.getElementById('trend-trigger');
+  const list = document.getElementById('trend-list');
+  if (!trigger || !list) return;
+  if (!list.dataset.built) {
+    buildTrendPicker();
+    list.dataset.built = '1';
+  }
+  const open = list.classList.toggle('open');
+  trigger.classList.toggle('open', open);
 }
 window.toggleTrendPicker = toggleTrendPicker;
 
-// ── BOTTOM-SHEET PICKER (shared by recipient + trend pickers) ───────────────
-// Replaces the inline dropdown picker with a slide-up sheet. The active
-// picker is identified by window.__pickerKind ('recipient' or 'trend').
-// Content is built fresh each open. Filter pills (recipient only) let the
-// viewer narrow the list to People or Groups.
-window.__pickerKind = null;
-window.__pickerFilter = 'all';
-
-function openPickerSheet(kind) {
-  window.__pickerKind = kind;
-  window.__pickerFilter = 'all';
-  const sheet = document.getElementById('picker-sheet');
-  const title = document.getElementById('picker-sheet-title');
-  if (!sheet || !title) return;
-  if (kind === 'recipient') {
-    title.textContent = 'Send to';
-  } else if (kind === 'trend') {
-    title.textContent = 'Tag-a-Trend';
+// Tap outside closes the trend picker.
+document.addEventListener('click', (e) => {
+  const trigger = document.getElementById('trend-trigger');
+  const list = document.getElementById('trend-list');
+  if (trigger && list && !trigger.contains(e.target) && !list.contains(e.target)) {
+    trigger.classList.remove('open');
+    list.classList.remove('open');
   }
-  renderPickerSheet();
-  sheet.classList.add('open');
-  document.body.classList.add('picker-sheet-open');
-}
-window.openPickerSheet = openPickerSheet;
-
-function closePickerSheet() {
-  const sheet = document.getElementById('picker-sheet');
-  if (sheet) sheet.classList.remove('open');
-  document.body.classList.remove('picker-sheet-open');
-  window.__pickerKind = null;
-}
-window.closePickerSheet = closePickerSheet;
-
-function renderPickerSheet() {
-  const body = document.getElementById('picker-sheet-body');
-  const filters = document.getElementById('picker-sheet-filters');
-  if (!body || !filters) return;
-  body.innerHTML = '';
-  filters.innerHTML = '';
-
-  if (window.__pickerKind === 'recipient') {
-    renderRecipientSheetContent(body, filters);
-  } else if (window.__pickerKind === 'trend') {
-    renderTrendSheetContent(body, filters);
-  }
-}
-
-function setPickerFilter(filter) {
-  window.__pickerFilter = filter;
-  renderPickerSheet();
-}
-window.setPickerFilter = setPickerFilter;
-
-function renderRecipientSheetContent(body, filters) {
-  // Filter pills.
-  const pills = [
-    { id: 'all', label: 'All' },
-    { id: 'people', label: 'People' },
-    { id: 'groups', label: 'Groups' }
-  ];
-  pills.forEach(p => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'picker-sheet-filter' + (window.__pickerFilter === p.id ? ' active' : '');
-    btn.textContent = p.label;
-    btn.onclick = () => setPickerFilter(p.id);
-    filters.appendChild(btn);
-  });
-
-  const filter = window.__pickerFilter;
-  const showPeople = filter === 'all' || filter === 'people';
-  const showGroups = filter === 'all' || filter === 'groups';
-
-  // "Me" row (always visible, regardless of filter).
-  if (filter === 'all') {
-    const meItem = document.createElement('div');
-    meItem.className = 'picker-item picker-item-me';
-    if (selectedRecipientSelf) meItem.classList.add('selected');
-    meItem.innerHTML = `
-      <span class="picker-avatar">ME</span>
-      <span class="picker-item-text">
-        <span class="picker-item-name">Note to self</span>
-        <span class="picker-item-sub">Only you</span>
-      </span>`;
-    meItem.onclick = () => {
-      selectedRecipientSelf = !selectedRecipientSelf;
-      meItem.classList.toggle('selected', selectedRecipientSelf);
-      updateRecipientLabel();
-    };
-    body.appendChild(meItem);
-  }
-
-  if (showPeople) {
-    const head = document.createElement('div');
-    head.className = 'picker-section';
-    head.textContent = 'People';
-    body.appendChild(head);
-
-    const sortedPeople = [...PEOPLE].sort((a,b) => a.first.localeCompare(b.first));
-    sortedPeople.forEach(p => {
-      const item = document.createElement('div');
-      item.className = 'picker-item picker-item-person';
-      if (selectedRecipientPeople.includes(p.id)) item.classList.add('selected');
-      const initialsStr = (typeof initials === 'function') ? initials(p.name) : (p.first ? p.first.charAt(0) : '?');
-      item.innerHTML = `
-        <span class="picker-avatar">${escapeHtml(initialsStr)}</span>
-        <span class="picker-item-text">
-          <span class="picker-item-name">${escapeHtml(p.name)}</span>
-          <span class="picker-item-sub">${escapeHtml(formatTagsForDisplay(p.tags))}</span>
-        </span>`;
-      item.onclick = () => {
-        const idx = selectedRecipientPeople.indexOf(p.id);
-        if (idx >= 0) {
-          selectedRecipientPeople.splice(idx, 1);
-          item.classList.remove('selected');
-        } else {
-          selectedRecipientPeople.push(p.id);
-          item.classList.add('selected');
-        }
-        updateRecipientLabel();
-      };
-      body.appendChild(item);
-    });
-  }
-
-  if (showGroups) {
-    const head = document.createElement('div');
-    head.className = 'picker-section';
-    head.textContent = 'Groups';
-    body.appendChild(head);
-
-    ROLE_TAGS.forEach(tag => {
-      const item = document.createElement('div');
-      item.className = 'picker-item picker-item-group';
-      if (selectedRecipientGroups.includes(tag)) item.classList.add('selected');
-      const groupLabel = tag === 'Cat Management' ? 'Cat Man' : tag;
-      item.innerHTML = `
-        <span class="picker-avatar picker-avatar-group">${escapeHtml(groupLabel.charAt(0))}</span>
-        <span class="picker-item-text">
-          <span class="picker-item-name">${escapeHtml(groupLabel)}</span>
-          <span class="picker-item-sub">Group</span>
-        </span>`;
-      item.onclick = () => {
-        const idx = selectedRecipientGroups.indexOf(tag);
-        if (idx >= 0) {
-          selectedRecipientGroups.splice(idx, 1);
-          item.classList.remove('selected');
-        } else {
-          selectedRecipientGroups.push(tag);
-          item.classList.add('selected');
-        }
-        updateRecipientLabel();
-      };
-      body.appendChild(item);
-    });
-  }
-}
-
-function renderTrendSheetContent(body, filters) {
-  // No filter pills on the trend picker — only one source.
-  // "No trend tagged" clear row.
-  const clearItem = document.createElement('div');
-  clearItem.className = 'picker-item';
-  if (pendingBoloId === null || pendingBoloId === undefined) clearItem.classList.add('selected');
-  clearItem.innerHTML = `
-    <span class="picker-avatar picker-avatar-group">&minus;</span>
-    <span class="picker-item-text">
-      <span class="picker-item-name">No trend tagged</span>
-      <span class="picker-item-sub">Skip</span>
-    </span>`;
-  clearItem.onclick = () => {
-    selectTrend(null);
-    closePickerSheet();
-  };
-  body.appendChild(clearItem);
-
-  const head = document.createElement('div');
-  head.className = 'picker-section';
-  head.textContent = 'PNW Trend Lines';
-  body.appendChild(head);
-
-  if (Array.isArray(BOLO_ITEMS)) {
-    BOLO_ITEMS.forEach((trend, idx) => {
-      const item = document.createElement('div');
-      item.className = 'picker-item';
-      if (pendingBoloId === idx) item.classList.add('selected');
-      item.innerHTML = `
-        <span class="picker-avatar picker-avatar-trend">${escapeHtml(String(idx + 1))}</span>
-        <span class="picker-item-text">
-          <span class="picker-item-name">${escapeHtml(trend.name || '')}</span>
-          <span class="picker-item-sub">${escapeHtml(trend.summary || '')}</span>
-        </span>`;
-      item.onclick = () => {
-        selectTrend(idx);
-        closePickerSheet();
-      };
-      body.appendChild(item);
-    });
-  }
-}
+});
 
 // ── DISCOVER: IDENTITY CONTEXT BANNER ───────────────────────────────────────
 
